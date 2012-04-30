@@ -47,7 +47,7 @@ class TranscodeStatusTable {
 	public static function getTranscodeRows( $file ){
 		global $wgUser;
 		$o='';
-		$transcodeRows = WebVideoTranscode::getTranscodeState( $file->getTitle()->getDbKey() );
+		$transcodeRows = WebVideoTranscode::getTranscodeState( $file );
 		
 		foreach( $transcodeRows as $transcodeKey => $state ){
 			$o.='<tr>';
