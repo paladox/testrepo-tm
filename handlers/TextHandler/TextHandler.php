@@ -18,14 +18,14 @@ class TextHandler {
 	 * Get the timed text tracks elements as an associative array
 	 */
 	function getTracks(){
-		if( !$this->file->isLocal() ){
-			return $this->getRemoteTextSources();
-		}else {
+		if( $this->file->isLocal() || $this->file->repo instanceof ForeignDBViaLBRepo ){
 			return $this->getLocalTextSources();
+		}else {
+			return $this->getRemoteTextSources();
 		}
 	}
 	function getTimedTextNamespace(){
-		if( $this->file->isLocal() ){
+		if( $this->file->isLocal() || $this->file->repo instanceof ForeignDBViaLBRepo ){
 			return NS_TIMEDTEXT;
 		} else {
 			if( $this->remoteNs !== null ){
@@ -113,6 +113,8 @@ class TextHandler {
 		$providerName = $this->file->repo->getName();
 		// For a while commons repo in the mediaWiki manual was called "shared"
 		// ( we need commons to be named "commons" so that the javascript api provider names match up )
+		//disabled for now, this breaks embedding commons on wikipedia
+		/*
 		if( $providerName == 'shared' || $providerName == 'wikimediacommons' ){
 			// We could alternatively check $this->file->repo->mApiBase
 			foreach( $wgForeignFileRepos as $repo ){
@@ -124,6 +126,7 @@ class TextHandler {
 				}
 			}
 		}
+		*/
 		// Provider name should be the same as the interwiki map
 		// @@todo more testing with this:
 		$interWikiPrefix = ( $providerName == 'local' )? '' : $providerName . ':';
