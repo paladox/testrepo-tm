@@ -250,11 +250,6 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			'controls'=> 'true',
 		);
 
-		// Set player skin:
-		if( $wgVideoPlayerSkin ){
-			$mediaAttr['class'] = htmlspecialchars ( $wgVideoPlayerSkin );
-		}
-
 		// Custom data-attributes
 		$mediaAttr += array(
 			'data-durationhint' => $length,
