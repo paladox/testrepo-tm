@@ -459,10 +459,10 @@ class WebVideoTranscode {
 
 		// Remove files by key:
 		foreach( $removeKeys as $tKey){
-			$filePath = self::getDerivativeFilePath($file,  $tKey);
-			if( is_file( $filePath ) ){
+			$filePath = self::getDerivativeFilePath( $file, $tKey );
+			if( $file->repo->fileExists( $filePath ) ){
 				wfSuppressWarnings();
-				$res = unlink( $filePath );
+				$res = $file->repo->delete( $filePath, '/');
 				wfRestoreWarnings();
 				if( !$res ){
 					wfDebug( "Could not delete file $filePath\n" );
@@ -473,7 +473,7 @@ class WebVideoTranscode {
 		// Build the sql query:
 		$dbw = $file->repo->getMasterDB();
 		$dbw = wfGetDB( DB_MASTER );
-		$deleteWhere = array( 'transcode_image_name' => $titleObj->getDBkey() );
+		$deleteWhere = array( 'transcode_image_name' => $file->getTitle()->getDBkey() );
 		// Check if we are removing a specific transcode key
 		if( $transcodeKey !== false ){
 			$deleteWhere['transcode_key'] = $transcodeKey;
