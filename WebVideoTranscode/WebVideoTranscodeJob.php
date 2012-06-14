@@ -174,8 +174,12 @@ class WebVideoTranscodeJob extends Job {
 			$finalDerivativeFilePath = WebVideoTranscode::getDerivativeFilePath( $file, $transcodeKey);
 			//wfSuppressWarnings();
 			// @TODO: use a FileRepo store function
-			$op = array( 'op' => 'store',
-				'src' => $this->getTargetEncodePath(), 'dst' => $finalDerivativeFilePath, 'overwrite' => true );
+			$op = array( 
+				'op' => 'store',
+				'src' => $this->getTargetEncodePath(),
+				'dst' => $finalDerivativeFilePath,
+				'overwrite' => true
+			);
 			// Copy derivaitve from the FS into storage at $finalDerivativeFilePath
 			$opts = array( 'ignoreErrors' => true, 'nonLocking' => true ); // performance
 			$file = $this->getFile();

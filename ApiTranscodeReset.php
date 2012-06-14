@@ -48,18 +48,17 @@ class ApiTranscodeReset extends ApiBase {
 
 		// Don't reset if less than 1 hour has passed and we have no error )
 		$file = wfFindFile( $titleObj );
-		$timeSinceLastReset = self::checkTimeSinceLastRest( $file, $transcodeKey );
+		$timeSinceLastReset = $this->checkTimeSinceLastRest( $file, $transcodeKey );
 		if( $timeSinceLastReset < $wgWaitTimeForTranscodeReset){
 			$this->dieUsage( 'Not enough time has passed since the last reset of this transcode. ' .
 				TimedMediaHandler::getTimePassedMsg( $wgWaitTimeForTranscodeReset - $timeSinceLastReset  ) .
 				' until this transcode can be reset', 'notenoughtimereset');
 		}
-<<<<<<< HEAD
 
 		// All good do the transcode removal:
-		WebVideoTranscode::removeTranscodes( $titleObj, $transcodeKey );
-
-		$this->getResult()->addValue(null, 'success', 'removed transcode');
+		WebVideoTranscode::removeTranscodes( $file, $transcodeKey );
+		
+		$this->getResult()->addValue( null, 'success', 'removed transcode');
 	}
 
 	/**
@@ -68,14 +67,14 @@ class ApiTranscodeReset extends ApiBase {
 	 * @return int|string
 	 */
 	static public function checkTimeSinceLastRest( $file, $transcodeKey ){
+		global $wgWaitTimeForTranscodeReset;
+		
 		// All good do the transcode removal:
 		WebVideoTranscode::removeTranscodes( $file, $transcodeKey );
-		$this->getResult()->addValue(null, 'success', 'removed transcode');
 
-		global $wgWaitTimeForTranscodeReset;
 		$transcodeStates = WebVideoTranscode::getTranscodeState( $file );
 		if( $transcodeKey ){
-			if( ! $transcodeStates[$transcodeKey] ){
+			if( ! isset( $transcodeStates[$transcodeKey] ) ){
 				// transcode key not found
 				return $wgWaitTimeForTranscodeReset + 1;
 			}
