@@ -100,6 +100,7 @@ Are you sure you want to proceed?',
 	'timedmedia-subtitle-language' => '$1 ($2) subtitles',
 	'timedmedia-subtitle-no-video' => 'There is no video associated with the current subtitle page',
 	'timedmedia-subtitle-no-subtitles' => 'There are currently no subtitles in $1 for this video, you can [{{fullurl:{{FULLPAGENAME}}|action=edit}} edit this page] to add them',
+	'timedmediahandler'             => 'TimedMediaHandler',
 );
 
 /** Message documentation (Message documentation)
