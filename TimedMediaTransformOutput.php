@@ -288,7 +288,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			// instead of the provider type "shared" )
 			$apiProviderName = $this->file->getRepoName();
 			if( $apiProviderName == 'shared' || $apiProviderName == 'wikimediacommons' ) {
-				$apiProviderName = 'commons';
+				$apiProviderName = 'wikimediacommons';
 			}
 		}
 		// XXX Note: will probably migrate mwprovider to an escaped api url.
