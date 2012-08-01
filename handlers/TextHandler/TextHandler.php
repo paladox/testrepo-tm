@@ -54,7 +54,20 @@ class TextHandler {
 	 * @return bool|int|null
 	 */
 	function getTimedTextNamespace(){
-		if( $this->file->isLocal() || $this->file->repo instanceof ForeignDBViaLBRepo ){
+		if( $this->file->isLocal() ) {
+			return NS_TIMEDTEXT;
+		} else if( $this->file->repo instanceof ForeignDBViaLBRepo ){
+			global $wgConf;
+			$wikiID = $this->file->getRepo()->getSlaveDB()->getWikiID();
+			$extraNS = $wgConf->get( 'wgExtraNamespaces', $wikiID );
+			if( is_array( $extraNS ) ) {
+				foreach( $extraNS as $ns => $nsName ){
+					if( $nsName == 'TimedText' ){
+						return $ns;
+					}
+				}
+			}
+			// failed to get namespace via ForeignDBViaLBRepo, return NS_TIMEDTEXT
 			return NS_TIMEDTEXT;
 		} else {
 			if( $this->remoteNs !== null ){
