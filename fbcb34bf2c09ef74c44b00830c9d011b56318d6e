@@ -1,0 +1,8 @@
+Code-Review+2: J <j@thing.net>
+Verified+1: J <j@thing.net>
+Code-Review+1: Mdale <mdale@wikimedia.org>
+Submitted-by: J <j@thing.net>
+Submitted-at: Wed, 01 Aug 2012 00:17:57 +0000
+Reviewed-on: https://gerrit.wikimedia.org/r/17152
+Project: mediawiki/extensions/TimedMediaHandler
+Branch: refs/heads/master
