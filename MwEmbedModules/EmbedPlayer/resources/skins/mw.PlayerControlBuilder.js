@@ -383,7 +383,7 @@ mw.PlayerControlBuilder.prototype = {
 		$interface.addClass( 'fullscreen' );
 
 		// if overlaying controls add hide show player binding.
-		if( _this.isOverlayControls() ){
+		if( _this.isOverlayControls() && !embedPlayer.isTouchDevice() ){
 			_this.addFullscreenMouseMoveHideShowControls();
 		}
 
@@ -997,7 +997,6 @@ mw.PlayerControlBuilder.prototype = {
 				}
 			});
 		} else { // hide show controls:
-
 			// Bind a startTouch to show controls
 			$( embedPlayer).bind( 'touchstart' + this.bindPostfix, function() {
 				if ( embedPlayer.getInterface().find( '.control-bar' ).is( ':visible' ) ) {
@@ -1008,11 +1007,11 @@ mw.PlayerControlBuilder.prototype = {
 					}
 				} else {
 					_this.showControlBar();
-                }
+				}
 				clearTimeout( _this.hideControlBarCallback );
 				_this.hideControlBarCallback = setTimeout( function() {
-					_this.hideControlBar()
-				}, 5000 );
+					_this.hideControlBar();
+				}, 60000 );
 				// ( Once the user touched the video "don't hide" )
 				return true;
 			} );
@@ -1124,8 +1123,13 @@ mw.PlayerControlBuilder.prototype = {
 		// Check for click
 		$( embedPlayer ).bind( "click" + _this.bindPostfix, function() {
 			mw.log( "PlayerControlBuilder:: click:" + embedPlayer.id + ' isPause:' + embedPlayer.paused);
-			// Don't do anything if native controls displayed:
-			if( embedPlayer.useNativePlayerControls() || _this.isControlsDisabled() || mw.isIpad() ) {
+			// Don't do anything if touch interface or native controls are shown
+			if( embedPlayer.useNativePlayerControls() 
+					|| 
+				_this.isControlsDisabled() 
+					|| 
+				embedPlayer.isTouchDevice()
+			) {
 				return true;
 			}
 			var clickTime = new Date().getTime();

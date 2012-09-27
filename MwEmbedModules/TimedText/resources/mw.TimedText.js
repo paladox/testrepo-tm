@@ -107,6 +107,11 @@
 			var _this = this;
 			mw.log("TimedText: init() ");
 			this.embedPlayer = embedPlayer;
+			// don't display captions on native player: 
+			if( embedPlayer.useNativePlayerControls() ){
+				return this;
+			}
+			
 			// Load user preferences config:
 			var preferenceConfig = $.cookie( 'TimedText.Preferences' );
 			if( preferenceConfig !== "false" && preferenceConfig != null ) {
