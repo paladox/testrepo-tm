@@ -136,7 +136,7 @@ class WebVideoTranscodeJob extends Job {
 		// Check the codec see which encode method to call;
 		if( $options['videoCodec'] == 'theora' ){
 			$status = $this->ffmpeg2TheoraEncode( $options );
-		} elseif( $options['videoCodec'] == 'vp8' ){
+		} else if( $options['videoCodec'] == 'vp8' || $options['videoCodec'] == 'libx264' ){
 			// Check for twopass:
 			if( isset( $options['twopass'] ) ){
 				// ffmpeg requires manual two pass
@@ -148,7 +148,7 @@ class WebVideoTranscodeJob extends Job {
 				$status = $this->ffmpegEncode( $options );
 			}
 		} else {
-			wfDebug( 'Error unknown codec:' . $options['codec'] );
+			wfDebug( 'Error unknown codec:' . $options['videoCodec'] );
 			$status =  'Error unknown target encode codec:' . $options['codec'];
 		}
 
@@ -291,21 +291,21 @@ class WebVideoTranscodeJob extends Job {
 		// Set up the base command
 		$cmd = wfEscapeShellArg( $wgFFmpegLocation ) . ' -y -i ' . wfEscapeShellArg( $this->getSourceFilePath() );
 
-		if( isset($options['preset']) ){
-			if ($options['preset'] == "360p") {
-				$cmd.= " -vpre libvpx-360p";
-			} elseif ( $options['preset'] == "720p" ) {
-				$cmd.= " -vpre libvpx-720p";
-			} elseif ( $options['preset'] == "1080p" ) {
-				$cmd.= " -vpre libvpx-1080p";
-			}
+		
+		if( isset( $options['vpre'] ) ){
+			$cmd.= ' -vpre ' . wfEscapeShellArg( $options['vpre'] );
 		}
+		
 		if ( isset( $options['novideo'] )  ) {
 			$cmd.= " -vn ";
-		} else {
-			$cmd.= $this->ffmpegAddVideoOptions( $options, $pass );
+		} else if( $options['videoCodec'] == 'vp8' ){
+			$cmd.= $this->ffmpegAddWebmVideoOptions( $options, $pass );
+		} else if( $options['videoCodec'] == 'libx264'){
+			$cmd.= $this->ffmpegAddH264VideoOptions( $options, $pass );
 		}
-
+		// Add size options: 
+		$cmd .= $this->ffmpegAddVideoSizeOptions( $options ) ;
+		
 		// Check for start time
 		if( isset( $options['starttime'] ) ){
 			$cmd.= ' -ss ' . wfEscapeShellArg( $options['starttime'] );
@@ -322,9 +322,6 @@ class WebVideoTranscodeJob extends Job {
 		} else {
 			$cmd.= $this->ffmpegAddAudioOptions( $options, $pass );
 		}
-
-		// Output WebM
-		$cmd.=" -f webm";
 
 		if ( $pass != 0 ) {
 			$cmd.=" -pass " .wfEscapeShellArg( $pass ) ;
@@ -350,37 +347,37 @@ class WebVideoTranscodeJob extends Job {
 		}
 		return true;
 	}
-
+	
 	/**
+	 * Adds ffmpeg shell options for h264
+	 * 
 	 * @param $options
 	 * @param $pass
 	 * @return string
 	 */
-	function ffmpegAddVideoOptions( $options, $pass ){
-
+	function ffmpegAddH264VideoOptions( $options, $pass ){
+		// Set the codec:
+		$cmd= " -vcodec libx264";
+		// check for presets:
+		if( isset( $options['preset'] ) ){
+			// add the two vpre types:
+			if( $options['preset'] ){
+				$cmd.= " -vpre " . wfEscapeShellArg( $options['preset'] );
+			}
+		}
+		if( isset( $options['videoBitrate'] ) ){ 
+			$cmd.= " -b " . wfEscapeShellArg (  $options['videoBitrate'] );
+		}
+		// Output mp4
+		$cmd.=" -f mp4";
+		return $cmd;
+	}
+	
+	function ffmpegAddVideoSizeOptions( $options ){
+		$cmd = '';
 		// Get a local pointer to the file object
 		$file = $this->getFile();
-
-		$cmd ='';
-		// Add the boiler plate vp8 ffmpeg command:
-		$cmd.=" -y -skip_threshold 0 -bufsize 6000k -rc_init_occupancy 4000 -threads 4";
-
-		// Check for video quality:
-		if ( isset( $options['videoQuality'] ) && $options['videoQuality'] >= 0 ) {
-			// Map 0-10 to 63-0, higher values worse quality
-			$quality = 63 - intval( intval( $options['videoQuality'] )/10 * 63 );
-			$cmd .= " -qmin " . wfEscapeShellArg( $quality );
-			$cmd .= " -qmax " . wfEscapeShellArg( $quality );
-		}
-
-		// Check for video bitrate:
-		if ( isset( $options['videoBitrate'] ) ) {
-			$cmd.= " -qmin 1 -qmax 51";
-			$cmd.= " -vb " . wfEscapeShellArg( $options['videoBitrate'] * 1000 );
-		}
-		// Set the codec:
-		$cmd.= " -vcodec libvpx";
-
+		
 		// Check for aspect ratio ( we don't do anything with this right now)
 		if ( isset( $options['aspect'] ) ) {
 			$aspectRatio = $options['aspect'];
@@ -412,6 +409,51 @@ class WebVideoTranscodeJob extends Job {
 				$cmd.= " $cmdArg " .  wfEscapeShellArg( $options[$name] );
 			}
 		}
+		return $cmd;
+	}
+	/**
+	 * Adds ffmpeg shell options for webm
+	 * 
+	 * @param $options
+	 * @param $pass
+	 * @return string
+	 */
+	function ffmpegAddWebmVideoOptions( $options, $pass ){
+
+		// Get a local pointer to the file object
+		$file = $this->getFile();
+
+		$cmd ='';
+		
+		// check for presets:
+		if( isset($options['preset']) ){
+			if ($options['preset'] == "360p") {
+				$cmd.= " -vpre libvpx-360p";
+			} elseif ( $options['preset'] == "720p" ) {
+				$cmd.= " -vpre libvpx-720p";
+			} elseif ( $options['preset'] == "1080p" ) {
+				$cmd.= " -vpre libvpx-1080p";
+			}
+		}
+		
+		// Add the boiler plate vp8 ffmpeg command:
+		$cmd.=" -y -skip_threshold 0 -bufsize 6000k -rc_init_occupancy 4000 -threads 4";
+
+		// Check for video quality:
+		if ( isset( $options['videoQuality'] ) && $options['videoQuality'] >= 0 ) {
+			// Map 0-10 to 63-0, higher values worse quality
+			$quality = 63 - intval( intval( $options['videoQuality'] )/10 * 63 );
+			$cmd .= " -qmin " . wfEscapeShellArg( $quality );
+			$cmd .= " -qmax " . wfEscapeShellArg( $quality );
+		}
+
+		// Check for video bitrate:
+		if ( isset( $options['videoBitrate'] ) ) {
+			$cmd.= " -qmin 1 -qmax 51";
+			$cmd.= " -vb " . wfEscapeShellArg( $options['videoBitrate'] * 1000 );
+		}
+		// Set the codec:
+		$cmd.= " -vcodec libvpx";
 
 		// Check for keyframeInterval
 		if( isset( $options['keyframeInterval'] ) ){
@@ -422,6 +464,9 @@ class WebVideoTranscodeJob extends Job {
 			$cmd.= ' -deinterlace';
 		}
 
+		// Output WebM
+		$cmd.=" -f webm";
+		
 		return $cmd;
 	}
 
@@ -441,11 +486,16 @@ class WebVideoTranscodeJob extends Job {
 		if( isset( $options['samplerate'] ) ){
 			$cmd.= " -ar " .  wfEscapeShellArg( $options['samplerate'] );
 		}
-		if( isset( $options['channels'] )){
+		if( isset( $options['channels'] ) ){
 			$cmd.= " -ac " . wfEscapeShellArg( $options['channels'] );
 		}
-		// Always use vorbis for audio:
-		$cmd.= " -acodec libvorbis ";
+	
+		if( isset( $options['audioCodec'] ) ){
+			$cmd.= " -acodec " . wfEscapeShellArg( $options['channels'] );
+		} else {
+			// if no audio codec set use vorbis :
+			$cmd.= " -acodec libvorbis ";
+		}
 		return $cmd;
 	}
 
