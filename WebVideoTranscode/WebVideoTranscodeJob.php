@@ -180,8 +180,12 @@ class WebVideoTranscodeJob extends Job {
 			// that the job has already been started.
 		}
 
-		// If status is oky and file exists and is larger than 0 bytes
-		if( $status === true && is_file( $this->getTargetEncodePath() ) && filesize( $this->getTargetEncodePath() ) > 0 ){
+		// If status is oky and target does not exist, reset status
+		if( $status === true && !is_file( $this->getTargetEncodePath() ) ) {
+			$status = 'Target does not exist: ' . $this->getTargetEncodePath();
+		}
+		// If status is ok and target is larger than 0 bytes
+		if( $status === true && filesize( $this->getTargetEncodePath() ) > 0 ){
 			$file = $this->getFile();
 			// Copy derivative from the FS into storage at $finalDerivativeFilePath
 			$status = $file->getRepo()->quickImport(
