@@ -180,7 +180,8 @@ class WebVideoTranscode {
 		if ( !$tmpFile ) {
 			return False;
 		}
-		$tmpFile->bind( $file );
+		// make sure its not deleted before transcode is imported.
+		$tmpFile->preserve();
 		return $tmpFile->getPath(); //path with 0-byte temp file
 	}
 
