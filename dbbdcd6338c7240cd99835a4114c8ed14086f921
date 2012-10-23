@@ -1,0 +1,8 @@
+Code-Review+2: J <j@thing.net>
+Verified+1: J <j@thing.net>
+Code-Review+1: Siebrand <siebrand@wikimedia.org>
+Submitted-by: J <j@thing.net>
+Submitted-at: Tue, 23 Oct 2012 07:53:03 +0000
+Reviewed-on: https://gerrit.wikimedia.org/r/25473
+Project: mediawiki/extensions/TimedMediaHandler
+Branch: refs/heads/master
