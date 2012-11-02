@@ -11,6 +11,13 @@ class TimedMediaThumbnail {
 		}
 
 		wfDebug( "Creating video thumbnail at" .  $options['dstPath']  . "\n" );
+		if(
+			isset( $options['width'] ) && isset( $options['height'] ) &&
+			$options['width'] != $options['file']->getWidth() &&
+			$options['height'] != $options['file']->getHeight()
+		){
+			return self::resizeThumb( $options );
+		}
 		// try OggThumb, and fallback to ffmpeg
 		$result = self::tryOggThumb( $options );
 		if ( $result === false ) {
@@ -41,7 +48,7 @@ class TimedMediaThumbnail {
 		}
 
 		$time = self::getThumbTime( $options );
-		$dstPath =  $options['dstPath'];
+		$dstPath = $options['dstPath'];
 		$videoPath = $options['file']->getLocalRefPath();
 
 		$cmd = wfEscapeShellArg( $wgOggThumbLocation )
@@ -128,6 +135,35 @@ class TimedMediaThumbnail {
 		}
 		// Return error box
 		return new MediaTransformError( 'thumbnail_error', $options['width'], $options['height'], implode( "\n", $lines ) );
+	}
+
+	static function resizeThumb( $options ) {
+		$file = $options['file'];
+		$params = array();
+		foreach(array('start', 'thumbtime') as $key) {
+			if(  isset( $options[ $key ] ) ) {
+				$params[ $key ] = $options[ $key ];
+			}
+		}
+		$params["width"] = $file->getWidth();
+		$params["height"] = $file->getHeight();
+
+		$thumb = $file->transform( $params, File::RENDER_NOW );
+		if ( !$thumb || !$thumb->file ) {
+			return $thumb;
+		}
+		if( $thumb->file->getRepo()->getBackend()->isStoragePath( $thumb->path) ) {
+			$src = $thumb->file->getRepo()->getLocalReference( $thumb->path )->getPath();
+		} else {
+			$src = $thumb->path;
+		}
+		$img = imagecreatefromjpeg( $src );
+		list($width, $height) = getimagesize( $src );
+		$scaled_img = imagecreatetruecolor($options['width'], $options['height']);
+		imagecopyresampled($scaled_img, $img, 0, 0, 0, 0,
+			$options['width'], $options['height'], $width, $height);
+		imagejpeg($scaled_img, $options['dstPath'], 75);
+		return true;
 	}
 
 	/**
