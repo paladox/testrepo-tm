@@ -475,9 +475,10 @@ class WebVideoTranscode {
 		$fileName = $file->getTitle()->getDbKey();
 		if( ! isset( self::$transcodeState[$fileName] ) ){
 			wfProfileIn( __METHOD__ );
+			$db = $file->repo->getSlaveDB();
 			// initialize the transcode state array
 			self::$transcodeState[ $fileName ] = array();
-			$res = $file->repo->getSlaveDB()->select( 'transcode',
+			$res = $db->select( 'transcode',
 					'*',
 					array( 'transcode_image_name' => $fileName ),
 					__METHOD__,
@@ -490,8 +491,24 @@ class WebVideoTranscode {
 				foreach( $row as $k => $v ){
 					$trascodeState[ str_replace( 'transcode_', '', $k ) ] = $v;
 				}
+				if ( !$trascodeState[ 'time_success' ] && !$trascodeState[ 'error' ] ) {
+					$trascodeState[ 'not_queued' ] = !isset($jobs[ $row->transcode_key ]);
+
+					$cond = array(
+						'job_title' => $fileName,
+						'job_cmd' => 'webVideoTranscode',
+					);
+					$cond[] = 'job_params ' . $db->buildLike( $db->anyString(), $row->transcode_key, $db->anyString() );
+					$trascodeState[ 'not_queued' ] = !(bool)$db->selectField(
+						'job',
+						'count(*)',
+						$cond,
+						__METHOD__
+					);
+				}
 				self::$transcodeState[ $fileName ][ $row->transcode_key ] = $trascodeState;
 			}
+
 			wfProfileOut( __METHOD__ );
 		}
 		return self::$transcodeState[ $fileName ];
@@ -694,7 +711,9 @@ class WebVideoTranscode {
 		// Check if we need to update the transcode state:
 		$transcodeState = self::getTranscodeState( $file );
 		// Check if the job has been added:
-		if( !isset( $transcodeState[ $transcodeKey ] ) || is_null( $transcodeState[ $transcodeKey ]['time_addjob'] ) ) {
+		if( !isset( $transcodeState[ $transcodeKey ] )
+			|| is_null( $transcodeState[ $transcodeKey ]['time_addjob'] )
+			|| $transcodeState[ $transcodeKey ]['not_queued'] ) {
 			// Add to job queue and update the db
 			$job = new WebVideoTranscodeJob( $file->getTitle(), array(
 				'transcodeMode' => 'derivative',
