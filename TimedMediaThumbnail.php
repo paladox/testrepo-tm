@@ -77,7 +77,7 @@ class TimedMediaThumbnail {
 	 * @return bool|MediaTransformError
 	 */
 	static function tryFfmpegThumb( $options ){
-		global $wgFFmpegLocation;
+		global $wgFFmpegLocation, $wgExtractThumbsViaHTTP;
 
 		if( !$wgFFmpegLocation || !is_file( $wgFFmpegLocation ) ){
 			return false;
@@ -96,8 +96,13 @@ class TimedMediaThumbnail {
 			$cmd .= ' -ss ' . ($offset - 2);
 			$offset = 2;
 		}
-		$srcPath = $options['file']->getLocalRefPath();
-		$cmd .= ' -y -i ' . wfEscapeShellArg( $srcPath );
+		if ( $wgExtractThumbsViaHTTP ) {
+			$src = $options['file']->getFullUrl();
+		} else {
+			$src = $options['file']->getLocalRefPath();
+		}
+
+		$cmd .= ' -y -i ' . wfEscapeShellArg( $src );
 		$cmd .= ' -ss ' . $offset . ' ';
 
 		// Set the output size if set in options:
