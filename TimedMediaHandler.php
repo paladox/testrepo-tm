@@ -97,6 +97,8 @@ $wgOggThumbLocation = '/usr/bin/oggThumb';
 // Location of the avconv/ffmpeg binary (used to encode WebM and for thumbnails)
 $wgFFmpegLocation = '/usr/bin/avconv';
 
+$wgExtractThumbsViaHTTP = false;
+
 // The NS for TimedText (registered on MediaWiki.org)
 // http://www.mediawiki.org/wiki/Extension_namespace_registration
 // Note commons pre-dates TimedMediaHandler and should set $wgTimedTextNS = 102 in LocalSettings.php
