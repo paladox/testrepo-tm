@@ -119,11 +119,13 @@ class TimedMediaHandlerHooks {
 		/**
 		 * Add support for the "TimedText" NameSpace
 		 */
-		define( "NS_TIMEDTEXT", $wgTimedTextNS );
-		define( "NS_TIMEDTEXT_TALK", $wgTimedTextNS +1 );
+		if ( $wgTimedTextNS != false ) {
+			define( "NS_TIMEDTEXT", $wgTimedTextNS );
+			define( "NS_TIMEDTEXT_TALK", $wgTimedTextNS +1 );
 
-		$wgExtraNamespaces[NS_TIMEDTEXT] = "TimedText";
-		$wgExtraNamespaces[NS_TIMEDTEXT_TALK] = "TimedText_talk";
+			$wgExtraNamespaces[NS_TIMEDTEXT] = "TimedText";
+			$wgExtraNamespaces[NS_TIMEDTEXT_TALK] = "TimedText_talk";
+		}
 
 		// Check for timed text page:
 		$wgHooks[ 'ArticleFromTitle' ][] = 'TimedMediaHandlerHooks::checkForTimedTextPage';
