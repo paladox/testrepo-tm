@@ -72,8 +72,13 @@ class TextHandler {
 	 * @return bool|int|null
 	 */
 	function getTimedTextNamespace(){
+		global $wgEnableTimedText;
 		if( $this->file->isLocal() ) {
-			return NS_TIMEDTEXT;
+			if ( $wgEnableTimedText ) {
+				return NS_TIMEDTEXT;
+			} else {
+				return false;
+			}
 		} else if( $this->file->repo instanceof ForeignDBViaLBRepo ){
 			global $wgTimedTextForeignNamespaces;
 			$wikiID = $this->file->getRepo()->getSlaveDB()->getWikiID();
@@ -160,13 +165,19 @@ class TextHandler {
 	 * @return array
 	 */
 	function getLocalTextSources(){
-		// Init $this->textTracks
-		$params = new FauxRequest( $this->getTextPagesQuery() );
-		$api = new ApiMain( $params );
-		$api->execute();
-		$data = $api->getResultData();
-		// Get the list of language Names
-		return $this->getTextTracksFromData( $data );
+		global $wgEnableTimedText;
+		if ( $wgEnableTimedText ) {
+			// Init $this->textTracks
+			$params = new FauxRequest( $this->getTextPagesQuery() );
+			$api = new ApiMain( $params );
+			$api->execute();
+			$data = $api->getResultData();
+			wfDebug(print_r($data, true));
+			// Get the list of language Names
+			return $this->getTextTracksFromData( $data );
+		} else {
+			return array();
+		}
 	}
 
 	/**
