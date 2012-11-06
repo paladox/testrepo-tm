@@ -1,0 +1,8 @@
+Change-Id: Ib9b02a3764b243b07952e03a177b69061460711f
+Code-Review+2: J <jgerber@wikimedia.org>
+Verified+1: J <jgerber@wikimedia.org>
+Submitted-by: J <jgerber@wikimedia.org>
+Submitted-at: Tue, 06 Nov 2012 18:08:11 +0000
+Reviewed-on: https://gerrit.wikimedia.org/r/32068
+Project: mediawiki/extensions/TimedMediaHandler
+Branch: refs/heads/master
