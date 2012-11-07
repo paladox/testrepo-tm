@@ -66,7 +66,7 @@ class TimedMediaThumbnail {
 			{
 				return new MediaTransformError( 'timedmedia-oggThumb-version', '0.9' );
 			} else {
-				return new MediaTransformError( 'timedmedia-oggThumb-failed' );
+				return new MediaTransformError( 'timedmedia-oggThumb-failed', '' );
 			}
 		}
 		return true;
