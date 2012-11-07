@@ -142,15 +142,22 @@ class SpecialTimedMediaHandler extends SpecialPage {
 				);
 				$stats[ $state ][ 'total' ] += $stats[ $state ][ $key ];
 			}
-			$stats[ 'transcodes' ][ $key ] = (int)$dbr->selectField(
-				'transcode',
-				'COUNT(*)',
-				array( 'transcode_key' => $key ),
-				__METHOD__
-			);
+		}
+
+		$res = $dbr->select( 'transcode',
+			array( 'COUNT(*) as count', 'transcode_key' ),
+			array( 'transcode_key' => $wgEnabledTranscodeSet ),
+			__METHOD__,
+			array( 'GROUP BY' => 'transcode_key' )
+		);
+
+		foreach( $res as $row ) {
+			$key = $row->transcode_key;
+			$stats[ 'transcodes' ][ $key ] = $row->count;
 			$stats[ 'transcodes' ][ $key ] -= $stats[ 'queued' ][ $key ];
 			$stats[ 'transcodes' ][ 'total' ] += $stats[ 'transcodes' ][ $key ];
 		}
+
 		$stats[ 'videos' ] = array( 'total' => 0 );
 		foreach( $this->formats as $format => $condition ) {
 			$stats[ 'videos' ][ $format ] = (int)$dbr->selectField(
