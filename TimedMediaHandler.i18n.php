@@ -129,7 +129,10 @@ Are you sure you want to proceed?',
 	'timedmedia-file' => 'File',
 	'timedmedia-oggThumb-version' => 'OggHandler requires oggThumb version $1 or later.',
 	'timedmedia-oggThumb-failed'  => 'oggThumb failed to create the thumbnail.',
-);
+
+	'right-transcode-reset' => '';
+	'right-transcode-status' => '';
+	);
 
 /** Message documentation (Message documentation)
  * @author Aotake
@@ -238,6 +241,8 @@ Parameters are:
 	'timedmedia-derivative-state-failed' => 'failed transcode jobs
 Parameters are:
 * $1 number of transcodes',
+	'right-transcode-reset' => '{{doc-right|transcode-reset}}';
+	'right-transcode-status' => '{{doc-right|transcode-status}}';
 );
 
 /** Afrikaans (Afrikaans)
