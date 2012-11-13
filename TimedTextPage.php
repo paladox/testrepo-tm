@@ -18,9 +18,8 @@ class TimedTextPage extends Article {
 		$user = $this->getContext()->getUser();
 
 		$diff = $request->getVal( 'diff' );
-		$diffOnly = $request->getBool( 'diffonly', $user->getOption( 'diffonly' ) );
 
-		if ( $this->getTitle()->getNamespace() != NS_TIMEDTEXT || ( isset( $diff ) && $diffOnly ) ) {
+		if ( $this->getTitle()->getNamespace() != NS_TIMEDTEXT || isset( $diff ) ) {
 			parent::view();
 			wfProfileOut( __METHOD__ );
 			return;
