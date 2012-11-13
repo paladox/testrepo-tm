@@ -4,7 +4,6 @@
 * for cross domain java applet loading.
 */
 window.cortadoDomainLocations = {
-	'upload.wikimedia.org' : 'http://upload.wikimedia.org/jars/cortado.jar'
 };
 
 // Set the default location for CortadoApplet
