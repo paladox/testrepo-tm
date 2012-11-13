@@ -78,6 +78,7 @@ class TimedMediaIframeOutput {
 	<style type="text/css">
 		html, body {
 		  height: 100%;
+		  width: 100%;
 		  margin: 0;
 		  padding: 0;
 		  overflow:hidden;
@@ -110,8 +111,9 @@ class TimedMediaIframeOutput {
 	<script>
 		// Turn off rewrite selector
 		mw.setConfig('EmbedPlayer.RewriteSelector', '');
-		// Set the fullscreen property inline to avoid poluting the player cache
-		mw.setConfig('EmbedPlayer.EnableFullscreen', false );
+		// find way to detect if fullscreen is allowed
+		// for now always assume fullscreen support
+		mw.setConfig('EmbedPlayer.EnableFullscreen', true );
 		$('#bgimage').remove();
 
 		mw.setConfig( 'EmbedPlayer.IsIframeServer', true );
