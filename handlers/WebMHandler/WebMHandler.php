@@ -55,6 +55,15 @@ class WebMHandler extends TimedMediaHandler {
 		if ( isset( $metadata['error'] ) ) {
 			return false;
 		}
+		if( isset( $metadata['video']['display_x'])
+				&&
+			isset( $metadata['video']['display_y'])
+		){
+			return array (
+				$metadata['video']['display_x'],
+				$metadata['video']['display_y']
+			);
+		}
 		if( isset( $metadata['video']['resolution_x'])
 				&&
 			isset( $metadata['video']['resolution_y'])
