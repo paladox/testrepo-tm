@@ -289,6 +289,9 @@
 					var $textButton = $( '<div />' )
 						.attr( 'title', gM( 'mwe-embedplayer-timed_text' ) )
 						.addClass( "ui-state-default ui-corner-all ui-icon_link rButton timed-text" )
+						.css({
+							'float': 'right'
+						})
 						.append(
 							$( '<span />' )
 							.addClass( "ui-icon ui-icon-comment" )

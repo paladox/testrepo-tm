@@ -1668,6 +1668,7 @@ mw.PlayerControlBuilder.prototype = {
             $closeButton = $('<div />')
             .addClass( 'ui-state-default ui-corner-all ui-icon_link rButton')
             .css({
+                'float': 'right',
                 'position': 'absolute',
                 'cursor' : 'pointer',
                 'top' : '2px',
@@ -2300,6 +2301,7 @@ mw.PlayerControlBuilder.prototype = {
 				return $( '<div />' )
 						.addClass( 'rButton' )
 						.css({
+							'float': 'right',
 							'top' : '1px',
 							'left' : '2px'
 						})
@@ -2326,6 +2328,9 @@ mw.PlayerControlBuilder.prototype = {
 				return $( '<div />' )
 						.attr( 'title', gM( 'mwe-embedplayer-player_options' ) )
 						.addClass( 'ui-state-default ui-corner-all ui-icon_link rButton options-btn' )
+						.css({
+							'float': 'right'
+						})
 						.append(
 							$('<span />')
 							.addClass( 'ui-icon ui-icon-wrench' )
@@ -2354,6 +2359,9 @@ mw.PlayerControlBuilder.prototype = {
 				var $btn = $( '<div />' )
 						.attr( 'title', gM( 'mwe-embedplayer-player_fullscreen' ) )
 						.addClass( "ui-state-default ui-corner-all ui-icon_link rButton fullscreen-btn" )
+						.css({
+							'float': 'right'
+						})
 						.append(
 							$( '<span />' )
 							.addClass( "ui-icon ui-icon-arrow-4-diag" )
@@ -2440,6 +2448,9 @@ mw.PlayerControlBuilder.prototype = {
 				return $( '<div />' )
 						.attr( 'title', gM( 'mwe-embedplayer-play_clip' ) )
 						.addClass ( "ui-state-default ui-corner-all ui-icon_link lButton play-btn" )
+						.css({
+							'float': 'left'
+						})
 						.append(
 							$( '<span />' )
 							.addClass( "ui-icon ui-icon-play" )
@@ -2467,6 +2478,9 @@ mw.PlayerControlBuilder.prototype = {
 					$volumeOut.append(
 						$( '<div />' )
 						.addClass( "ui-slider ui-slider-horizontal rButton volume-slider" )
+						.css({
+							'float': 'right'
+						})
 					);
 				}
 
@@ -2475,6 +2489,9 @@ mw.PlayerControlBuilder.prototype = {
 				 	$('<div />')
 				 	.attr( 'title', gM( 'mwe-embedplayer-volume_control' ) )
 				 	.addClass( "ui-state-default ui-corner-all ui-icon_link rButton volume_control" )
+					.css({
+						'float': 'right'
+					})
 				 	.append(
 				 		$( '<span />' )
 				 		.addClass( "ui-icon ui-icon-volume-on" )
@@ -2506,6 +2523,9 @@ mw.PlayerControlBuilder.prototype = {
 				// Stream switching widget ( display the current selected stream text )
 				return $( '<div />' )
 					.addClass('ui-widget source-switch')
+					.css({
+						'float': 'right'
+					})
 					.append(
 						ctrlObj.embedPlayer.mediaElement.selectedSource.getShortTitle()
 					).menu( {
@@ -2545,6 +2565,9 @@ mw.PlayerControlBuilder.prototype = {
 			'o' : function( ctrlObj ) {
 				return $( '<div />' )
 				.addClass( "ui-widget time-disp" )
+				.css({
+					'float': 'right'
+				})
 				.append(
 					ctrlObj.embedPlayer.getTimeRange()
 				);

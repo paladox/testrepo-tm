@@ -37,6 +37,9 @@ mw.PlayerSkinKskin = {
 				return $( '<div />' )
 					.attr( 'title', gM( 'mwe-embedplayer-player_options' ) )
 					.addClass( "ui-state-default ui-corner-bl rButton k-options" )
+					.css({
+						'float': 'right'
+					})
 					.append(
 						$( '<span />' )
 						.text( gM( 'mwe-embedplayer-menu_btn' ) )
@@ -96,7 +99,10 @@ mw.PlayerSkinKskin = {
 				}
 
 				var $menuBar = $( '<ul />' )
-					.addClass( 'k-menu-bar' );
+					.addClass( 'k-menu-bar' )
+					.css({
+						right: 0
+					});
 
 				// Don't include about player menu item ( FIXME should be moved to a init function )
 				delete ctrlObj.supportedMenuItems['aboutPlayerLibrary'];
