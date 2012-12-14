@@ -106,7 +106,12 @@ class OggHandlerTMH extends TimedMediaHandler {
 	function getMetadataType( $image ) {
 		return 'ogg';
 	}
-
+	/**
+	 * @param $file File
+	 */
+	function getWebType( $file ) {
+		return 'video/ogg; codecs="theora, vorbis"';
+	}
 	/**
 	 * @param $file File
 	 * @return array|bool
