@@ -615,12 +615,13 @@ class WebVideoTranscode {
 
 		$bitrate = $file->getHandler()->getBitrate( $file );
 		$metadataType = $file->getHandler()->getMetadataType( $file );
-
+		
 		$source = array(
 			'src' => $src,
 			'title' => wfMessage( 'timedmedia-source-file-desc', $metadataType )
 				->numParams( $file->getWidth(), $file->getHeight() )
 				->params( $wgLang->formatBitrate( $bitrate ) )->text(),
+			'type' => $file->getHandler()->getWebType( $file ),
 			"shorttitle" => wfMessage(
 				'timedmedia-source-file',
 				wfMessage( 'timedmedia-' . $metadataType )->text()
@@ -673,6 +674,7 @@ class WebVideoTranscode {
 		return array(
 				'src' => $src,
 				'title' => wfMessage( 'timedmedia-derivative-desc-' . $transcodeKey )->text(),
+				'type' => $file->getHandler()->getWebType( $file ),
 				"shorttitle" => wfMessage( 'timedmedia-derivative-' . $transcodeKey )->text(),
 				"transcodekey" => $transcodeKey,
 
