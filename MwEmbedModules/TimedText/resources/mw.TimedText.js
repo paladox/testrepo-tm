@@ -285,6 +285,7 @@
 			*/
 			return {
 				'w': 30,
+				'position': 69,
 				'o': function( ctrlObj ) {
 					var $textButton = $( '<div />' )
 						.attr( 'title', gM( 'mwe-embedplayer-timed_text' ) )
