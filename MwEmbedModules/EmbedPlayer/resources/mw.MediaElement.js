@@ -263,6 +263,9 @@ mw.MediaElement.prototype = {
 					case 'mp3Native':
 						var shortName = 'mp3';
 						break;
+					case 'aacNative':
+						var shortName = 'aac';
+						break;
 					case 'oggNative':
 						var shortName = 'ogg';
 						break;

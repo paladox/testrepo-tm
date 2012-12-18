@@ -443,6 +443,8 @@ mw.MediaSource.prototype = {
 			break;
 			case 'mp3':
 				return 'audio/mpeg';
+			case 'm4a':
+				return 'audio/mp4';
 			break;
 			case 'anx':
 				return 'video/ogg';
