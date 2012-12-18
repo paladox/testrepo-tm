@@ -23,6 +23,7 @@ var oggNativePlayer = new mw.MediaPlayer( 'oggNative', ['video/ogg', 'audio/ogg'
 var h264NativePlayer = new mw.MediaPlayer( 'h264Native', ['video/h264'], 'Native' );
 var appleVdnPlayer = new mw.MediaPlayer( 'appleVdn', ['application/vnd.apple.mpegurl'], 'Native');
 var mp3NativePlayer = new mw.MediaPlayer( 'mp3Native', ['audio/mpeg', 'audio/mp3'], 'Native' );
+var aacNativePlayer = new mw.MediaPlayer( 'aacNative', ['audio/mp4'], 'Native' );
 var webmNativePlayer = new mw.MediaPlayer( 'webmNative', ['video/webm'], 'Native' );
 
 // Image Overlay player ( extends native )
@@ -160,6 +161,11 @@ mw.EmbedTypes = {
 					// Test for MP3:
 					if ( this.supportedMimeType('audio/mpeg') ) {
 							this.mediaPlayers.addPlayer( mp3NativePlayer );
+					}
+
+					// Test for AAC:
+					if ( dummyvid.canPlayType( 'audio/mp4; codecs="mp4a.40.5"' ) ) {
+							this.mediaPlayers.addPlayer( aacNativePlayer );
 					}
 
 					// Test for h264:
