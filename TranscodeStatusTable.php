@@ -89,7 +89,7 @@ class TranscodeStatusTable {
 	 */
 	public static function getSourceUrl( $file, $transcodeKey ){
 		$thumbName = $file->thumbName( array() );
-		$thumbUrl = $file->getThumbUrl( $thumbName );
+		$thumbUrl = $file->getTranscodeUrl( $thumbName );
 		$thumbUrlDir = dirname( $thumbUrl );
 		return $thumbUrlDir . '/' . rawurlencode( $file->getName() ) . '.' . $transcodeKey;
 	}
