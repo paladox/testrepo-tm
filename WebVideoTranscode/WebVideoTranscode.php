@@ -255,13 +255,12 @@ class WebVideoTranscode {
 	 * @return string
 	 */
 	static public function getDerivativeFilePath( &$file, $transcodeKey){
-		return dirname(
-				$file->getThumbPath(
-					$file->thumbName( array() )
-				)
-			) . '/' .
-			$file->getName() . '.' .
-			$transcodeKey ;
+		if ( MWInit::methodExists( $file, 'getTranscodedPath' ) ) {
+			$path = $file->getTranscodedPath( $file->thumbName( array() ) );
+		} else {
+			$path = $file->getThumbPath( $file->thumbName( array() ) );
+		}
+		return dirname( $path ) . '/' . $file->getName() . '.' . $transcodeKey;
 	}
 
 	/**
@@ -723,8 +722,12 @@ class WebVideoTranscode {
 		$fileName = $file->getTitle()->getDbKey();
 
 		$thumbName = $file->thumbName( array() );
-		$thumbUrl = $file->getThumbUrl( $thumbName );
-		$thumbUrlDir = dirname( $thumbUrl );
+		if ( MWInit::methodExists( $file, 'getTranscodedUrl' ) ) {
+			$transcodedUrl = $file->getTranscodedUrl( $thumbName );
+		} else {
+			$transcodedUrl = $file->getThumbUrl( $thumbName );
+		}
+		$transcodedUrlDir = dirname( $transcodedUrl );
 
 		if( $file->getHandler()->isAudio( $file ) ){
 			$width = $height = 0;
@@ -739,7 +742,7 @@ class WebVideoTranscode {
 						self::$derivativeSettings[$transcodeKey]['framerate'] :
 						$file->getHandler()->getFramerate( $file );
 		// Setup the url src:
-		$src = $thumbUrlDir . '/' . rawurlencode( $file->getName() ) . '.' . $transcodeKey;
+		$src = $transcodedUrlDir . '/' . rawurlencode( $file->getName() ) . '.' . $transcodeKey;
 		$src = in_array( 'fullurl', $options)?  wfExpandUrl( $src ) : $src;
 		return array(
 				'src' => $src,
