@@ -74,6 +74,7 @@ $messages['en'] = array(
 	'mwe-embedplayer-playerSelect' => 'Players',
 	'mwe-embedplayer-read_before_embed' => '<a href="http://mediawiki.org/wiki/Security_Notes_on_Remote_Embedding" target="new">Read this</a> before embedding.',
 	'mwe-embedplayer-embed_site_or_blog' => 'Embed on a page',
+	'mwe-embedplayer-embed_wiki' => 'Embed on a wiki',
 	'mwe-embedplayer-related_videos' => 'Related videos',
 	'mwe-embedplayer-seeking' => 'seeking',
 	'mwe-embedplayer-buffering' => 'buffering',
@@ -113,6 +114,8 @@ $messages['qqq'] = array(
 future identical warnings messages',
 	'mwe-embedplayer-playerSelect' => '{{Identical|Player}}',
 	'mwe-embedplayer-copy-code' => 'Button label. Pressing the button marks the code in a textarea above it so it can be copied.',
+	'mwe-embedplayer-embed_site_or_blog' => 'title for iframe embed code in share dialog',
+	'mwe-embedplayer-embed_wiki' => 'title for wiki embed code in share dialog',
 );
 
 /** Afrikaans (Afrikaans)
