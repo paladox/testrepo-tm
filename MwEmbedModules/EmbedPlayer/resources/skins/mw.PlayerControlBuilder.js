@@ -1877,6 +1877,7 @@ mw.PlayerControlBuilder.prototype = {
 	getShare: function( ) {
 		var embedPlayer = this.embedPlayer;
 		var embed_code = embedPlayer.getSharingEmbedCode();
+		var embed_wiki_code = embedPlayer.getWikiEmbedCode();
 		var _this = this;
 
 		var $shareInterface = $('<div />');
@@ -1904,6 +1905,23 @@ mw.PlayerControlBuilder.prototype = {
 			$( '<h2 />' )
 			.text( gM( 'mwe-embedplayer-share_this_video' ) )
 		);
+
+		if ( embed_wiki_code ) {
+			$shareInterface.append(
+				$('<ul />').append(
+					$('<li />').text(
+						gM( 'mwe-embedplayer-embed_wiki' )
+					)
+				),
+				$( '<textarea />' )
+				.attr( 'rows', 1 )
+				.html( embed_wiki_code )
+				.click( function() {
+					$( this ).select();
+				}),
+				$('<br />')
+			);
+		}
 
 		$shareInterface.append(
 			$shareList
