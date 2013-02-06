@@ -149,7 +149,7 @@
 					)
 				}
 				$creditLine.append( $( '<br />' ),
-					gM('mwe-embedplayer-credit-author', $authorText.html() )
+					gM('mwe-embedplayer-credit-author', $authorText.text() )
 				)
 			}
 
@@ -162,7 +162,7 @@
 				// remove white space:
 				$date.find('br').remove();
 				$creditLine.append(  $( '<br />' ),
-					gM('mwe-embedplayer-credit-date', $date.html() )
+					gM('mwe-embedplayer-credit-date', $date.text() )
 				)
 			}
 
