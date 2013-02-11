@@ -775,8 +775,8 @@ mw.PlayerControlBuilder.prototype = {
 
 		// OSX has a different short cut than windows and liux
 		var toolTipMsg = ( navigator.userAgent.indexOf('Mac OS X') != -1 )?
-				gM( 'mwe-embedplayer-fullscreen-tip-osx') :
-				gM( 'mwe-embedplayer-fullscreen-tip');
+				mw.msg( 'mwe-embedplayer-fullscreen-tip-osx') :
+				mw.msg( 'mwe-embedplayer-fullscreen-tip');
 
 		var $targetTip = this.addWarningBinding( 'EmbedPlayer.FullscreenTip',
 			$('<h3/>').html(
@@ -1093,7 +1093,7 @@ mw.PlayerControlBuilder.prototype = {
 		if ( _this.checkNativeWarning( ) ) {
 			_this.addWarningBinding(
 				'EmbedPlayer.ShowNativeWarning',
-				gM( 'mwe-embedplayer-for_best_experience',
+				mw.msg( 'mwe-embedplayer-for_best_experience',
 					$('<a />')
 						.attr({
 							'href': 'http://www.mediawiki.org/wiki/Extension:TimedMediaHandler/Client_download',
@@ -1440,7 +1440,7 @@ mw.PlayerControlBuilder.prototype = {
 			);
 			$targetWarning.append(
 				$('<label />')
-				.text( gM( 'mwe-embedplayer-do_not_warn_again' ) )
+				.text( mw.msg( 'mwe-embedplayer-do_not_warn_again' ) )
 				.attr( 'for', 'ffwarn_' + embedPlayer.id )
 			);
 		}
@@ -1549,7 +1549,7 @@ mw.PlayerControlBuilder.prototype = {
 	onSeek: function(){
 		//mw.log( "controlBuilder:: onSeek" );
 		// Update the interface:
-		this.setStatus( gM( 'mwe-embedplayer-seeking' ) );
+		this.setStatus( mw.msg( 'mwe-embedplayer-seeking' ) );
 		// add a loading spinner:
 		this.embedPlayer.addPlayerSpinner();
 		// hide once playing again:
@@ -1577,7 +1577,7 @@ mw.PlayerControlBuilder.prototype = {
 		// Share the video menu
 		'share': function( ctrlObj ) {
 			return $.getLineItem(
-				gM( 'mwe-embedplayer-share' ),
+				mw.msg( 'mwe-embedplayer-share' ),
 				'mail-closed',
 				function( ) {
 					ctrlObj.displayMenuOverlay(
@@ -1590,7 +1590,7 @@ mw.PlayerControlBuilder.prototype = {
 
 		'aboutPlayerLibrary' : function( ctrlObj ){
 			return $.getLineItem(
-					gM( 'mwe-embedplayer-about-library' ),
+					mw.msg( 'mwe-embedplayer-about-library' ),
 					'info',
 					function( ) {
 						ctrlObj.displayMenuOverlay(
@@ -1854,12 +1854,12 @@ mw.PlayerControlBuilder.prototype = {
 			.append(
 				$( '<h2 />' )
 					.text(
-						gM('mwe-embedplayer-about-library')
+						mw.msg('mwe-embedplayer-about-library')
 					)
 				,
 				$( '<span />')
 					.append(
-						gM('mwe-embedplayer-about-library-desc',
+						mw.msg('mwe-embedplayer-about-library-desc',
 							$('<a />').attr({
 								'href' : mw.config.get( 'EmbedPlayer.LibraryPage' ),
 								'target' : '_new'
@@ -1888,7 +1888,7 @@ mw.PlayerControlBuilder.prototype = {
 		$shareList
 		.append(
 			$('<li />').text(
-				gM( 'mwe-embedplayer-embed_site_or_blog' )
+				mw.msg( 'mwe-embedplayer-embed_site_or_blog' )
 			)
 			/*
 			.append(
@@ -1896,7 +1896,7 @@ mw.PlayerControlBuilder.prototype = {
 				.attr('href', '#')
 				.addClass( 'active' )
 				.text(
-					gM( 'mwe-embedplayer-embed_site_or_blog' )
+					mw.msg( 'mwe-embedplayer-embed_site_or_blog' )
 				)
 			)
 			*/
@@ -1904,7 +1904,7 @@ mw.PlayerControlBuilder.prototype = {
 
 		$shareInterface.append(
 			$( '<h2 />' )
-			.text( gM( 'mwe-embedplayer-share_this_video' ) )
+			.text( mw.msg( 'mwe-embedplayer-share_this_video' ) )
 		);
 
 		$shareInterface.append(
@@ -1915,7 +1915,7 @@ mw.PlayerControlBuilder.prototype = {
 		if( ! mw.isIpad() ) {
 			$shareButton = $('<button />')
 			.addClass( 'ui-state-default ui-corner-all copycode' )
-			.text( gM( 'mwe-embedplayer-copy-code' ) )
+			.text( mw.msg( 'mwe-embedplayer-copy-code' ) )
 			.click(function() {
 				$shareInterface.find( 'textarea' ).focus().select();
 				// Copy the text if supported:
@@ -1958,7 +1958,7 @@ mw.PlayerControlBuilder.prototype = {
 		var $playerSelect = $('<div />')
 		.append(
 			$( '<h2 />' )
-			.text( gM( 'mwe-embedplayer-choose_player' ) )
+			.text( mw.msg( 'mwe-embedplayer-choose_player' ) )
 		);
 
 		$.each( embedPlayer.mediaElement.getPlayableSources(), function( sourceId, source ) {
@@ -2056,7 +2056,7 @@ mw.PlayerControlBuilder.prototype = {
 
 			} else {
 				// No player available:
-				$playerSelect.append( gM( 'mwe-embedplayer-no-player', source.getTitle() ) );
+				$playerSelect.append( mw.msg( 'mwe-embedplayer-no-player', source.getTitle() ) );
 			}
 		} );
 
@@ -2124,7 +2124,7 @@ mw.PlayerControlBuilder.prototype = {
 		if( $mediaList.find('li').length != 0 ) {
 			$target.append(
 				$('<h2 />')
-				.text( gM( 'mwe-embedplayer-download_full' ) ),
+				.text( mw.msg( 'mwe-embedplayer-download_full' ) ),
 				$mediaList
 			);
 		}
@@ -2132,7 +2132,7 @@ mw.PlayerControlBuilder.prototype = {
 		if( $textList.find('li').length != 0 ) {
 			$target.append(
 				$('<h2 />')
-				.html( gM( 'mwe-embedplayer-download_text' ) ),
+				.html( mw.msg( 'mwe-embedplayer-download_text' ) ),
 				$textList
 			);
 		}
@@ -2268,7 +2268,7 @@ mw.PlayerControlBuilder.prototype = {
 			'position': 1,
 			'o': function( ctrlObj ) {
 				return $( '<div />' )
-						.attr( 'title', gM( 'mwe-embedplayer-play_clip' ) )
+						.attr( 'title', mw.msg( 'mwe-embedplayer-play_clip' ) )
 						.addClass ( "ui-state-default ui-corner-all ui-icon_link lButton play-btn" )
 						.append(
 							$( '<span />' )
@@ -2303,7 +2303,7 @@ mw.PlayerControlBuilder.prototype = {
 				// Add the volume control icon
 				$volumeOut.append(
 				 	$('<div />')
-				 	.attr( 'title', gM( 'mwe-embedplayer-volume_control' ) )
+					.attr( 'title', mw.msg( 'mwe-embedplayer-volume_control' ) )
 				 	.addClass( "ui-state-default ui-corner-all ui-icon_link rButton volume_control" )
 				 	.append(
 				 		$( '<span />' )
@@ -2336,7 +2336,7 @@ mw.PlayerControlBuilder.prototype = {
 			'o' : function( ctrlObj ) {
 				return $( '<div />' )
 					.attr( {
-						'title'	: gM( 'mwe-embedplayer-play_clip' ),
+						'title'	: mw.msg( 'mwe-embedplayer-play_clip' ),
 						'class'	: "play-btn-large"
 					} )
 					// Get dynamic position for big play button
@@ -2421,7 +2421,7 @@ mw.PlayerControlBuilder.prototype = {
 			'position': 10,
 			'o': function( ctrlObj ) {
 				return $( '<div />' )
-						.attr( 'title', gM( 'mwe-embedplayer-player_options' ) )
+						.attr( 'title', mw.msg( 'mwe-embedplayer-player_options' ) )
 						.addClass( 'ui-state-default ui-corner-all ui-icon_link rButton options-btn' )
 						.append(
 							$('<span />')
@@ -2450,7 +2450,7 @@ mw.PlayerControlBuilder.prototype = {
 			'position': 8,
 			'o': function( ctrlObj ) {
 				var $btn = $( '<div />' )
-						.attr( 'title', gM( 'mwe-embedplayer-player_fullscreen' ) )
+						.attr( 'title', mw.msg( 'mwe-embedplayer-player_fullscreen' ) )
 						.addClass( "ui-state-default ui-corner-all ui-icon_link rButton fullscreen-btn" )
 						.append(
 							$( '<span />' )
@@ -2597,7 +2597,7 @@ mw.PlayerControlBuilder.prototype = {
 							embedPlayer.jumpTime = mw.seconds2npt( parseFloat( parseFloat( embedPlayer.getDuration() ) * perc ) + embedPlayer.startTimeSec );
 							// mw.log('perc:' + perc + ' * ' + embedPlayer.getDuration() + ' jt:'+ this.jumpTime);
 							if ( _this.longTimeDisp ) {
-								ctrlObj.setStatus( gM( 'mwe-embedplayer-seek_to', embedPlayer.jumpTime ) );
+								ctrlObj.setStatus( mw.msg( 'mwe-embedplayer-seek_to', embedPlayer.jumpTime ) );
 							} else {
 								ctrlObj.setStatus( embedPlayer.jumpTime );
 							}
@@ -2617,7 +2617,7 @@ mw.PlayerControlBuilder.prototype = {
 								// set seek time (in case we have to do a url seek)
 								embedPlayer.seekTimeSec = mw.npt2seconds( embedPlayer.jumpTime, true );
 								mw.log( 'PlayerControlBuilder:: seek to: ' + embedPlayer.jumpTime + ' perc:' + perc + ' sts:' + embedPlayer.seekTimeSec );
-								ctrlObj.setStatus( gM( 'mwe-embedplayer-seeking' ) );
+								ctrlObj.setStatus( mw.msg( 'mwe-embedplayer-seeking' ) );
 								if( embedPlayer.isStopped() ){
 									embedPlayer.play();
 								}
