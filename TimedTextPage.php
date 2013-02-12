@@ -135,21 +135,32 @@ class TimedTextPage extends Article {
 		// Set the page title:
 		$out->setPageTitle( wfMessage( 'timedmedia-subtitle-new' ) );
 
-		$timedTextTile = Title::newFromText( $this->getTitle()->getDBKey() . '.'.
-			$lang->getCode() . '.srt', NS_TIMEDTEXT );
+		// Look up the language name:
+		$language = $out->getLanguage()->getCode();
+
+		$languages = Language::fetchLanguageNames( $language );
+		ksort( $languages );
+
+		$options = "\n";
+		foreach( $languages as $code => $name ) {
+			$timedTextTile = Title::newFromText( $this->getTitle()->getDBKey() . '.'.
+				$code . '.srt', NS_TIMEDTEXT );
+			$value = $timedTextTile->getFullText();
+			$options .= Xml::option( "$code - $name", $value, ($code == $language) ) . "\n";
+		}
+
+		$languageSelector = Xml::tags( 'select',
+			array( 'id' => 'timedmedia-tt-input' ), $options );
+
 		$out->addHTML(
 			Xml::tags('div', array( 'style' => 'text-align:center' ),
 				Xml::tags( 'div', null,
 					wfMessage( 'timedmedia-subtitle-new-desc', $lang->getCode() )->parse()
 				) .
-				Xml::tags( 'input', array(
-					'id' => 'timedmedia-tt-input',
-					'value' => $timedTextTile->getFullText(),
-					'size' => 50 ),
-					Xml::tags( 'button',
-						array( 'id' => 'timedmedia-tt-go' ),
-						wfMessage( 'timedmedia-subtitle-new-go' )->escaped()
-					)
+				$languageSelector .
+				Xml::tags( 'button',
+					array( 'id' => 'timedmedia-tt-go' ),
+					wfMessage( 'timedmedia-subtitle-new-go' )->escaped()
 				)
 			)
 		);
