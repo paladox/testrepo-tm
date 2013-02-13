@@ -680,12 +680,19 @@ class WebVideoTranscode {
 		$bitrate = $file->getHandler()->getBitrate( $file );
 		$metadataType = $file->getHandler()->getMetadataType( $file );
 
+		if( $file->getHandler()->isAudio( $file ) ){
+			$title = wfMessage( 'timedmedia-source-audio-file-desc', $metadataType )
+				->params( $wgLang->formatBitrate( $bitrate ) )->text();
+		} else {
+			$title = wfMessage( 'timedmedia-source-file-desc', $metadataType )
+				->numParams( $file->getWidth(), $file->getHeight() )
+				->params( $wgLang->formatBitrate( $bitrate ) )->text();
+		}
+
 		$source = array(
 			'src' => $src,
-			'title' => wfMessage( 'timedmedia-source-file-desc', $metadataType )
-				->numParams( $file->getWidth(), $file->getHeight() )
-				->params( $wgLang->formatBitrate( $bitrate ) )->text(),
 			'type' => $file->getHandler()->getWebType( $file ),
+			'title' => $title,
 			"shorttitle" => wfMessage(
 				'timedmedia-source-file',
 				wfMessage( 'timedmedia-' . $metadataType )->text()
