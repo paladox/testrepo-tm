@@ -68,6 +68,7 @@ Are you sure you want to proceed?',
 	'timedmedia-mp4' => 'MP4',
 	'timedmedia-source-file' => '$1 source',
 	'timedmedia-source-file-desc' => 'Original $1, $2 × $3 ($4)',
+	'timedmedia-source-audio-file-desc' => 'Original $1 ($2)',
 
 	'timedmedia-derivative-160p.ogv' => 'Ogg 160P',
 	'timedmedia-derivative-desc-160p.ogv' => 'Low bandwidth Ogg video (160P)',
@@ -209,6 +210,9 @@ Parameters are:
 * $2 resolution width
 * $3 resolution height
 * $4 human readable bitrate',
+	'timedmedia-source-audio-file-desc' => 'Source file description. Paramaters:
+* $1 file type ie webm or ogg
+* $2 human readable bitrate',
 	'timedmedia-derivative-160p.ogv' => '{{optional}}',
 	'timedmedia-derivative-360p.ogv' => '{{optional}}',
 	'timedmedia-derivative-480p.ogv' => '{{optional}}',
