@@ -110,7 +110,7 @@ class WebVideoTranscodeJob extends Job {
 
 	/**
 	 * Run the transcode request
-	 * @return bool|string
+	 * @return boolean success
 	 */
 	public function run() {
 		// get a local pointer to the file
@@ -271,8 +271,7 @@ class WebVideoTranscodeJob extends Job {
 		// Clear the webVideoTranscode cache ( so we don't keep out dated table cache around )
 		WebVideoTranscode::clearTranscodeCache( $this->title->getDBkey() );
 
-		// pass along result status:
-		return $status;
+		return $status === true;
 	}
 
 	function removeFffmpgeLogFiles(){
