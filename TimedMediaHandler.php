@@ -14,6 +14,8 @@ if( !class_exists( 'MwEmbedResourceManager' ) ) {
 $timedMediaDir = dirname( __FILE__ );
 // Include WebVideoTranscode (prior to config so that its defined transcode keys can be used in configuration)
 $wgAutoloadClasses['WebVideoTranscode'] = "$timedMediaDir/WebVideoTranscode/WebVideoTranscode.php";
+$wgAutoloadClasses['WebVideoEncoder'] = "$timedMediaDir/WebVideoTranscode/WebVideoEncoder.php";
+$wgAutoloadClasses['FfmpegEncoder'] = "$timedMediaDir/WebVideoTranscode/WebVideoEncoder.php";
 
 // Add the rest transcode right:
 $wgAvailableRights[] = 'transcode-reset';
@@ -50,6 +52,9 @@ $wgMwEmbedModuleConfig['TimedText.ShowAddTextLink'] = true;
 $wgGroupPermissions['sysop']['transcode-reset'] = true;
 // Which users can see Special:TimedMediaHandler
 $wgGroupPermissions['sysop']['transcode-status'] = true;
+
+// Class to use to encode files.
+$wgTranscodeEncoderClass = 'FfmpegEncoder';
 
 // How long you have to wait between transcode resets for non-error transcodes
 $wgWaitTimeForTranscodeReset = 3600;
