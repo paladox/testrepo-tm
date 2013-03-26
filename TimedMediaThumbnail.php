@@ -11,6 +11,13 @@ class TimedMediaThumbnail {
 		}
 
 		wfDebug( "Creating video thumbnail at" .  $options['dstPath']  . "\n" );
+		if(
+			isset( $options['width'] ) && isset( $options['height'] ) &&
+			$options['width'] != $options['file']->getWidth() &&
+			$options['height'] != $options['file']->getHeight()
+		){
+			return self::resizeThumb( $options );
+		}
 		// try OggThumb, and fallback to ffmpeg
 		$result = self::tryOggThumb( $options );
 		if ( $result === false ) {
@@ -41,7 +48,7 @@ class TimedMediaThumbnail {
 		}
 
 		$time = self::getThumbTime( $options );
-		$dstPath =  $options['dstPath'];
+		$dstPath = $options['dstPath'];
 		$videoPath = $options['file']->getLocalRefPath();
 
 		$cmd = wfEscapeShellArg( $wgOggThumbLocation )
@@ -134,6 +141,37 @@ class TimedMediaThumbnail {
 		$returnText = $cmd . "\nwgMaxShellMemory: $wgMaxShellMemory\n" . $returnText;
 		// Return error box
 		return new MediaTransformError( 'thumbnail_error', $options['width'], $options['height'], $returnText );
+	}
+
+	static function resizeThumb( $options ) {
+		$file = $options['file'];
+		$params = array();
+		foreach(array('start', 'thumbtime') as $key) {
+			if(  isset( $options[ $key ] ) ) {
+				$params[ $key ] = $options[ $key ];
+			}
+		}
+		$params["width"] = $file->getWidth();
+		$params["height"] = $file->getHeight();
+
+		$thumb = $file->transform( $params, File::RENDER_NOW );
+		if ( !$thumb || !$thumb->file ) {
+			return $thumb;
+		}
+		if( $thumb->file->getRepo()->getBackend()->isStoragePath( $thumb->path ) ) {
+			$src = $thumb->file->getRepo()->getLocalReference( $thumb->path )->getPath();
+		} else {
+			$src = $thumb->path;
+		}
+		$thumbFile = new UnregisteredLocalFile(null, RepoGroup::singleton()->getLocalRepo(), $src, 'image/jpeg');
+		$fsFile = new FSFile( $src );
+		$thumbFile->setLocalReference( $fsFile );
+		$thumbParams = array(
+			"width" => $options['width'],
+			"height" => $options['height']
+		);
+		$scaledThumb = $thumbFile->getHandler()->doTransform( $thumbFile, $options['dstPath'], $options['dstUrl'], $thumbParams );
+		return true;
 	}
 
 	/**
