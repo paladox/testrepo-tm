@@ -398,7 +398,8 @@ class TimedMediaHandler extends MediaHandler {
 		$transcodeSet = array_merge($wgEnabledTranscodeSet, $wgEnabledAudioTranscodeSet);
 
 		//dont remove derivatives on normal purge
-		foreach($files as $key => $file) {
+		foreach(array_slice($files, 1) as $key => $file) {
+			wfDebug("check $key -> $file\n");
 			foreach( $transcodeSet as $transcodeKey ) {
 				if ( preg_match('/' . preg_quote($transcodeKey) . '$/', $file) ) {
 					unset($files[$key]);
