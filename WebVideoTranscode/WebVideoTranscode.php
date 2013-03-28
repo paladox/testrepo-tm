@@ -663,7 +663,20 @@ class WebVideoTranscode {
 		if( self::isTranscodeReady( $file, $transcodeKey ) ){
 			$sources[] = self::getDerivativeSourceAttributes( $file, $transcodeKey, $dataPrefix );
 		} else {
-			self::updateJobQueue( $file, $transcodeKey );
+			if ( MWInit::classExists( 'PoolCounterWorkViaCallback' ) ) {
+				$poolKey = $file->getRepo()->getSharedCacheKey( 'file', md5( $file->getName() ) );
+				$poolKey = '_tmh:updateJobQueue:' . $poolKey . ':' . $transcodeKey;
+				$work = new PoolCounterWorkViaCallback( 'TMHupdateJobQueue', $poolKey,
+					array( 'doWork' => function() use ($file, $transcodeKey) {
+						WebVideoTranscode::updateJobQueue( $file, $transcodeKey );
+						return true;
+					}, 'doCachedWork' => function() {
+						return true;
+					} ) );
+				$work->execute();
+			} else {
+				self::updateJobQueue( $file, $transcodeKey );
+			}
 		}
 	}
 
