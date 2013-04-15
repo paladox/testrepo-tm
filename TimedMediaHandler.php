@@ -90,6 +90,8 @@ $wgTranscodeBackgroundTimeLimit = 3600 * 8;
 $wgTranscodeBackgroundMemoryLimit = 2 * 1024 * 1024; // 2GB avconv, ffmpeg2theora mmap resources so virtual memory needs to be high enough
 // Maximum file size transcoding processes can create, in KB
 $wgTranscodeBackgroundSizeLimit = 3 * 1024 * 1024; // 3GB
+//decoding 1080p Ogg Theora can require lots of ram
+$wgTMHThumbnailMemoryLimit = 1536000;
 
 // The location of ffmpeg2theora (transcoding)
 $wgFFmpeg2theoraLocation = '/usr/bin/ffmpeg2theora';
