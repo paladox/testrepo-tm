@@ -86,11 +86,14 @@ class TimedMediaThumbnail {
 	 * @return bool|MediaTransformError
 	 */
 	static function tryFfmpegThumb( $options ){
-		global $wgFFmpegLocation, $wgMaxShellMemory;
+		global $wgFFmpegLocation, $wgMaxShellMemory, $wgThumbnailMemoryLimit;
 
 		if( !$wgFFmpegLocation || !is_file( $wgFFmpegLocation ) ){
 			return false;
 		}
+		$env = array();
+		//decoding 1080p Ogg Theora can require lots of ram
+		$limits = array( 'memory' => $wgThumbnailMemoryLimit );
 
 		$cmd = wfEscapeShellArg( $wgFFmpegLocation ) . ' -threads 1 ';
 
@@ -133,7 +136,7 @@ class TimedMediaThumbnail {
 			wfEscapeShellArg( $options['dstPath'] ) . ' 2>&1';
 
 		$retval = 0;
-		$returnText = wfShellExec( $cmd, $retval );
+		$returnText = wfShellExec( $cmd, $retval, $env, $limits );
 		// Check if it was successful
 		if ( !$options['file']->getHandler()->removeBadFile( $options['dstPath'], $retval ) ) {
 			return true;
