@@ -141,6 +141,7 @@ class TimedMediaHandlerHooks {
 		$wgHooks[ 'ImagePageAfterImageLinks' ][] = 'TimedMediaHandlerHooks::checkForTranscodeStatus';
 		$wgHooks[ 'NewRevisionFromEditComplete' ][] = 'TimedMediaHandlerHooks::onNewRevisionFromEditComplete';
 
+		$wgHooks['LoadExtensionSchemaUpdates'][] = 'TimedMediaHandlerHooks::checkSchemaUpdates';
 		return true;
 	}
 
@@ -349,4 +350,26 @@ class TimedMediaHandlerHooks {
 		$out->addModuleStyles( 'mw.PopUpMediaTransform' );
 		return true;
 	}
+
+	public static function checkSchemaUpdates( DatabaseUpdater $updater ) {
+		$base = dirname( __FILE__ );
+
+		switch ( $updater->getDB()->getType() ) {
+		case 'mysql':
+			$updater->addExtensionTable( 'transcode', "$base/TimedMediaHandler.sql" ); // Initial install tables
+			$updater->addExtensionIndex( 'transcode', 'transcode_name_key',
+				"$base/archives/transcode_name_key.sql" );
+			break;
+		case 'sqlite':
+			$updater->addExtensionTable( 'transcode', "$base/TimedMediaHandler.sql" ); // Initial install tables
+			$updater->addExtensionUpdate( array( 'addIndex', 'transcode', 'transcode_name_key',
+				"$base/archives/transcode_name_key.sql", true ) );
+			break;
+		case 'postgres':
+			//TODO
+			break;
+		}
+		return true;
+	}
+
 }
