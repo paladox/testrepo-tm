@@ -29,7 +29,8 @@ class CleanupTranscodes extends Maintenance {
 		}
 		$this->output( "Cleanup transcodes:\n" );
 		$dbr = wfGetDB( DB_SLAVE );
-		$res = $dbr->select( 'transcode', '*', $where, __METHOD__ );
+		$res = $dbr->select( 'transcode', '*', $where, __METHOD__,
+			array( 'LIMIT' => 100 ) );
 		foreach ( $res as $row ) {
 			$this->output(
 				'remove: '. $row->transcode_image_name . ' ' . $row->transcode_key . "\n"
