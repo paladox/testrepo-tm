@@ -81,6 +81,9 @@
 		// can be displayed in the player without loading the media file
 		'data-durationhint': null,
 
+		// to disable menu or timedText for a given embed
+		'data-disablecontrols': null,
+
 		// Also support direct durationHint attribute ( backwards compatibly )
 		// @deprecated please use data-durationhint instead.
 		'durationHint' : null,
@@ -342,6 +345,11 @@
 			// Make sure duration is a float:
 			this.duration = parseFloat( this.duration );
 			mw.log( 'EmbedPlayer::init:' + this.id + " duration is: " + this.duration );
+
+			// Add disablecontrols property form data-disablecontrols:
+			if( _this['data-disablecontrols'] ){
+				_this.disablecontrols = _this['data-disablecontrols'];
+			}
 
 			// Set the playerElementId id
 			this.pid = 'pid_' + this.id;
