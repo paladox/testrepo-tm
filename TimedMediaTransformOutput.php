@@ -120,9 +120,11 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 		if ( count( func_get_args() ) == 2 ) {
 			throw new MWException( __METHOD__ .' called in the old style' );
 		}
-
-		// Check if the video is too small to play inline ( instead do a pop-up dialog )
-		if( $this->getPlayerWidth() <= $wgMinimumVideoPlayerSize && $this->isVideo ){
+		// If the video is too small to play inline or is explicitly set to be
+		// modal, show it in a modal pop-up.
+		if ( $this->isVideo
+			&& ( $this->getPlayerWidth() <= $wgMinimumVideoPlayerSize || $options['modal'] )
+		) {
 			return $this->getImagePopUp();
 		} else {
 			return $this->getHtmlMediaTagOutput();
