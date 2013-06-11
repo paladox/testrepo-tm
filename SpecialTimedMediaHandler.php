@@ -25,18 +25,13 @@ class SpecialTimedMediaHandler extends SpecialPage {
 	}
 
 	public function execute( $par ) {
-		global $wgMemc;
 		$this->setHeaders();
 		$out = $this->getOutput();
 
 		$out->addModuleStyles( 'mediawiki.special' );
 
-		$key = wfMemcKey( 'TimedMediaHandler', 'stats' );
-		$stats = $wgMemc->get( $key );
-		if ( !$stats ) {
-			$stats = $this->getStats();
-			$wgMemc->add( $key, $stats, 3600 );
-		}
+		$stats = $this->getStats();
+
 		$out->addHTML(
 			"<h2>"
 			. $this->msg( 'timedmedia-videos',  $stats['videos']['total'] )->escaped()
@@ -88,7 +83,7 @@ class SpecialTimedMediaHandler extends SpecialPage {
 			}
 		}
 	}
-	private function getTranscodes ( $state, $limit = 30 ) {
+	private function getTranscodes ( $state, $limit = 50 ) {
 		$dbr = wfGetDB( DB_SLAVE );
 		$files = array();
 		$res = $dbr->select(
@@ -108,7 +103,7 @@ class SpecialTimedMediaHandler extends SpecialPage {
 		return $files;
 	}
 
-	private function getTranscodesTable ( $state, $limit = 30 ) {
+	private function getTranscodesTable ( $state, $limit = 50 ) {
 		$table = '<table class="wikitable">' . "\n"
 			. '<tr>'
 			. '<th>' . $this->msg( 'timedmedia-transcodeinfo' )->escaped() . '</th>'
@@ -129,9 +124,25 @@ class SpecialTimedMediaHandler extends SpecialPage {
 	}
 
 	private function getStats() {
-		global $wgEnabledTranscodeSet;
-		$stats = array();
+		global $wgEnabledTranscodeSet, $wgMemc;
 		$dbr = wfGetDB( DB_SLAVE );
+		$key = wfMemcKey( 'TimedMediaHandler', 'stats' );
+		$stats = $wgMemc->get( $key );
+		if ( !$stats ) {
+			$stats = array();
+			$stats[ 'videos' ] = array( 'total' => 0 );
+			foreach( $this->formats as $format => $condition ) {
+				$stats[ 'videos' ][ $format ] = (int)$dbr->selectField(
+					'image',
+					'COUNT(*)',
+					'img_media_type = "VIDEO" AND (' . $condition . ')',
+					__METHOD__
+				);
+				$stats[ 'videos' ][ 'total' ] += $stats[ 'videos' ][ $format ];
+			}
+			$wgMemc->add( $key, $stats, 3600 );
+		}
+
 		$stats[ 'transcodes' ] = array( 'total' => 0 );
 		foreach ( $this->transcodeStates as $state => $condition ) {
 			$stats[ $state ] = array( 'total' => 0 );
@@ -165,16 +176,6 @@ class SpecialTimedMediaHandler extends SpecialPage {
 			$stats[ 'transcodes' ][ 'total' ] += $stats[ 'transcodes' ][ $key ];
 		}
 
-		$stats[ 'videos' ] = array( 'total' => 0 );
-		foreach( $this->formats as $format => $condition ) {
-			$stats[ 'videos' ][ $format ] = (int)$dbr->selectField(
-				'image',
-				'COUNT(*)',
-				'img_media_type = "VIDEO" AND (' . $condition . ')',
-				__METHOD__
-			);
-			$stats[ 'videos' ][ 'total' ] += $stats[ 'videos' ][ $format ];
-		}
 		return $stats;
 	}
 }
