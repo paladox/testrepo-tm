@@ -971,8 +971,10 @@ mw.PlayerControlBuilder.prototype = {
 			embedPlayer.updatePlayheadStatus()
 		});
 
-		// Update buffer information TODO move to controlBuilder
-		$( embedPlayer ).bind( 'progress' + this.bindPostfix, function(){
+		// Update buffer information 
+		$( embedPlayer ).bind( 'progress' + this.bindPostfix, function( event, jEvent, id){
+			// regain scope
+			var embedPlayer = $( '#' + id )[0];
 			embedPlayer.updateBufferStatus();
 		});
 
@@ -1200,10 +1202,10 @@ mw.PlayerControlBuilder.prototype = {
 			}, dblClickTime );
 			return true;
 		};
-		if (!embedPlayer.addEventListener) {
+		// Add click binding: ( $(embedPlayer).click ) has scope issues )
+		if ( embedPlayer.attachEvent ) {
 			embedPlayer.attachEvent("onclick", playerClickCb);
 		} else{
-			// For some reason jquery .bind( 'click' ) is doing evil things
 			// Firefox 3.5 requires third argument to addEventListener
 			embedPlayer.addEventListener('click', playerClickCb, false );
 		}
@@ -1246,7 +1248,7 @@ mw.PlayerControlBuilder.prototype = {
 			.fadeOut( animateDuration );
 		//mw.log('about to trigger hide control bar')
 		// Allow interface items to update:
-		$( this.embedPlayer ).trigger('onHideControlBar', {'bottom' : 15} );
+		$( this.embedPlayer ).trigger('onHideControlBar', [ {'bottom' : 15}, this.embedPlayer.id ] );
 
 	},
 	restoreControlsHover:function(){
@@ -1276,9 +1278,9 @@ mw.PlayerControlBuilder.prototype = {
 		}
 
 		// Trigger the screen overlay with layout info:
-		$( this.embedPlayer ).trigger( 'onShowControlBar', {
+		$( this.embedPlayer ).trigger( 'onShowControlBar', [{
 			'bottom' : this.getHeight() + 15
-		} );
+		}, this.embedPlayer.id ] );
 	},
 
 	/**
