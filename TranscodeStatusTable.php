@@ -130,7 +130,7 @@ class TranscodeStatusTable {
 			}
 
 			return wfMessage( 'timedmedia-error-on',
-				$wgContLang->timeAndDate( $state['time_error'] ) )->escaped() .
+				$wgContLang->timeAndDate( $state['time_error'] ) )->escaped() . ' ' .
 				$showErrorLink;
 		}
 
