@@ -21,8 +21,12 @@ $messages['en'] = array(
 
 	'timedmedia-webm-short-video' => 'WebM $1 video file, $2',
 	'timedmedia-webm-long-video' => 'WebM audio/video file, $1, length $2, $4 × $5 pixels, $3 overall',
+
 	'timedmedia-flac-short-audio' => 'FLAC audio file, $1',
 	'timedmedia-flac-long-audio' => 'FLAC audio file, length $1, $2 overall',
+
+	'timedmedia-wav-short-audio' => 'WAV audio file, $1',
+	'timedmedia-wav-long-audio' => 'WAV audio file, length $1, $2 overall',
 
 	'timedmedia-mp4-short-video' => 'MP4 $1 video file, $2',
 	'timedmedia-mp4-long-video' => 'MP4 audio/video file, $1, length $2, $4 × $5 pixels, $3 overall',
@@ -235,6 +239,7 @@ Parameters:
 * $5 - height of the video (in pixels)
 See also:
 * {{msg-mw|Timedmedia-webm-short-video}}',
+
 	'timedmedia-flac-short-audio' => 'File details for FLAC audio files, short version.
 Parameters:
 * $1 - duration of the audio (localized) - e.g. 1m34s
@@ -243,8 +248,7 @@ Primarily used on Special:Search results pages, i.e.
  https://commons.wikimedia.org/w/index.php?title=Special%3ASearch&profile=advanced&search=What%27s+a+love+dart&fulltext=Search&ns6=1&profile=advanced
 
 See also:
-* {{msg-mw|Timedmedia-flac-long-audio}}
-* {{msg-mw|Timedmedia-ogg-short-audio}}',
+* {{msg-mw|Timedmedia-flac-long-audio}}',
 	'timedmedia-flac-long-audio' => 'File details for FLAC files, long version.
 
 Shown after the filename in the image description page.
@@ -254,6 +258,21 @@ Parameters:
 * $2 - bit-rate (localized) - e.g. 97kbps
 See also:
 * {{msg-mw|Timedmedia-flac-short-audio}}',
+
+	'timedmedia-wav-short-audio' => 'File details for WAV audio files, short version.
+Parameters:
+* $1 - duration of the audio (localized) - e.g. 1m34s
+See also:
+* {{msg-mw|Timedmedia-wav-long-audio}}',
+	'timedmedia-wav-long-audio' => 'File details for WAV files, long version.
+Shown after the filename in the image description page.
+
+Parameters:
+* $1 - duration (localized) - e.g. 1m34s
+* $2 - bit-rate (localized) - e.g. 97kbps
+See also:
+* {{msg-mw|Timedmedia-wav-short-audio}}',
+
 	'timedmedia-mp4-short-video' => 'File details for MP4 video files, short version.
 Parameters:
 * $1 - stream type names (slash separated) - e.g. AAC/h.264
