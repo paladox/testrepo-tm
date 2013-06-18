@@ -24,6 +24,9 @@ $messages['en'] = array(
 	'timedmedia-flac-short-audio' => 'FLAC audio file, $1',
 	'timedmedia-flac-long-audio' => 'FLAC audio file, length $1, $2 overall',
 
+	'timedmedia-wav-short-audio' => 'WAV audio file, $1',
+	'timedmedia-wav-long-audio' => 'WAV audio file, length $1, $2 overall',
+
 	'timedmedia-mp4-short-video' => 'MP4 $1 video file, $2',
 	'timedmedia-mp4-long-video' => 'MP4 audio/video file, $1, length $2, $4 × $5 pixels, $3 overall',
 
@@ -235,6 +238,17 @@ Parameters:
 * $5 - height of the video (in pixels)
 See also:
 * {{msg-mw|Timedmedia-webm-short-video}}',
+
+	'timedmedia-wav-short-audio' => 'File details for WAV audio files, short version.
+Parameters:
+* $1 - duration of the audio (localized) - e.g. 1m34s
+See also:
+* {{msg-mw|Timedmedia-wav-long-audio}}',
+	'timedmedia-wav-long-audio' => 'File details for WAV files, long version.
+Shown after the filename in the image description page.
+See also:
+* {{msg-mw|Timedmedia-wav-short-audio}}',
+
 	'timedmedia-flac-short-audio' => 'File details for FLAC audio files, short version.
 Parameters:
 * $1 - duration of the audio (localized) - e.g. 1m34s
