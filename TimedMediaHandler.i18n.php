@@ -21,7 +21,10 @@ $messages['en'] = array(
 
 	'timedmedia-webm-short-video' => 'WebM $1 video file, $2',
 	'timedmedia-webm-long-video' => 'WebM audio/video file, $1, length $2, $4 × $5 pixels, $3 overall',
-
+	
+	'timedmedia-wav-short-audio' => 'WAV audio file, $1',
+	'timedmedia-wav-long-audio' => 'WAV audio file, length $1, $2 overall',
+	
 	'timedmedia-mp4-short-video' => 'MP4 $1 video file, $2',
 	'timedmedia-mp4-long-video' => 'MP4 audio/video file, $1, length $2, $4 × $5 pixels, $3 overall',
 

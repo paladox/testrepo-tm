@@ -12,7 +12,7 @@ class TimedMediaHandler extends MediaHandler {
 
 	function getImageSize( $file, $path, $metadata = false ) {
 		/* override by handler */
-		return array();
+		return false;
 	}
 
 	/**
