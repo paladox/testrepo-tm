@@ -85,11 +85,11 @@ $wgEnableNiceBackgroundTranscodeJobs = false;
 $wgTranscodeBackgroundPriority = 19;
 
 // The total amout of time a transcoding shell command can take:
-$wgTranscodeBackgroundTimeLimit = 3600 * 4;
+$wgTranscodeBackgroundTimeLimit = 3600 * 8;
 // Maximum amount of virtual memory available to transcoding processes in KB
 $wgTranscodeBackgroundMemoryLimit = 2 * 1024 * 1024; // 2GB avconv, ffmpeg2theora mmap resources so virtual memory needs to be high enough
 // Maximum file size transcoding processes can create, in KB
-$wgTranscodeBackgroundSizeLimit = 1024 * 1024; // 1GB
+$wgTranscodeBackgroundSizeLimit = 3 * 1024 * 1024; // 3GB
 
 // The location of ffmpeg2theora (transcoding)
 $wgFFmpeg2theoraLocation = '/usr/bin/ffmpeg2theora';
@@ -172,7 +172,8 @@ $wgTmhEnableMp4Uploads = false;
 
 // List of extensions handled by Timed Media Handler since its referenced in a few places.
 // you should not modify this variable
-$wgTmhFileExtensions = array( 'ogg', 'ogv', 'oga', 'webm', 'mp4' );
+
+$wgTmhFileExtensions = array( 'ogg', 'ogv', 'oga', 'flac', 'wav', 'webm', 'mp4' );
 
 $wgFileExtensions = array_merge( $wgFileExtensions, $wgTmhFileExtensions );
 
@@ -198,10 +199,15 @@ ini_set( 'include_path',
 // getID3 provides metadata for mp4 and webm files:
 $wgAutoloadClasses['getID3'] = "$timedMediaDir/libs/getid3/getid3.php";
 
+// WAV Handler
+$wgAutoloadClasses['WAVHandler'] = "$timedMediaDir/handlers/WAVHandler/WAVHandler.php";
+
 // Mp4 / h264 Handler
 $wgAutoloadClasses['Mp4Handler'] = "$timedMediaDir/handlers/Mp4Handler/Mp4Handler.php";
 // WebM Handler
 $wgAutoloadClasses['WebMHandler'] = "$timedMediaDir/handlers/WebMHandler/WebMHandler.php";
+// FLAC Handler
+$wgAutoloadClasses['FLACHandler'] = "$timedMediaDir/handlers/FLACHandler/FLACHandler.php";
 
 // Text handler
 $wgAutoloadClasses['TextHandler'] = "$timedMediaDir/handlers/TextHandler/TextHandler.php";

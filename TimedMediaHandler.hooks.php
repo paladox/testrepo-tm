@@ -40,6 +40,14 @@ class TimedMediaHandlerHooks {
 		$wgMediaHandlers['application/ogg'] = 'OggHandlerTMH';
 		$wgMediaHandlers['video/webm'] = 'WebMHandler';
 		$wgMediaHandlers['video/mp4'] = 'Mp4Handler';
+		$wgMediaHandlers['audio/x-flac'] = 'FLACHandler';
+		$wgMediaHandlers['audio/flac'] = 'FLACHandler';
+
+		$wgMediaHandlers['audio/wav'] = 'WAVHandler';
+
+		$wgMediaHandlers['audio/x-flac'] = 'FLACHandler';
+		$wgMediaHandlers['audio/flac'] = 'FLACHandler';
+
 
 		// Add transcode job class:
 		$wgJobClasses['webVideoTranscode'] = 'WebVideoTranscodeJob';
@@ -189,7 +197,7 @@ class TimedMediaHandlerHooks {
 		global $wgEnableTranscode, $wgEnabledAudioTranscodeSet;
 
 		// don't show the transcode table if transcode is disabled
-		if( $wgEnableTranscode === false ){
+		if( !$wgEnableTranscode && !$wgEnabledAudioTranscodeSet ){
 			return false;
 		}
 		// Can't find file
