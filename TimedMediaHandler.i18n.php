@@ -21,6 +21,11 @@ $messages['en'] = array(
 
 	'timedmedia-webm-short-video' => 'WebM $1 video file, $2',
 	'timedmedia-webm-long-video' => 'WebM audio/video file, $1, length $2, $4 × $5 pixels, $3 overall',
+	'timedmedia-flac-short-audio' => 'FLAC audio file, $1',
+	'timedmedia-flac-long-audio' => 'FLAC audio file, length $1, $2 overall',
+
+	'timedmedia-wav-short-audio' => 'WAV audio file, $1',
+	'timedmedia-wav-long-audio' => 'WAV audio file, length $1, $2 overall',
 
 	'timedmedia-mp4-short-video' => 'MP4 $1 video file, $2',
 	'timedmedia-mp4-long-video' => 'MP4 audio/video file, $1, length $2, $4 × $5 pixels, $3 overall',
@@ -233,6 +238,34 @@ Parameters:
 * $5 - height of the video (in pixels)
 See also:
 * {{msg-mw|Timedmedia-webm-short-video}}',
+	'timedmedia-wav-short-audio' => 'File details for WAV audio files, short version.
+Parameters:
+* $1 - duration of the audio (localized) - e.g. 1m34s
+See also:
+* {{msg-mw|Timedmedia-wav-long-audio}}',
+	'timedmedia-wav-long-audio' => 'File details for WAV files, long version.
+Shown after the filename in the image description page.
+See also:
+* {{msg-mw|Timedmedia-wav-short-audio}}'
+
+	'timedmedia-flac-short-audio' => 'File details for FLAC audio files, short version.
+Parameters:
+* $1 - duration of the audio (localized) - e.g. 1m34s
+
+Primarily used on Special:Search results pages, i.e.
+ https://commons.wikimedia.org/w/index.php?title=Special%3ASearch&profile=advanced&search=What%27s+a+love+dart&fulltext=Search&ns6=1&profile=advanced
+
+See also:
+* {{msg-mw|Timedmedia-flac-long-audio}}',
+	'timedmedia-flac-long-audio' => 'File details for FLAC files, long version.
+
+Shown after the filename in the image description page.
+
+Parameters:
+* $1 - duration (localized) - e.g. 1m34s
+* $2 - bit-rate (localized) - e.g. 97kbps
+See also:
+* {{msg-mw|Timedmedia-flac-short-audio}}',
 	'timedmedia-mp4-short-video' => 'File details for MP4 video files, short version.
 Parameters:
 * $1 - stream type names (slash separated) - e.g. AAC/h.264
@@ -268,7 +301,7 @@ Parameters:
 Parameters are:
 * $1 The date that the transcode was completed',
 	'timedmedia-error-on' => 'Parameters:
-* $1 is a timestamp.',
+* $1 - timestamp',
 	'timedmedia-started-transcode' => 'Status update for Transcodes
 Parameters are:
 * $1 Time passed since transcoded started
@@ -529,6 +562,8 @@ $messages['ast'] = array(
 	'timedmedia-ogg-long-error' => 'Ficheru Ogg inválidu: $1',
 	'timedmedia-webm-short-video' => 'Ficheru de videu  WebM $1, $2',
 	'timedmedia-webm-long-video' => 'Ficheru de soníu/videu  WebM, $1, llonxitú $2, $4 × $5 pixels, $3 total',
+	'timedmedia-flac-short-audio' => 'Ficheru de soníu FLAC, $1',
+	'timedmedia-flac-long-audio' => 'Ficheru de soníu FLAC, duración $1, $2 total',
 	'timedmedia-mp4-short-video' => 'Archivu de videu MP4 $1, $2',
 	'timedmedia-mp4-long-video' => 'Ficheru de soníu/videu  MP4, $1, llonxitú $2, $4 × $5 pixels, $3 total',
 	'timedmedia-no-player-js' => 'Sentimoslo, o\'l so navegador tien desactiváu JavaScript o nun tien un reproductor compatible.<br />
@@ -549,7 +584,7 @@ Pue <a href="$1">descargar el clip</a> o <a href="//www.mediawiki.org/wiki/Exten
 	'timedmedia-direct-link' => 'Descargar el deriváu',
 	'timedmedia-not-ready' => 'Nun ta preparáu',
 	'timedmedia-completed-on' => 'Trescodificación completada el $1',
-	'timedmedia-error-on' => 'Error na trescodificación del $1.',
+	'timedmedia-error-on' => 'Error na trescodificación del $1',
 	'timedmedia-started-transcode' => 'La trescodificación principió hai $1. $2',
 	'timedmedia-percent-done' => 'Fecho alredor del $1%',
 	'timedmedia-in-job-queue' => 'Amestáu a la cola de trabayos hai $1',
@@ -558,7 +593,6 @@ Pue <a href="$1">descargar el clip</a> o <a href="//www.mediawiki.org/wiki/Exten
 	'timedmedia-hours' => '{{PLURAL:$1|1 hora|$1 hores}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|1 minutu|$1 minutos}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|1 segundu|$1 segundos}}',
-	'timedmedia-show-error' => "Ver l'error",
 	'timedmedia-reset' => 'Reaniciar la trescodificación',
 	'timedmedia-reset-confirm' => 'Al reaniciar esta trescodificación desaniciará tolos ficheros esistentes (si los hai), y volverá a amestar la trescodificación a la cola de trabayos. Llevará un tiempu volver a trescodificar.<br /><br />
 ¿Ta seguru de que quier siguir?',
@@ -1041,6 +1075,7 @@ Er du sikker på, du vil fortsætte?',
 /** German (Deutsch)
  * @author Filzstift
  * @author G.Hagedorn
+ * @author Geitost
  * @author Kghbln
  * @author Leithian
  * @author Metalhead64
@@ -1061,6 +1096,8 @@ $messages['de'] = array(
 	'timedmedia-ogg-long-error' => 'Ungültige Ogg-Datei: $1',
 	'timedmedia-webm-short-video' => 'WebM-$1-Videodatei, $2',
 	'timedmedia-webm-long-video' => 'WebM-Audio-/Video-Datei, $1, Länge: $2, $4×$5 Pixel, $3 insgesamt',
+	'timedmedia-flac-short-audio' => 'FLAC-Audiodatei, $1',
+	'timedmedia-flac-long-audio' => 'FLAC-Audiodatei, Länge: $1, Bitrate: $2',
 	'timedmedia-mp4-short-video' => 'MP4-$1-Videodatei, $2',
 	'timedmedia-mp4-long-video' => 'MP4-Audio-/Video-Datei, $1, Länge $2, $4 × $5 Pixel, $3 gesamt',
 	'timedmedia-no-player-js' => 'Entschuldige, aber dein Browser hat entweder JavaScript deaktiviert oder keine unterstützte Abspielsoftware.<br />
@@ -1081,7 +1118,7 @@ Du kannst <a href="$1">den Clip herunterladen</a> oder <a href="//www.mediawiki.
 	'timedmedia-direct-link' => 'Formatvariante herunterladen',
 	'timedmedia-not-ready' => 'Nicht bereit',
 	'timedmedia-completed-on' => 'Umschlüsselung abgeschlossen um $1',
-	'timedmedia-error-on' => 'Fehler beim Umschlüsseln um $1.',
+	'timedmedia-error-on' => 'Fehler beim Umschlüsseln um $1',
 	'timedmedia-started-transcode' => 'Umschlüsselung startete vor $1. $2',
 	'timedmedia-percent-done' => 'Ungefähr $1 % sind erledigt',
 	'timedmedia-in-job-queue' => 'Vor $1 der Auftragswarteschlange hinzugefügt',
@@ -1090,7 +1127,6 @@ Du kannst <a href="$1">den Clip herunterladen</a> oder <a href="//www.mediawiki.
 	'timedmedia-hours' => '{{PLURAL:$1|1 Stunde|$1 Stunden}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|1 Minute|$1 Minuten}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|1 Sekunde|$1 Sekunden}}',
-	'timedmedia-show-error' => 'Fehler anzeigen',
 	'timedmedia-reset' => 'Umschlüsselung zurücksetzen',
 	'timedmedia-reset-confirm' => 'Das Zurücksetzen dieser Umschlüsselung wird, sofern vorhanden, die bestehende Datei entfernen und die Umschlüsselung erneut der Auftragswarteschlange hinzufügen. Die erneute Umschlüsselung wird einige Zeit dauern.<br /><br />Soll dies tatsächlich gemacht werden?',
 	'timedmedia-reset-error' => 'Fehler beim Zurücksetzen der Umschlüsselung',
@@ -1127,7 +1163,7 @@ Du kannst <a href="$1">den Clip herunterladen</a> oder <a href="//www.mediawiki.
 	'timedmedia-derivative-state-queued' => '{{PLURAL:$1|Eine Umschlüsselung|$1 Umschlüsselungen}} in der Warteschlange',
 	'timedmedia-derivative-state-failed' => '{{PLURAL:$1|Eine fehlgeschlagene Umschlüsselung|$1 fehlgeschlagene Umschlüsselungen}}',
 	'timedmedia-file' => 'Datei',
-	'right-transcode-reset' => 'Fehlgeschlagene oder umgeschlüsselte Videos zurücksetzen, um sie erneut in die Auftragswarteschlange einzureihen',
+	'right-transcode-reset' => 'Fehlgeschlagene oder erfolgreiche Umschlüsselungen von Video-Dateien zurücksetzen, um sie erneut in die Auftragswarteschlange einzureihen',
 	'right-transcode-status' => '[[Special:TimedMediaHandler|Informationen über aktuelle Umschlüsselungen]] betrachten',
 	'action-transcode-status' => 'den aktuellen Transkodierungstatus anzusehen',
 );
@@ -1557,6 +1593,8 @@ $messages['fr'] = array(
 	'timedmedia-ogg-long-error' => 'Fichier Ogg invalide : $1',
 	'timedmedia-webm-short-video' => 'Fichier vidéo WebM $1, $2',
 	'timedmedia-webm-long-video' => "Fichier audio/vidéo WebM, $1, longueur $2, $4 x $5 pixels, $3 l'ensemble",
+	'timedmedia-flac-short-audio' => 'Fichier audio FLAC, $1',
+	'timedmedia-flac-long-audio' => 'Fichier audio FLAC, durée $1, débit $2 sur l’ensemble',
 	'timedmedia-mp4-short-video' => 'Fichier vidéo MP4 $1, $2',
 	'timedmedia-mp4-long-video' => 'Fichier audio/vidéo MP4, $1, taille $2, $4 x $5 pixels, $3 au total',
 	'timedmedia-no-player-js' => 'Désolé, soit votre navigateur a JavaScript désactivé, soit il ne dispose d’aucun lecteur pris en charge.<br />
@@ -1577,7 +1615,7 @@ Vous pouvez <a href="$1">télécharger le clip</a> ou <a href="//www.mediawiki.o
 	'timedmedia-direct-link' => 'Télécharger le dérivé',
 	'timedmedia-not-ready' => 'Pas prêt',
 	'timedmedia-completed-on' => 'Transcodage de $1 terminé',
-	'timedmedia-error-on' => 'Erreur dans le transcodage de $1.',
+	'timedmedia-error-on' => 'Erreur dans le transcodage de $1',
 	'timedmedia-started-transcode' => 'Transcodage démarré depuis $1. $2',
 	'timedmedia-percent-done' => 'Environ $1 % complété',
 	'timedmedia-in-job-queue' => 'Ajouté à la file d’attente des travaux il y a $1',
@@ -1586,7 +1624,6 @@ Vous pouvez <a href="$1">télécharger le clip</a> ou <a href="//www.mediawiki.o
 	'timedmedia-hours' => '{{PLURAL:$1|1 heure|$1 heures}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|1 minute|$1 minutes}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|1 seconde|$1 secondes}}',
-	'timedmedia-show-error' => 'Afficher les erreurs',
 	'timedmedia-reset' => 'Réinitialiser le transcodage',
 	'timedmedia-reset-confirm' => 'Remettre à zéro ce transcodage supprimera tout fichier existant (s’il y en a) et ajoutera de nouveau le transcodage à la file de travaux. Cela prendra un certain temps pour être transcodé de nouveau. <br /><br />
 Êtes-vous sûr de vouloir continuer ?',
@@ -1725,6 +1762,8 @@ $messages['gl'] = array(
 	'timedmedia-ogg-long-error' => 'Ficheiro Ogg non válido: $1',
 	'timedmedia-webm-short-video' => 'Ficheiro de vídeo WebM $1, $2',
 	'timedmedia-webm-long-video' => 'Ficheiro WebM de son/vídeo, $1, duración $2, $4×$5 píxeles, $3 total',
+	'timedmedia-flac-short-audio' => 'Ficheiro de son FLAC, $1',
+	'timedmedia-flac-long-audio' => 'Ficheiro de son FLAC, duración $1, $2 total',
 	'timedmedia-mp4-short-video' => 'Ficheiro de vídeo MP4 $1, $2',
 	'timedmedia-mp4-long-video' => 'Ficheiro MP4 de son/vídeo, $1, duración $2, $4×$5 píxeles, $3 total',
 	'timedmedia-no-player-js' => 'Sentímolo, o seu navegador ten o JavaScript desactivado ou non conta con ningún reprodutor dos soportados.<br />
@@ -1745,7 +1784,7 @@ Pode <a href="$1">descargar o vídeo</a> ou <a href="//www.mediawiki.org/wiki/Ex
 	'timedmedia-direct-link' => 'Descargar o derivado',
 	'timedmedia-not-ready' => 'Aínda non está preparado',
 	'timedmedia-completed-on' => 'Transcodificación completada o $1',
-	'timedmedia-error-on' => 'Erro na transcodificación o $1.',
+	'timedmedia-error-on' => 'Erro na transcodificación o $1',
 	'timedmedia-started-transcode' => 'A transcodificación comezou hai $1. $2',
 	'timedmedia-percent-done' => 'Preto do $1% feito',
 	'timedmedia-in-job-queue' => 'Engadido á cola de traballos hai $1',
@@ -1754,7 +1793,6 @@ Pode <a href="$1">descargar o vídeo</a> ou <a href="//www.mediawiki.org/wiki/Ex
 	'timedmedia-hours' => '{{PLURAL:$1|1 hora|$1 horas}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|1 minuto|$1 minutos}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|1 segundo|$1 segundos}}',
-	'timedmedia-show-error' => 'Mostrar o erro',
 	'timedmedia-reset' => 'Restablecer a transcodificación',
 	'timedmedia-reset-confirm' => 'Ao restablecer a transcodificación eliminarase calquera ficheiro existente e volverá engadir a transcodificación á cola de traballos. A nova transcodificación levará bastante tempo.<br /><br />
 Está seguro de querer continuar?',
@@ -2470,6 +2508,8 @@ $messages['it'] = array(
 	'timedmedia-ogg-long-error' => 'File ogg non valido: $1',
 	'timedmedia-webm-short-video' => 'File video WebM $1, $2',
 	'timedmedia-webm-long-video' => 'File audio/video WebM $1, durata $2, dimensioni $4×$5 pixel, complessivamente $3',
+	'timedmedia-flac-short-audio' => 'File audio FLAC, $1',
+	'timedmedia-flac-long-audio' => 'File audio FLAC, durata $1, complessivamente $2',
 	'timedmedia-mp4-short-video' => 'File video MP4 $1, $2',
 	'timedmedia-mp4-long-video' => 'File audio/video MP4 $1, durata $2, dimensioni $4×$5 pixel, complessivamente $3',
 	'timedmedia-no-player-js' => 'Si sta utilizzando un browser che ha JavaScript disattivato oppure non ha alcun riproduttore supportato.<br />
@@ -2490,7 +2530,7 @@ $messages['it'] = array(
 	'timedmedia-direct-link' => 'Scarica derivato',
 	'timedmedia-not-ready' => 'Non pronto',
 	'timedmedia-completed-on' => 'Transcodifica completata $1',
-	'timedmedia-error-on' => 'Errore nella transcodifica il $1.',
+	'timedmedia-error-on' => 'Errore nella transcodifica il $1',
 	'timedmedia-started-transcode' => 'Transcodifica iniziata $1 fa. $2',
 	'timedmedia-percent-done' => '$1% circa completato',
 	'timedmedia-in-job-queue' => 'Aggiunto alla coda di lavoro  $1  fa',
@@ -2499,7 +2539,6 @@ $messages['it'] = array(
 	'timedmedia-hours' => '{{PLURAL:$1|1 ora|$1 ore}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|1 minuto|$1 minuti}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|1 secondo|$1 secondi}}',
-	'timedmedia-show-error' => 'Vedi errore',
 	'timedmedia-reset' => 'Resetta transcodifica',
 	'timedmedia-reset-confirm' => 'Resettando questa transcodifica tutti i file esistenti (se presenti) saranno cancellati e la transcodifica sarà nuovamente aggiunta alla coda di lavoro. Ci vorrà qualche tempo per rieseguire la transcodifica. <br /><br />
 Continuare?',
@@ -2556,13 +2595,15 @@ $messages['ja'] = array(
 	'timedmedia-ogg-short-general' => 'Ogg $1 メディアファイル、$2',
 	'timedmedia-ogg-long-audio' => 'Ogg $1 音声ファイル、長さ $2、$3',
 	'timedmedia-ogg-long-video' => 'Ogg $1 動画ファイル、長さ $2、$4 × $5 ピクセル、$3',
-	'timedmedia-ogg-long-multiplexed' => 'Ogg 多重音声/動画ファイル、$1、長さ $2、$4 × $5 ピクセル、全体で$3',
+	'timedmedia-ogg-long-multiplexed' => 'Ogg 多重音声/動画ファイル、$1、長さ $2、$4 × $5 ピクセル、全体で $3',
 	'timedmedia-ogg-long-general' => 'Ogg メディアファイル、長さ $2、$3',
 	'timedmedia-ogg-long-error' => '無効な Ogg ファイル: $1',
 	'timedmedia-webm-short-video' => 'WebM $1 動画ファイル、$2',
-	'timedmedia-webm-long-video' => 'WebM 音声/動画ファイル、$1、長さ $2、$4 × $5 ピクセル、全体で$3',
+	'timedmedia-webm-long-video' => 'WebM 音声/動画ファイル、$1、長さ $2、$4 × $5 ピクセル、全体で $3',
+	'timedmedia-flac-short-audio' => 'FLAC 音声ファイル、$1',
+	'timedmedia-flac-long-audio' => 'FLAC 音声ファイル、長さ $1、全体で $2',
 	'timedmedia-mp4-short-video' => 'MP4 $1 動画ファイル、$2',
-	'timedmedia-mp4-long-video' => 'MP4 音声/動画ファイル、$1、長さ $2、$4 × $5 ピクセル、全体で$3',
+	'timedmedia-mp4-long-video' => 'MP4 音声/動画ファイル、$1、長さ $2、$4 × $5 ピクセル、全体で $3',
 	'timedmedia-no-player-js' => '申し訳ありませんが、あなたのブラウザーではJavaScriptが無効になっているか、対応しているプレーヤーがありません。<br />
 再生するには、<a href="$1">クリップをダウンロード</a>するか、<a href="//www.mediawiki.org/wiki/Extension:TimedMediaHandler/Client_download">プレーヤーをダウンロード</a>する必要があります。',
 	'timedmedia-more' => 'その他…',
@@ -2582,7 +2623,6 @@ $messages['ja'] = array(
 	'timedmedia-hours' => '{{PLURAL:$1|$1 時間}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|$1 分}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|$1 秒}}',
-	'timedmedia-show-error' => 'エラーを表示',
 	'timedmedia-mp4' => 'MP4',
 	'timedmedia-source-file' => '$1 音源',
 	'timedmedia-source-file-desc' => 'オリジナル $1 ファイル、$2 × $3 ($4)',
@@ -3170,6 +3210,8 @@ $messages['mk'] = array(
 	'timedmedia-ogg-long-error' => 'Оштетена Ogg-податотека: $1',
 	'timedmedia-webm-short-video' => 'WebM $1 видеоснимка, $2',
 	'timedmedia-webm-long-video' => 'WebM аудио/видео снимка, $1, должина: $2, $4 × $5 пиксели, вкупно $3',
+	'timedmedia-flac-short-audio' => 'Аудиоподатотека FLAC, $1',
+	'timedmedia-flac-long-audio' => 'Аудиоподатотека FLAC, траење: $1, вкупно $2',
 	'timedmedia-mp4-short-video' => 'MP4 $1 видеоснимка, $2',
 	'timedmedia-mp4-long-video' => 'MP4 аудио/видео снимка, $1, времетраење $2, $4 × $5 пиксели, вкупно $3',
 	'timedmedia-no-player-js' => 'Нажалост, вашиот прелистувач или има оневозможено JavaScript, или нема ниту еден поддржан изведувач.<br />
@@ -3190,7 +3232,7 @@ $messages['mk'] = array(
 	'timedmedia-direct-link' => 'Преземи изведено',
 	'timedmedia-not-ready' => 'Не е готово',
 	'timedmedia-completed-on' => 'Прекодирањето е завршено $1',
-	'timedmedia-error-on' => 'Грешка при прекодирањето на $1.',
+	'timedmedia-error-on' => 'Грешка при прекодирањето на $1',
 	'timedmedia-started-transcode' => 'Прекодирањето започна пред $1. $2',
 	'timedmedia-percent-done' => 'Сработено: околу $1%',
 	'timedmedia-in-job-queue' => 'Додадено во редицата на задачи пред $1',
@@ -3199,7 +3241,6 @@ $messages['mk'] = array(
 	'timedmedia-hours' => '{{PLURAL:$1|1 час|$1 часа}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|1 минута|$1 минути}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|1 секунда|$1 секунди}}',
-	'timedmedia-show-error' => 'Покажи ја грешката',
 	'timedmedia-reset' => 'Одново',
 	'timedmedia-reset-confirm' => 'Враќајќи го ова прекодирање одново ќе ја отстраните постоечката податотека (ако ја има) и ќе го вратите прекодирањето во редицата на задачи. Повторното прекодирање ќе потрае. <br /><br />Дали сте сигурни дека сакате да продолжите?',
 	'timedmedia-reset-error' => 'Грешка при повторното пуштање на транскодирањето.',
@@ -3384,6 +3425,8 @@ $messages['ms'] = array(
 	'timedmedia-ogg-long-error' => 'Fail Ogg tidak sah: $1',
 	'timedmedia-webm-short-video' => 'fail video WebM $1, $2',
 	'timedmedia-webm-long-video' => 'fail audio/video webM, $1, tempoh $2, $4×$5 piksel, $3 keseluruhannya',
+	'timedmedia-flac-short-audio' => 'Fail audio FLAC, $1',
+	'timedmedia-flac-long-audio' => 'Fail audio FLAC, tempoh $1, $2 keseluruhannya',
 	'timedmedia-mp4-short-video' => 'fail video MP4 $1, $2',
 	'timedmedia-mp4-long-video' => 'fail audio/video MP4, $1, tempoh $2, $4×$5 piksel, $3 keseluruhannya',
 	'timedmedia-no-player-js' => 'Maaf, pelayar anda sama ada telah dimatikan JavaScript-nya ataupun tidak mempunyai sebarang pemain yang disokong.<br />
@@ -3404,7 +3447,7 @@ Anda boleh <a href="$1">memuat turun sedutan</a> itu atau <a href="//www.mediawi
 	'timedmedia-direct-link' => 'Muat turun terbitan',
 	'timedmedia-not-ready' => 'Belum sedia',
 	'timedmedia-completed-on' => 'Pentranskodan selesai pada $1',
-	'timedmedia-error-on' => 'Ralat dalam transkod pada $1.',
+	'timedmedia-error-on' => 'Ralat dalam transkod pada $1',
 	'timedmedia-started-transcode' => 'Pentranskodan bermula $1 lalu. $2',
 	'timedmedia-percent-done' => 'Kira-kira $1% selesai',
 	'timedmedia-in-job-queue' => 'Ditambahkan ke dalam baris gilir kerja $1 lalu',
@@ -3413,7 +3456,6 @@ Anda boleh <a href="$1">memuat turun sedutan</a> itu atau <a href="//www.mediawi
 	'timedmedia-hours' => '$1 jam',
 	'timedmedia-minutes' => '$1 minit',
 	'timedmedia-seconds' => '$1 saat',
-	'timedmedia-show-error' => 'Paparkan ralat',
 	'timedmedia-reset' => 'Set semula transkod',
 	'timedmedia-reset-confirm' => 'Mengeset semula transkod ini akan membuang sebarang fail yang sedia ada (jika ada), lalu menambahkan semula transkod ke dalam baris gilir tugas. Pentranskodan semula akan memakan masa.<br /><br />Adakah anda tetap ingin melakukannya?',
 	'timedmedia-reset-error' => 'Ralat ketika mengeset semula tugas pentranskodan.',
@@ -3504,6 +3546,16 @@ Du kan <a href="$1">laste ned klippet</a> eller <a href="//www.mediawiki.org/wik
 	'timedmedia-desc-link' => 'Om denne filen',
 	'timedmedia-oggThumb-version' => 'OggHandler krever oggThumb versjon $1 eller senere.',
 	'timedmedia-oggThumb-failed' => 'oggThumb klarte ikke å opprette miniatyrbildet.',
+	'timedmedia-status' => 'Status',
+	'timedmedia-status-unknown' => 'Ukjent status',
+	'timedmedia-actions' => 'Handlinger',
+	'timedmedia-not-ready' => 'Ikke klar',
+	'timedmedia-percent-done' => 'Rundt $1% ferdig',
+	'timedmedia-days' => '{{PLURAL:$1|1 dag|$1 dager}}',
+	'timedmedia-hours' => '{{PLURAL:$1|1 time|$1 timer}}',
+	'timedmedia-minutes' => '{{PLURAL:$1|1 minutt|$1 minutter}}',
+	'timedmedia-seconds' => '{{PLURAL:$1|1 sekund|$1 sekunder}}',
+	'timedmedia-mp4' => 'MP4',
 	'timedmedia-source-file' => '$1 kilde',
 	'timedmedia-source-file-desc' => 'Original $1, $2 × $3 ($4)', # Fuzzy
 	'timedmedia-derivative-desc-160p.ogv' => 'Lav båndbredde Ogg-video (160P)',
@@ -3514,8 +3566,17 @@ Du kan <a href="$1">laste ned klippet</a> eller <a href="//www.mediawiki.org/wik
 	'timedmedia-derivative-desc-360p.webm' => 'Nett-strømbar WebM (360P)',
 	'timedmedia-derivative-desc-480p.webm' => 'Nett-strømbar WebM (480P)',
 	'timedmedia-derivative-desc-720p.webm' => 'Høykvalitets nedlastbar WebM (720P)',
+	'timedmedia-derivative-desc-480p.mp4' => 'Nett-strømbar MP4 (480P)',
+	'timedmedia-derivative-desc-720p.mp4' => 'HD-kvalitet MP4 (720P)',
+	'timedmedia-subtitle-new' => 'Opprett ny oversettelse eller rediger eksisterende',
+	'timedmedia-subtitle-new-desc' => "Velg språk eller trykk på '''{{int:Timedmedia-subtitle-new-go}}'''-knappen",
 	'timedmedia-subtitle-new-go' => 'Kjør',
 	'timedmedia-subtitle-language' => '$1 ($2) undertekster',
+	'timedmediahandler' => 'TimedMediaHandler',
+	'timedmedia-videos' => '{{PLURAL:$1|$1 video|$1 videoer}}',
+	'timedmedia-ogg-videos' => '{{PLURAL:$1|$1 Ogg-video|$1 Ogg-videoer}}',
+	'timedmedia-webm-videos' => '{{PLURAL:$1|$1 WebM-video|$1 WebM-videoer}}',
+	'timedmedia-file' => 'Fil',
 );
 
 /** Low German (Plattdüütsch)
@@ -4053,21 +4114,20 @@ Pode fazer o <a href="$1">download do vídeo</a> ou o <a href="//www.mediawiki.o
 	'timedmedia-direct-link' => 'Download do ficheiro transcodificado',
 	'timedmedia-not-ready' => 'Ainda não está pronto',
 	'timedmedia-completed-on' => 'Transcodificação de $1 terminada',
-	'timedmedia-error-on' => 'Erro na transcodificação, em $1.',
+	'timedmedia-error-on' => 'Erro na transcodificação, em $1.', # Fuzzy
 	'timedmedia-started-transcode' => 'A transcodificação foi iniciada há $1. $2',
 	'timedmedia-percent-done' => 'O progresso é cerca de $1%',
 	'timedmedia-in-job-queue' => 'Adicionado à fila de tarefas há $1',
 	'timedmedia-unknown-target-size' => 'Dimensão do destino desconhecida; $1 codificados',
-	'timedmedia-days' => '{{PLURAL:$1|dia|$1 dias}}', # Fuzzy
-	'timedmedia-hours' => '{{PLURAL:$1|hora|$1 horas}}', # Fuzzy
-	'timedmedia-minutes' => '{{PLURAL:$1|minuto|$1 minutos}}', # Fuzzy
-	'timedmedia-seconds' => '{{PLURAL:$1|segundo|$1 segundos}}', # Fuzzy
-	'timedmedia-show-error' => 'Mostrar erro',
+	'timedmedia-days' => '{{PLURAL:$1|1 dia|$1 dias}}',
+	'timedmedia-hours' => '{{PLURAL:$1|1 hora|$1 horas}}',
+	'timedmedia-minutes' => '{{PLURAL:$1|1 minuto|$1 minutos}}',
+	'timedmedia-seconds' => '{{PLURAL:$1|1 segundo|$1 segundos}}',
 	'timedmedia-reset' => 'Reiniciar transcodificação',
 	'timedmedia-reset-confirm' => 'Reiniciar esta transcodificação elimina qualquer ficheiro existente e volta a adicionar a transcodificação à fila de tarefas. A nova transcodificação irá demorar algum tempo. <br /><br />Tem a certeza de que pretende continuar?',
 	'timedmedia-reset-error' => 'Ocorreu um erro ao reiniciar a tarefa de transcodificação',
 	'timedmedia-source-file' => 'Fonte $1',
-	'timedmedia-source-file-desc' => 'Original $1, $2 × $3 ($4)', # Fuzzy
+	'timedmedia-source-file-desc' => 'Ficheiro $1 original, $2 × $3 ($4)',
 	'timedmedia-derivative-desc-160p.ogv' => 'Vídeo Ogg de baixa largura de banda (160P)',
 	'timedmedia-derivative-desc-360p.ogv' => 'Vídeo Ogg para web streaming (360P)',
 	'timedmedia-derivative-desc-480p.ogv' => 'Vídeo Ogg para web streaming (480P)',
@@ -4109,7 +4169,6 @@ Você pode <a href="$1">descarregar o clipe</a> ou <a href="//www.mediawiki.org/
 	'timedmedia-hours' => '{{PLURAL:$1|1 hora|$1 horas}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|1 minuto|$1 minutos}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|1 segundo|$1 segundos}}',
-	'timedmedia-show-error' => 'Mostrar erro',
 	'timedmedia-mp4' => 'MP4',
 	'timedmedia-source-file' => 'Fonte $1',
 	'timedmedia-subtitle-new-go' => 'Ir',
@@ -4145,6 +4204,8 @@ $messages['ro'] = array(
 	'timedmedia-ogg-long-error' => 'fișier ogg incorect: $1',
 	'timedmedia-webm-short-video' => 'fișier video WebM $1, $2',
 	'timedmedia-webm-long-video' => 'fișier audio/video WebM, $1, lungime $2, $4 × $5 pixeli, $3 per ansamblu',
+	'timedmedia-flac-short-audio' => 'fișier audio FLAC, $1',
+	'timedmedia-flac-long-audio' => 'fișier audio FLAC, lungime $1, $2 per ansmablu',
 	'timedmedia-mp4-short-video' => 'fișier video MP4 $1, $2',
 	'timedmedia-mp4-long-video' => 'fișier audio/video MP4, $1, lungime $2, $4 × $5 pixeli, $3 per ansamblu',
 	'timedmedia-no-player-js' => 'Ne pare rău, însă navigatorul dumneavoastră fie are JavaScript dezactivat, fie nu conține niciun player suportat.<br />
@@ -4165,7 +4226,7 @@ Puteți <a href="$1">descărca clipul</a> sau puteți <a href="//www.mediawiki.o
 	'timedmedia-direct-link' => 'Descarcă derivata',
 	'timedmedia-not-ready' => 'Nu este gata',
 	'timedmedia-completed-on' => 'Codificarea $1 s-a finalizat',
-	'timedmedia-error-on' => 'Eroare în codificarea din $1.',
+	'timedmedia-error-on' => 'Eroare în codificarea din $1',
 	'timedmedia-started-transcode' => 'Codificare pornită acum $1. $2',
 	'timedmedia-percent-done' => 'Aproximativ $1% finalizat',
 	'timedmedia-in-job-queue' => 'Adăugat la șirul de sarcini acum $1',
@@ -4174,14 +4235,14 @@ Puteți <a href="$1">descărca clipul</a> sau puteți <a href="//www.mediawiki.o
 	'timedmedia-hours' => '{{PLURAL:$1|o oră|$1 ore|$1 de ore}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|un minut|$1 minute|$1 de minute}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|o secundă|$1 secunde|$1 de secunde}}',
-	'timedmedia-show-error' => 'Afișează eroarea',
 	'timedmedia-reset' => 'Reinițializează codificarea',
 	'timedmedia-reset-confirm' => 'Reinițializarea acestei codificări va elimina orice fișier existent (dacă există) și va readăuga codificarea la șirul de sarcini. Va dura ceva timp pentru a recodifica. <br /><br />
 Sunteți sigur că doriți să continuați?',
 	'timedmedia-reset-error' => 'Eroare la reinițializarea codificării.',
 	'timedmedia-mp4' => 'MP4',
 	'timedmedia-source-file' => 'Sursă $1',
-	'timedmedia-source-file-desc' => '$1 original, $2 × $3 ($4)', # Fuzzy
+	'timedmedia-source-file-desc' => 'Fișier $1 original, $2 × $3 ($4)',
+	'timedmedia-source-audio-file-desc' => 'Fișier $1 original ($2)',
 	'timedmedia-derivative-desc-160p.ogv' => 'Videoclip Ogg cu lățime de bandă mică (160P)',
 	'timedmedia-derivative-desc-360p.ogv' => 'Videoclip Ogg pentru redare pe web (360P)',
 	'timedmedia-derivative-desc-480p.ogv' => 'Videoclip Ogg pentru redare pe web (480P)',
@@ -4194,7 +4255,7 @@ Sunteți sigur că doriți să continuați?',
 	'timedmedia-derivative-desc-480p.mp4' => 'MP4 pentru redare pe web (480P)',
 	'timedmedia-derivative-desc-720p.mp4' => 'MP4 de calitate HD (720P)',
 	'timedmedia-subtitle-new' => 'Creare traducere nouă sau modificare una existentă',
-	'timedmedia-subtitle-new-desc' => "Înlocuiți expresia '''$1''' cu [[:en:ISO 639|codul limbii]] dumneavoastră și apăsați butonul '''{{int:Timedmedia-subtitle-new-go}}'''", # Fuzzy
+	'timedmedia-subtitle-new-desc' => "Alegeți limba și apăsați butonul '''{{int:Timedmedia-subtitle-new-go}}'''",
 	'timedmedia-subtitle-new-go' => 'Du-te',
 	'timedmedia-subtitle-language' => 'Subtitrare în $1 ($2)',
 	'timedmedia-subtitle-no-video' => 'Nu există niciun videoclip asociat cu pagina curentă de subtitrare',
@@ -4211,7 +4272,8 @@ Sunteți sigur că doriți să continuați?',
 	'timedmedia-derivative-state-failed' => '{{PLURAL:$1|$1 codificare eșuată|$1 codificări eșuate|$1 de codificări eșuate}}',
 	'timedmedia-file' => 'Fișier',
 	'right-transcode-reset' => 'Reinițializează videoclipuri nereușit codificate pentru ca acestea să fie readăugate la șirul de sarcini.',
-	'right-transcode-status' => 'Vizualizează [[Special:TimedMediaHandler]], pagină cu informații despre activitatea curentă de codificare', # Fuzzy
+	'right-transcode-status' => 'Vizualizează [[Special:TimedMediaHandler|informații despre activitatea curentă de codificare]]',
+	'action-transcode-status' => 'vizualizați statutul actual al codificării',
 );
 
 /** tarandíne (tarandíne)
@@ -4229,6 +4291,8 @@ $messages['roa-tara'] = array(
 	'timedmedia-ogg-long-error' => 'Ogg file invalide: $1',
 	'timedmedia-webm-short-video' => 'WebM $1 file video, $2',
 	'timedmedia-webm-long-video' => 'File WebM audio/video, $1, lunghezze $2, $4 × $5 pixel, $3 in totale',
+	'timedmedia-flac-short-audio' => 'File audio FLAC, $1',
+	'timedmedia-flac-long-audio' => 'File audio FLAC, lunghezze $1, in totale $2',
 	'timedmedia-mp4-short-video' => 'MP4 $1 file video, $2',
 	'timedmedia-mp4-long-video' => 'File MP4 audio/video, $1, lunghezze $2, $4 × $5 pixel, $3 in totale',
 	'timedmedia-no-player-js' => "Ne dispiace, 'u browser tune tène 'u JavaScript disabbilitate o non ge tène 'n'esecutore supportate.<br />
@@ -4249,7 +4313,7 @@ Tu puè <a href=\"\$1\">scarecà 'u video</a> o <a href=\"//www.mediawiki.org/wi
 	'timedmedia-direct-link' => 'Scareche le derivate',
 	'timedmedia-not-ready' => "Non g'è pronde",
 	'timedmedia-completed-on' => 'Codifeche combletate $1',
-	'timedmedia-error-on' => "Errore jndr'à transcodifeche sus a $1.",
+	'timedmedia-error-on' => "Errore jndr'à transcodifeche sus a $1",
 	'timedmedia-started-transcode' => 'Transcodifeche accumenzate $1 fà. $2',
 	'timedmedia-percent-done' => 'Cchiù o mene $1% fatte',
 	'timedmedia-in-job-queue' => "Aggiunde a 'a Fatìe in code $1 fà",
@@ -4258,7 +4322,6 @@ Tu puè <a href=\"\$1\">scarecà 'u video</a> o <a href=\"//www.mediawiki.org/wi
 	'timedmedia-hours' => '{{PLURAL: $1|1 ore|$1 ore}}',
 	'timedmedia-minutes' => '{{PLURAL:$1|1 minute|$1 minute}}',
 	'timedmedia-seconds' => '{{PLURAL:$1|1 seconde|$1 seconde}}',
-	'timedmedia-show-error' => "Fà vedè l'errore",
 	'timedmedia-reset' => "Azzere 'a transcodifeche",
 	'timedmedia-reset-confirm' => "Stoche azzere sta transcodifiche ca adda luà ogne file esistende (ce presende), e pò aggiunge 'a transcodifiche jndr'à code d'a fatìe. Cchiù vote accumenze 'a transcodifiche. <br /><br />
 Sì secure ca vuè ccu vvè nnande?",
@@ -5342,7 +5405,7 @@ Bạn có thể <a href="$1">tải về đoạn âm hoặc đoạn video</a> hay
 	'timedmedia-direct-link' => 'Tải về tác phẩm phái sinh',
 	'timedmedia-not-ready' => 'Chưa sẵn',
 	'timedmedia-completed-on' => 'Hoàn tất chuyển mã $1',
-	'timedmedia-error-on' => 'Lỗi chuyển mã vào $1.',
+	'timedmedia-error-on' => 'Lỗi chuyển mã vào $1',
 	'timedmedia-started-transcode' => 'Bắt đầu chuyển mã cách đây $1. $2',
 	'timedmedia-percent-done' => 'Hoàn tất khoảng $1%',
 	'timedmedia-in-job-queue' => 'Đã thêm vào hàng đợi việc cách đây $1',
@@ -5351,7 +5414,6 @@ Bạn có thể <a href="$1">tải về đoạn âm hoặc đoạn video</a> hay
 	'timedmedia-hours' => '$1 giờ',
 	'timedmedia-minutes' => '$1 phút',
 	'timedmedia-seconds' => '$1 giây',
-	'timedmedia-show-error' => 'Xem lỗi',
 	'timedmedia-reset' => 'Đặt lại chuyển mã',
 	'timedmedia-reset-confirm' => 'Việc đặt lại chuyển mã sẽ xóa tập tin nào hiện có, nếu có, và sẽ lại thêm việc chuyển mã vào hàng đợi việc. Việc chuyển mã lại sẽ mất một chút thì giờ.<br /><br />
 Bạn có chắc chắn muốn tiếp tục?',
@@ -5581,7 +5643,7 @@ $messages['zh-hant'] = array(
 	'timedmedia-direct-link' => '下載衍生作品',
 	'timedmedia-not-ready' => '未就緒',
 	'timedmedia-completed-on' => '已完成轉碼$1',
-	'timedmedia-error-on' => '於$1轉碼錯誤。',
+	'timedmedia-error-on' => '於$1轉碼錯誤。', # Fuzzy
 	'timedmedia-started-transcode' => '於$1前開始轉碼。$2',
 	'timedmedia-percent-done' => '大約$1%已完成',
 	'timedmedia-in-job-queue' => '$1前添加到工作隊列',
@@ -5590,7 +5652,6 @@ $messages['zh-hant'] = array(
 	'timedmedia-hours' => '$1小時',
 	'timedmedia-minutes' => '$1分',
 	'timedmedia-seconds' => '$1秒',
-	'timedmedia-show-error' => '顯示錯誤',
 	'timedmedia-reset' => '重置轉碼',
 	'timedmedia-reset-confirm' => '重置轉碼會移除所有現有文件，並將其重新加入轉碼工作隊列。可能需要一些時間來重新轉碼。<br /><br />
 您確實想繼續嗎？',
@@ -5618,7 +5679,7 @@ $messages['zh-hant'] = array(
 	'timedmedia-subtitle-no-subtitles' => '當前沒有這個視頻的$1字幕，您可以[{{fullurl:{{FULLPAGENAME}}|action=edit}} 編輯這個頁面]以添加',
 	'timedmedia-subtitle-remote' => '本檔案的字幕位於$1',
 	'timedmedia-subtitle-remote-link' => '您可於$2查看[$1 該檔案的描述頁]',
-	'timedmediahandler' => 'TimedMediaHandler',
+	'timedmediahandler' => '定時媒體處理器',
 	'timedmedia-videos' => '$1個視頻',
 	'timedmedia-ogg-videos' => '$1個Ogg視頻',
 	'timedmedia-webm-videos' => '$1個WebM視頻',
