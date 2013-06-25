@@ -357,7 +357,7 @@ class WebVideoTranscode {
 			wfDebug("source cache miss\n");
 		}
 
-		wfDebug("Get Video sources from remote api for " . $file->getTitle()->getDBKey() . "\n");
+		wfDebug("Get Video sources from remote api for " . self::getDBKey( $file->getTitle() ) . "\n");
 		$query = array(
 			'action' => 'query',
 			'prop' => 'videoinfo',
@@ -532,6 +532,21 @@ class WebVideoTranscode {
 	}
 
 	/**
+	 *	Get capitalized DBKey for $title
+	 *
+	 *	independend of $wgCapitalLinkOverrides, $wgCapitalLinks
+	 *	always return capitalized DBKey since it is shared between
+	 *	sites that dont have the same $wgCapitalLinks settings.
+	 *
+	 * @param {Object} Title object
+	 * @return string
+	 */
+	public static function getDBKey( $title ) {
+		global $wgContLang;
+		return $wgContLang->ucfirst( $title->getDBKey() );
+	}
+
+	/**
 	 * Populates the transcode table with the current DB state of transcodes
 	 * if transcodes are not found in the database their state is set to "false"
 	 *
@@ -539,7 +554,7 @@ class WebVideoTranscode {
 	 */
 	public static function getTranscodeState( $file, $db = false ){
 		global $wgTranscodeBackgroundTimeLimit;
-		$fileName = $file->getTitle()->getDbKey();
+		$fileName = self::getDBKey( $file->getTitle() );
 		if( ! isset( self::$transcodeState[$fileName] ) ){
 			wfProfileIn( __METHOD__ );
 			if ( $db === false ) {
@@ -608,7 +623,7 @@ class WebVideoTranscode {
 			// Remove any existing files ( regardless of their state )
 			$res = $file->repo->getMasterDB()->select( 'transcode',
 				array( 'transcode_key' ),
-				array( 'transcode_image_name' => $file->getTitle()->getDBKey() )
+				array( 'transcode_image_name' => self::getDBKey( $file->getTitle() ) )
 			);
 			$removeKeys = array();
 			foreach( $res as $transcodeRow ){
@@ -631,7 +646,8 @@ class WebVideoTranscode {
 
 		// Build the sql query:
 		$dbw = wfGetDB( DB_MASTER );
-		$deleteWhere = array( 'transcode_image_name' => $file->getTitle()->getDBkey() );
+		$titleObj = $file->getTitle();
+		$deleteWhere = array( 'transcode_image_name' => self::getDBKey( $titleObj ) );
 		// Check if we are removing a specific transcode key
 		if( $transcodeKey !== false ){
 			$deleteWhere['transcode_key'] = $transcodeKey;
@@ -640,7 +656,6 @@ class WebVideoTranscode {
 		$dbw->delete( 'transcode', $deleteWhere, __METHOD__ );
 
 		// Purge the cache for pages that include this video:
-		$titleObj = $file->getTitle();
 		self::invalidatePagesWithFile( $titleObj );
 
 		// Remove from local WebVideoTranscode cache:
