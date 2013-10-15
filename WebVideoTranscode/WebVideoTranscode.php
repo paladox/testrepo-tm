@@ -719,8 +719,8 @@ class WebVideoTranscode {
 				'timedmedia-source-file',
 				wfMessage( 'timedmedia-' . $metadataType )->text()
 			)->text(),
-			"width" => $file->getWidth(),
-			"height" => $file->getHeight(),
+			"width" => intval( $file->getWidth() ),
+			"height" => intval( $file->getHeight() ),
 		);
 
 		if( $bitrate ){
@@ -731,7 +731,7 @@ class WebVideoTranscode {
 		if( !$file->getHandler()->isAudio( $file ) ){
 			$framerate = $file->getHandler()->getFramerate( $file );
 			if( $framerate ){
-				$source[ "framerate" ] = $framerate;
+				$source[ "framerate" ] = floatval( $framerate );
 			}
 		}
 		return $source;
@@ -779,11 +779,11 @@ class WebVideoTranscode {
 
 				// Add data attributes per emerging DASH / webTV adaptive streaming attributes
 				// eventually we will define a manifest xml entry point.
-				"width" => $width,
-				"height" => $height,
+				"width" => intval( $width ),
+				"height" => intval( $height ),
 				// a "ready" transcode should have a bitrate:
-				"bandwidth" => self::$transcodeState[$fileName][ $transcodeKey ]['final_bitrate'],
-				"framerate" => $framerate,
+				"bandwidth" => intval( self::$transcodeState[$fileName][ $transcodeKey ]['final_bitrate'] ),
+				"framerate" => floatval( $framerate ),
 			);
 	}
 
