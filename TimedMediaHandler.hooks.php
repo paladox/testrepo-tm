@@ -104,10 +104,6 @@ class TimedMediaHandlerHooks {
 		// Add parser hook
 		$wgParserOutputHooks['TimedMediaHandler'] = array( 'TimedMediaHandler', 'outputHook' );
 
-		// We should probably move this script output to a parser function but not working correctly in
-		// dynamic contexts ( for example in special upload, when there is an "existing file" warning. )
-		$wgHooks['BeforePageDisplay'][] = 'TimedMediaHandlerHooks::pageOutputHook';
-
 		// Exclude transcoded assets from normal thumbnail purging
 		// ( a maintenance script could handle transcode asset purging)
 		if ( isset( $wgExcludeFromThumbnailPurge ) ) {
@@ -338,17 +334,6 @@ class TimedMediaHandlerHooks {
 		foreach( $testFiles as $fileName ){
 			$files[] = $testDir . $fileName;
 		}
-		return true;
-	}
-
-	/**
-	 * @param $out OutputPage
-	 * @param $sk
-	 * @return bool
-	 */
-	static function pageOutputHook(  &$out, &$sk ){
-		$out->addModules( 'mw.PopUpMediaTransform' );
-		$out->addModuleStyles( 'mw.PopUpMediaTransform' );
 		return true;
 	}
 
