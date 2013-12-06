@@ -104,8 +104,8 @@ class TimedMediaHandlerHooks {
 		// Add parser hook
 		$wgParserOutputHooks['TimedMediaHandler'] = array( 'TimedMediaHandler', 'outputHook' );
 
-		// We should probably move this script output to a parser function but not working correctly in
-		// dynamic contexts ( for example in special upload, when there is an "existing file" warning. )
+		// Use a BeforePageDisplay hook to load the styles in pages that pull in media dynamically.
+		// (Special:Upload, for example, when there is an "existing file" warning.)
 		$wgHooks['BeforePageDisplay'][] = 'TimedMediaHandlerHooks::pageOutputHook';
 
 		// Exclude transcoded assets from normal thumbnail purging
@@ -342,13 +342,27 @@ class TimedMediaHandlerHooks {
 	}
 
 	/**
+	 * Add JavaScript and CSS for special pages that may include timed media
+	 * but which will not fire the parser hook.
+	 *
+	 * FIXME: There ought to be a better interface for determining whether the
+	 * page is liable to contain timed media.
+	 *
 	 * @param $out OutputPage
 	 * @param $sk
 	 * @return bool
 	 */
 	static function pageOutputHook(  &$out, &$sk ){
-		$out->addModules( 'mw.PopUpMediaTransform' );
-		$out->addModuleStyles( 'mw.PopUpMediaTransform' );
+		$title = $out->getTitle();
+
+		if ( $title->isSpecialPage() ) {
+			$name = SpecialPageFactory::resolveAlias( $title->getDBkey() )[0];
+			if ( stripos( $name, 'file' ) !== false || $name === 'Search' || $name === 'GlobalUsage' ) {
+				$out->addModules( 'mw.PopUpMediaTransform' );
+				$out->addModuleStyles( 'mw.PopUpMediaTransform' );
+			}
+		}
+
 		return true;
 	}
 
