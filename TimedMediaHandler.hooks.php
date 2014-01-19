@@ -347,7 +347,8 @@ class TimedMediaHandlerHooks {
 	 * @return bool
 	 */
 	static function pageOutputHook(  &$out, &$sk ){
-		$out->addModules( 'mw.PopUpMediaTransform' );
+		$out->addModuleScripts( 'mw.PopUpMediaTransform' );
+		$out->addModuleStyles( 'mw.PopUpMediaTransform' );
 		return true;
 	}
 
