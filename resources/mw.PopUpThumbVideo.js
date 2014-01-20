@@ -3,7 +3,13 @@
 */
 ( function( mw, $ ) {
 	$(document).ready(function(){
-		$('.PopUpMediaTransform a').each( function(){
+		var $popUp = $('.PopUpMediaTransform a');
+		if ( $popUp.length ) {
+			// If there is actually a pop-up media on this page, need to
+			// make sure jquery.dialog is loaded, or pop-up has wrong dimensions
+			mw.loader.load( 'jquery.ui.dialog', 'text/javascript', true );
+		}
+		$popUp.each( function(){
 			var parent = $(this).parent();
 			if ( parent.attr( 'videopayload' ) ) {
 				$( this ).click( function( event ){
