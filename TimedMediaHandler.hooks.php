@@ -108,6 +108,9 @@ class TimedMediaHandlerHooks {
 		// (Special:Upload, for example, when there is an "existing file" warning.)
 		$wgHooks['BeforePageDisplay'][] = 'TimedMediaHandlerHooks::pageOutputHook';
 
+		// Add MwEmbedSupport modules to startup
+		$wgHooks['ResourceLoaderGetStartupModules'][] = 'TimedMediaHandlerHooks::onResourceLoaderGetStartupModules';
+
 		// Make sure modules are loaded on image pages that don't have a media file in the wikitext.
 		$wgHooks['ImageOpenShowImageInlineBefore'][] = 'TimedMediaHandlerHooks::onImageOpenShowImageInlineBefore';
 
@@ -358,6 +361,32 @@ class TimedMediaHandlerHooks {
 	}
 
 	/**
+	 * Check if TimedMediaHandler CSS and JS support are needed for the
+	 * current page.
+	 *
+	 * @return bool
+	 */
+	static function modulesRequired() {
+		global $wgTitle;
+
+		$namespace = $wgTitle->getNamespace();
+
+		if ( $namespace === NS_CATEGORY || $namespace === NS_TIMEDTEXT ) {
+			return true;
+		}
+
+		if ( $wgTitle->isSpecialPage() ) {
+			list( $name, /* subpage */ ) = SpecialPageFactory::resolveAlias( $wgTitle->getDBkey() );
+			if ( stripos( $name, 'file' ) !== false || stripos( $name, 'image' ) !== false
+				|| $name === 'Search' || $name === 'GlobalUsage' ) {
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Add JavaScript and CSS for special pages that may include timed media
 	 * but which will not fire the parser hook.
 	 *
@@ -369,27 +398,29 @@ class TimedMediaHandlerHooks {
 	 * @return bool
 	 */
 	static function pageOutputHook(  &$out, &$sk ){
-		$title = $out->getTitle();
-		$namespace = $title->getNamespace();
-		$addModules = false;
-
-		if ( $namespace === NS_CATEGORY || $namespace === NS_TIMEDTEXT ) {
-			$addModules = true;
-		}
-
-		if ( $title->isSpecialPage() ) {
-			list( $name, /* subpage */ ) = SpecialPageFactory::resolveAlias( $title->getDBkey() );
-			if ( stripos( $name, 'file' ) !== false || stripos( $name, 'image' ) !== false
-				|| $name === 'Search' || $name === 'GlobalUsage' ) {
-					$addModules = true;
-			}
-		}
-
-		if ( $addModules ) {
-			$out->addModules( 'mw.PopUpMediaTransform' );
+		if ( self::modulesRequired() ) {
+			$out->addModules( array( 'mw.MwEmbedSupport.style', 'mw.PopUpMediaTransform' ) );
 			$out->addModuleStyles( 'mw.PopUpMediaTransform' );
 		}
 
+		return true;
+	}
+
+	/**
+	 * Add MwEmbedSupport modules to startup, if needed.
+	 * @param $modules
+	 * @return bool
+	 */
+	static function onResourceLoaderGetStartupModules( &$modules ) {
+		if ( self::modulesRequired() ) {
+			$modules += array(
+				'jquery.triggerQueueCallback',
+				'Spinner',
+				'jquery.loadingSpinner',
+				'jquery.mwEmbedUtil',
+				'mw.MwEmbedSupport',
+			);
+		}
 		return true;
 	}
 
