@@ -251,6 +251,9 @@ $wgHooks['SetupAfterCache'][] = 'TimedMediaHandlerHooks::register';
 
 $wgHooks['ExtractThumbParameters'][] = 'TimedMediaHandler::onExtractThumbParameters';
 
+$wgHooks['APIQueryInfoTokens'][] = 'ApiTranscodeReset::addTokenMethod';
+$wgHooks['ApiTokensGetTokenTypes'][] = 'ApiTranscodeReset::addTokenMethod';
+
 # add Special:TimedMediaHandler
 $wgSpecialPages['TimedMediaHandler'] = 'SpecialTimedMediaHandler';
 $wgSpecialPageGroups['TimedMediaHandler'] = 'media';

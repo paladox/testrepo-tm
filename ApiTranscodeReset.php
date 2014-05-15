@@ -149,6 +149,34 @@ class ApiTranscodeReset extends ApiBase {
 		);
 	}
 
+	/**
+	 * Handler for APIQueryInfoTokens and ApiTokensGetTokenTypes hook.
+	 *
+	 * @param Array &$tokenFunctions Associative array of token type to Callable
+	 * @return boolean
+	 */
+	public static function addTokenMethod( &$tokenFunctions ) {
+		$tokenFunctions['transcodereset'] = array( __CLASS__, 'getToken' );
+		return true;
+	}
+
+	/**
+	 * Get a transcode reset token
+	 *
+	 * Called for prop=info&intoken=transcodereset or action=tokens
+	 *
+	 * @param int $pageid Page id (or negative for missing, or null for none)
+	 * @param Title $title Page title
+	 * @return String|boolean Token or false if user not allowed.
+	 */
+	public static function getToken( $pageid, $title ) {
+		global $wgUser;
+		if ( !$wgUser->isAllowed( 'transcode-reset' ) ) {
+			return false;
+		}
+		return $wgUser->getEditToken();
+	}
+
 	public function needsToken() {
 		return true;
 	}
