@@ -201,9 +201,11 @@ class TextHandler {
 	function getForeignDBTextSources(){
 		// Init $this->textTracks
 		$params = new FauxRequest( $this->getTextPagesQuery() );
+		// FIXME this manual API setup is horrible and needs to die in a fire
 		$api = new ApiMain( $params );
 		$api->profileIn();
-		$module = new ForeignApiQueryAllPages( $this->file->getRepo()->getSlaveDB(), $api, 'allpages' );
+		$query = new ApiQuery( $api, 'query' );
+		$module = new ForeignApiQueryAllPages( $this->file->getRepo()->getSlaveDB(), $query, 'allpages' );
 		$module->profileIn();
 		$module->execute();
 		$module->profileOut();
