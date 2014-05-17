@@ -1,4 +1,4 @@
-( function( mw, $ ) { "use strict";
+( function ( mw, $ ) { "use strict";
 /**
 * List of domains and hosted location of cortado.
 * Lets clients avoid the security warning
@@ -20,24 +20,23 @@ mw.EmbedPlayerJava = {
 
 	// Supported feature set of the cortado applet:
 	supports: {
-		'playHead' : true,
-		'pause' : true,
-		'stop' : true,
-		'fullscreen' : false,
-		'timeDisplay' : true,
-		'volumeControl' : false
+		'playHead': true,
+		'pause': true,
+		'stop': true,
+		'fullscreen': false,
+		'timeDisplay': true,
+		'volumeControl': false
 	},
 
 	/**
 	* Output the the embed html
 	*/
 	embedPlayerHTML: function () {
-		var _this = this;
+		var localThis = this;
 		mw.log( "EmbedPlayerJava:: java play url:" + this.getSrc( this.seekTimeSec ) );
 
 		mw.log( 'EmbedPlayerJava:: Applet location: ' +  this.getAppletLocation() );
 		mw.log( 'EmbedPlayerJava:: Play media: ' + this.getSrc() );
-
 
 		// load directly in the page..
 		// ( media must be on the same server or applet must be signed )
@@ -56,7 +55,7 @@ mw.EmbedPlayerJava = {
 			'<param name="seekable" value="true" />';
 
 		// Add the duration attribute if set:
-		if( this.getDuration() ){
+		if ( this.getDuration() ) {
 			appletCode += '<param name="duration" value="' + parseFloat( this.getDuration() ) + '" />' + "\n";
 		}
 
@@ -68,17 +67,17 @@ mw.EmbedPlayerJava = {
 		$( this ).html( appletCode );
 
 		// Start the monitor:
-		_this.monitor();
+		localThis.monitor();
 	},
 
 	/**
 	* Get the applet location
 	*/
-	getAppletLocation: function() {
+	getAppletLocation: function () {
 		var mediaSrc = this.getSrc();
 		var appletLoc = false;
 		// Check for wgCortadoJarFile override
-		if( mw.config.get( 'wgCortadoJarFile' ) !== false ){
+		if ( mw.config.get( 'wgCortadoJarFile' ) !== false ) {
 			return mw.config.get('wgCortadoJarFile' );
 		}
 		if (
@@ -101,7 +100,7 @@ mw.EmbedPlayerJava = {
 	/**
 	* Get the embed player time
 	*/
-	getPlayerElementTime: function() {
+	getPlayerElementTime: function () {
 		this.getPlayerElement();
 		var currentTime = 0;
 		if ( this.playerElement ) {
@@ -129,8 +128,8 @@ mw.EmbedPlayerJava = {
 	* ( Cortado seek does not seem to work very well )
 	* @param {Float} percentage Percentage to seek into the stream
 	*/
-	seek: function( percentage ) {
-		mw.log( 'EmbedPlayerJava :: seek: p: ' + percentage + ' : ' + this.supportsURLTimeEncoding() + ' dur: ' + this.getDuration() + ' sts:' + this.seekTimeSec );
+	seek: function ( percentage ) {
+		mw.log( 'EmbedPlayerJava :: seek: p: ' + percentage + ': ' + this.supportsURLTimeEncoding() + ' dur: ' + this.getDuration() + ' sts:' + this.seekTimeSec );
 		this.getPlayerElement();
 
 		if ( this.supportsURLTimeEncoding() ) {
@@ -151,16 +150,16 @@ mw.EmbedPlayerJava = {
 	* Issue a play request then seek to a percentage point in the stream
 	* @param {Float} percentage Percentage to seek into the stream
 	*/
-	doPlayThenSeek: function( percentage ) {
+	doPlayThenSeek: function ( percentage ) {
 		mw.log( 'EmbedPlayerJava:: doPlayThenSeek' );
-		var _this = this;
+		var localThis = this;
 		this.play();
 		var rfsCount = 0;
-		var readyForSeek = function() {
-			_this.getPlayerElement();
+		var readyForSeek = function () {
+			localThis.getPlayerElement();
 			// if we have .jre ~in theory~ we can seek (but probably not)
-			if ( _this.playerElement ) {
-				_this.seek( perc );
+			if ( localThis.playerElement ) {
+				localThis.seek( perc );
 			} else {
 				// try to get player for 10 seconds:
 				if ( rfsCount < 200 ) {
@@ -177,8 +176,8 @@ mw.EmbedPlayerJava = {
 	/**
 	* Update the playerElement instance with a pointer to the embed object
 	*/
-	getPlayerElement: function() {
-		if( !$( '#' + this.pid ).length ) {
+	getPlayerElement: function () {
+		if ( !$( '#' + this.pid ).length ) {
 			return false;
 		};
 		this.playerElement = $( '#' + this.pid ).get( 0 );
@@ -189,13 +188,13 @@ mw.EmbedPlayerJava = {
 	* Issue the doPlay request to the playerElement
 	*	calls parent_play to update interface
 	*/
-	play: function() {
+	play: function () {
 		this.getPlayerElement();
 		this.parent_play();
 		if ( this.playerElement ) {
 			try{
 				this.playerElement.play();
-			}catch( e ){
+			}catch( e ) {
 				mw.log("EmbedPlayerJava::Could not issue play request");
 			}
 		}
@@ -205,7 +204,7 @@ mw.EmbedPlayerJava = {
 	* Pause playback
 	* 	calls parent_pause to update interface
 	*/
-	pause: function() {
+	pause: function () {
 		this.getPlayerElement();
 		// Update the interface
 		this.parent_pause();
@@ -213,7 +212,7 @@ mw.EmbedPlayerJava = {
 		if ( this.playerElement ) {
 			try{
 				this.playerElement.pause();
-			}catch( e ){
+			}catch( e ) {
 				mw.log("EmbedPlayerJava::Could not issue pause request");
 			}
 		}

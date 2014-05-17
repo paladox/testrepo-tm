@@ -2,7 +2,7 @@
 * Skin js allows you to override contrlBuilder html/class output
 */
 
-( function( mw, $ ) {"use strict";
+( function ( mw, $ ) {"use strict";
 
 mw.PlayerSkinKskin = {
 
@@ -34,12 +34,12 @@ mw.PlayerSkinKskin = {
 		'volumeControl': {
 			'w': 40
 		},
-		'playButtonLarge' : {
-			'h' : 55
+		'playButtonLarge': {
+			'h': 55
 		},
 		'options': {
 			'w': 52,
-			'o': function( ctrlObj ) {
+			'o': function ( /* ctrlObj */ ) {
 				return $( '<div />' )
 					.attr( 'title', mw.msg( 'mwe-embedplayer-player_options' ) )
 					.addClass( "ui-state-default ui-corner-bl rButton k-options" )
@@ -50,48 +50,47 @@ mw.PlayerSkinKskin = {
 			}
 		},
 		// No attributionButton component for kSkin ( its integrated into the credits screen )
-		'attributionButton' : false,
+		'attributionButton': false,
 
 		// Time display:
 		'timeDisplay': {
 			'w': 52
 		},
 		'optionsMenu': {
-			'w' : 0,
-			'o' : function( ctrlObj ) {
+			'w': 0,
+			'o': function ( ctrlObj ) {
 				var embedPlayer = ctrlObj.embedPlayer;
 				var $menuOverlay = $( '<div />')
 					.addClass( 'overlay-win k-menu ui-widget-content' )
 					.css( {
-						'width' : '100%',
+						'width': '100%',
 						'position': 'absolute',
-						'top' : '0px',
-						'bottom' : ( ctrlObj.getHeight() + 2 ) + 'px'
+						'top': '0px',
+						'bottom': ( ctrlObj.getHeight() + 2 ) + 'px'
 					} );
 
 				// Note safari can't display video overlays with text:
 				// see bug https://bugs.webkit.org/show_bug.cgi?id=48379
 
 				var userAgent = navigator.userAgent.toLowerCase();
-				if( userAgent.indexOf('safari') != -1 ){
+				if ( userAgent.indexOf('safari') !== -1 ) {
 					$menuOverlay.css('opacity', '0.9');
 				}
 				// Setup menu offset ( if player height < getOverlayHeight )
 				// This displays the menu outside of the player on small embeds
 				if ( embedPlayer.getPlayerHeight() < ctrlObj.getOverlayHeight() ) {
-					var topPos = ( ctrlObj.isOverlayControls() )
-							? embedPlayer.getPlayerHeight()
-							: embedPlayer.getPlayerHeight() + ctrlObj.getHeight();
+					var topPos = embedPlayer.getPlayerHeight() +
+						( ctrlObj.isOverlayControls() ? 0 : ctrlObj.getHeight() );
 
-					if( embedPlayer.isAudio() ){
+					if ( embedPlayer.isAudio() ) {
 						topPos = ctrlObj.embedPlayer.getInterface().height();
 					}
 
 					$menuOverlay.css( {
-						'top' : topPos + 'px',
-						'bottom' : null,
-						'width' : ctrlObj.getOverlayWidth(),
-						'height' : ctrlObj.getOverlayHeight() + 'px'
+						'top': topPos + 'px',
+						'bottom': null,
+						'width': ctrlObj.getOverlayWidth(),
+						'height': ctrlObj.getOverlayHeight() + 'px'
 					} );
 					// Special common overflow hack for thumbnail display of player
 					$( embedPlayer ).parents( '.thumbinner' ).css( 'overflow', 'visible' );
@@ -101,10 +100,11 @@ mw.PlayerSkinKskin = {
 					.addClass( 'k-menu-bar' );
 
 				// Don't include about player menu item ( FIXME should be moved to a init function )
-				delete ctrlObj.supportedMenuItems['aboutPlayerLibrary'];
+				delete ctrlObj.supportedMenuItems.aboutPlayerLibrary;
 
+				var menuItem;
 				// Output menu item containers:
-				for ( var menuItem in ctrlObj.supportedMenuItems ) {
+				for ( menuItem in ctrlObj.supportedMenuItems ) {
 					// Give grep a chance to find the usages:
 					// mwe-embedplayer-playerSelect, mwe-embedplayer-download,
 					// mwe-embedplayer-share, mwe-embedplayer-credits
@@ -116,8 +116,8 @@ mw.PlayerSkinKskin = {
 						.append(
 							$( '<a />' )
 							.attr( {
-								'title' : mw.msg( 'mwe-embedplayer-' + menuItem ),
-								'href' : '#'
+								'title': mw.msg( 'mwe-embedplayer-' + menuItem ),
+								'href': '#'
 							})
 						)
 					);
@@ -129,14 +129,14 @@ mw.PlayerSkinKskin = {
 				var $menuScreens = $( '<div />' )
 					.addClass( 'k-menu-screens' )
 					.css( {
-						'position' : 'absolute',
-						'top' : '0px',
-						'left' : '0px',
-						'bottom' : '0px',
-						'right' : '45px',
-						'overflow' : 'hidden'
+						'position': 'absolute',
+						'top': '0px',
+						'left': '0px',
+						'bottom': '0px',
+						'right': '45px',
+						'overflow': 'hidden'
 					} );
-				for ( var menuItem in ctrlObj.supportedMenuItems ) {
+				for ( menuItem in ctrlObj.supportedMenuItems ) {
 					$menuScreens.append(
 						$( '<div />' )
 						.addClass( 'menu-screen menu-' + menuItem )
@@ -155,46 +155,45 @@ mw.PlayerSkinKskin = {
 	/**
 	* Get minimal width for interface overlay
 	*/
-	getOverlayWidth: function(){
+	getOverlayWidth: function () {
 		return ( this.embedPlayer.getPlayerWidth() < 220 )? 220 : this.embedPlayer.getPlayerWidth();
 	},
 
 	/**
 	* Get minimal height for interface overlay
 	*/
-	getOverlayHeight: function(){
+	getOverlayHeight: function () {
 		return ( this.embedPlayer.getPlayerHeight() < 160 )? 160 : this.embedPlayer.getPlayerHeight();
 	},
 
 	/**
 	* Adds the skin Control Bindings
 	*/
-	addSkinControlBindings: function() {
+	addSkinControlBindings: function () {
 		var embedPlayer = this.embedPlayer;
-		var _this = this;
+		var localThis = this;
 
 		// Set up control bar pointer
 		this.$playerTarget = embedPlayer.$interface;
 		// Set the menu target:
 
-
 		// Options menu display:
 		this.$playerTarget.find( '.k-options' )
 		.unbind()
-		.click( function() {
-			_this.checkMenuOverlay();
-			var $kmenu = _this.$playerTarget.find( '.k-menu' );
+		.click( function () {
+			localThis.checkMenuOverlay();
+			var $kmenu = localThis.$playerTarget.find( '.k-menu' );
 			if ( $kmenu.is( ':visible' ) ) {
-				_this.closeMenuOverlay( );
+				localThis.closeMenuOverlay( );
 			} else {
-				_this.showMenuOverlay();
+				localThis.showMenuOverlay();
 				// no other item is selected by default show the media credits:
-				if ( !_this.currentMenuItem ){
-					_this.showMenuItem('credits');
+				if ( !localThis.currentMenuItem ) {
+					localThis.showMenuItem('credits');
 					// Hide the others
-					_this.$playerTarget.find( '.menu-screen' ).hide();
+					localThis.$playerTarget.find( '.menu-screen' ).hide();
 					// Show credits
-					_this.$playerTarget.find( '.menu-credits' ).fadeIn( "fast" );
+					localThis.$playerTarget.find( '.menu-credits' ).fadeIn( "fast" );
 				}
 			}
 		} );
@@ -204,34 +203,34 @@ mw.PlayerSkinKskin = {
 	/**
 	* checks for menu overlay and runs menu bindings if unset
 	*/
-	checkMenuOverlay: function(){
-		var _this = this;
+	checkMenuOverlay: function () {
+		var localThis = this;
 		var embedPlayer = this.embedPlayer;
-		if ( _this.$playerTarget.find( '.k-menu' ).length == 0 ) {
+		if ( localThis.$playerTarget.find( '.k-menu' ).length === 0 ) {
 			// Stop the player if it does not support overlays:
-			if ( !embedPlayer.supports['overlays'] ) {
+			if ( !embedPlayer.supports.overlays ) {
 				embedPlayer.stop();
 			}
 
 			// Add the menu binding
-			_this.addMenuBinding();
+			localThis.addMenuBinding();
 		}
 	},
 
 	/**
 	* Close the menu overlay
 	*/
-	closeMenuOverlay: function() {
+	closeMenuOverlay: function () {
 		mw.log("PlayerSkinKskin:: close menu overlay" );
 		var embedPlayer = this.embedPlayer;
 		var $optionsMenu = embedPlayer.getInterface().find( '.k-options' );
 		var $kmenu = embedPlayer.getInterface().find( '.k-menu' );
-		$kmenu.fadeOut( "fast", function() {
+		$kmenu.fadeOut( "fast", function () {
 			$optionsMenu.find( 'span' )
 				.text ( mw.msg( 'mwe-embedplayer-menu_btn' ) );
 		} );
 		// show the play button if not playing
-		if( !embedPlayer.isPlaying() ){
+		if ( !embedPlayer.isPlaying() ) {
 			embedPlayer.getInterface().find( '.play-btn-large' ).fadeIn( 'fast' );
 		}
 
@@ -245,11 +244,11 @@ mw.PlayerSkinKskin = {
 	/**
 	* Show the menu overlay
 	*/
-	showMenuOverlay: function( $ktxt ) {
+	showMenuOverlay: function ( /* $ktxt */ ) {
 		var $optionsMenu = this.$playerTarget.find( '.k-options' );
 		var $kmenu = this.$playerTarget.find( '.k-menu' );
 
-		$kmenu.fadeIn( "fast", function() {
+		$kmenu.fadeIn( "fast", function () {
 			$optionsMenu.find( 'span' )
 				.text ( mw.msg( 'mwe-embedplayer-close_btn' ) );
 		} );
@@ -266,27 +265,27 @@ mw.PlayerSkinKskin = {
 	*
 	* @param {Object} $tp Target video container for
 	*/
-	addMenuBinding: function() {
-		var _this = this;
+	addMenuBinding: function () {
+		var localThis = this;
 		var embedPlayer = this.embedPlayer;
 		// Set local player target pointer:
 		var $playerTarget = embedPlayer.$interface;
 
 		// Check if k-menu already exists:
-		if ( $playerTarget.find( '.k-menu' ).length != 0 )
+		if ( $playerTarget.find( '.k-menu' ).length !== 0 )
 			return false;
 
 		// Add options menu to top of player target children:
 		$playerTarget.append(
-			_this.getComponent( 'optionsMenu' )
+			localThis.getComponent( 'optionsMenu' )
 		);
 
 		// By default its hidden:
 		$playerTarget.find( '.k-menu' ).hide();
 
 		// Add menu-items bindings:
-		for ( var menuItem in _this.supportedMenuItems ) {
-			$playerTarget.find( '.k-' + menuItem + '-btn' ).click( function( ) {
+		for ( var menuItem in localThis.supportedMenuItems ) {
+			$playerTarget.find( '.k-' + menuItem + '-btn' ).click( function ( ) {
 
 				// Grab the context from the "clicked" menu item
 				var mk = $( this ).attr( 'rel' );
@@ -295,7 +294,7 @@ mw.PlayerSkinKskin = {
 				var $targetItem = $playerTarget.find( '.menu-' + mk );
 
 				// call the function showMenuItem
-				_this.showMenuItem(	mk );
+				localThis.showMenuItem(	mk );
 
 				// Hide the others
 				$playerTarget.find( '.menu-screen' ).hide();
@@ -317,11 +316,11 @@ mw.PlayerSkinKskin = {
 	*
 	* @param {String} menu_itme Menu item key to display
 	*/
-	showMenuItem:function( menuItem ) {
+	showMenuItem:function ( menuItem ) {
 		var embedPlayer = this.embedPlayer;
 		this.currentMenuItem = menuItem;
 		//handle special k-skin specific display;
-		switch( menuItem ){
+		switch( menuItem ) {
 			case 'credits':
 				this.showCredits();
 			break;
@@ -350,10 +349,9 @@ mw.PlayerSkinKskin = {
 	/**
 	* Show the credit screen ( presently specific to kaltura skin )
 	*/
-	showCredits: function() {
+	showCredits: function () {
 		// Set up the shortcuts:
 		var embedPlayer = this.embedPlayer;
-		var _this = this;
 		var $target = embedPlayer.$interface.find( '.menu-credits' );
 
 		$target.empty().append(
@@ -368,23 +366,23 @@ mw.PlayerSkinKskin = {
 			)
 		);
 
-		if( mw.config.get( 'EmbedPlayer.KalturaAttribution' ) == true ){
+		if ( mw.config.get( 'EmbedPlayer.KalturaAttribution' ) === true ) {
 			$target.append(
 				$( '<div />' )
 				.addClass( 'k-attribution' )
 				.attr({
 					'title': mw.msg('mwe-embedplayer-kaltura-platform-title')
 				})
-				.click( function( ) {
+				.click( function ( ) {
 					window.location = 'http://html5video.org';
 				})
 			);
 		}
 		var $creditBox = $target.find('.credits_box');
 		$creditBox.data( 'playerId', embedPlayer.id );
-		$( embedPlayer ).triggerQueueCallback('showCredits', $creditBox, function( addedCredits ){
-			if( !addedCredits ){
-				$creditBox.find('.credits_box').text( mw.msg( 'mwe-embedplayer-nocredits') )
+		$( embedPlayer ).triggerQueueCallback('showCredits', $creditBox, function ( addedCredits ) {
+			if ( !addedCredits ) {
+				$creditBox.find('.credits_box').text( mw.msg( 'mwe-embedplayer-nocredits') );
 			}
 		});
 	}

@@ -4,9 +4,10 @@
  * @param {Object} source Source object to extend
  * @param {Object} textProvider [Optional] The text provider interface ( to load source from api )
  */
-( function( mw, $ ) { "use strict";
+( function ( mw, $ ) {
+	'use strict';
 
-	mw.TextSource = function( source ) {
+	mw.TextSource = function ( source ) {
 		return this.init( source );
 	};
 	mw.TextSource.prototype = {
@@ -30,18 +31,18 @@
 		 * @param {source} Base source element
 		 * @param {Object} Pointer to the textProvider
 		 */
-		init: function( source , textProvider) {
-			//	Inherits mediaSource
-			for( var i in source){
+		init: function ( source, textProvider) {
+			// Inherits mediaSource
+			for ( var i in source ) {
 				this[ i ] =  source[ i ];
 			}
 
 			// Set default category to subtitle if unset:
-			if( ! this.kind ) {
+			if ( !this.kind ) {
 				this.kind = 'subtitle';
 			}
 			//Set the textProvider if provided
-			if( textProvider ) {
+			if ( textProvider ) {
 				this.textProvider = textProvider;
 			}
 			return this;
@@ -51,48 +52,48 @@
 		 * Function to load and parse the source text
 		 * @param {Function} callback Function called once text source is loaded
 		 */
-		load: function( callback ) {
-			var _this = this;
-			mw.log("TextSource:: load src "+ _this.getSrc() );
+		load: function ( callback ) {
+			var localThis = this;
+			mw.log( 'TextSource:: load src ' + localThis.getSrc() );
 
 			// Setup up a callback ( in case it was not defined )
-			if( !callback ){
-				callback = function(){ return ; };
+			if ( !callback ) {
+				callback = function () { return; };
 			}
 
 			// Check if the captions have already been loaded:
-			if( this.loaded ){
+			if ( this.loaded ) {
 				return callback();
 			}
 
 			// Try to load src via XHR source
-			if( !this.getSrc() ) {
-				mw.log( "Error: TextSource no source url for text track");
+			if ( !this.getSrc() ) {
+				mw.log( 'Error: TextSource no source url for text track' );
 				return callback();
 			}
 
 			// Check type for special loaders:
-			$( mw ).triggerQueueCallback( 'TimedText_LoadTextSource', _this, function(){
-				if( _this.loaded ){
+			$( mw ).triggerQueueCallback( 'TimedText_LoadTextSource', localThis, function () {
+				if ( localThis.loaded ) {
 					callback();
 				} else {
 					// if no module loaded the text source use the normal ajax proxy:
 					new mw.ajaxProxy({
-						url: _this.getSrc(),
-						success: function( resultXML ) {
-							_this.captions = _this.getCaptions( resultXML );
-							_this.loaded = true;
-							mw.log("mw.TextSource :: loaded from " +  _this.getSrc() + " Found: " + _this.captions.length + ' captions' );
+						url: localThis.getSrc(),
+						success: function ( resultXML ) {
+							localThis.captions = localThis.getCaptions( resultXML );
+							localThis.loaded = true;
+							mw.log( 'mw.TextSource :: loaded from ' +  localThis.getSrc() + ' Found: ' + localThis.captions.length + ' captions' );
 							callback();
 						},
-						error: function() {
-							mw.log("Error: TextSource Error with http response");
-							_this.loaded = true;
+						error: function () {
+							mw.log( 'Error: TextSource Error with http response' );
+							localThis.loaded = true;
 							callback();
 						}
 					});
 				}
-			})
+			} );
 		},
 		/**
 		* Returns the text content for requested time
@@ -100,28 +101,33 @@
 		* @param {Number} time Time in seconds
 		*/
 		getCaptionForTime: function ( time ) {
-			var prevCaption = this.captions[ this.prevIndex ];
-			var captionSet = {};
+			var startIndex,
+				i,
+				caption,
+				prevCaption = this.captions[ this.prevIndex ],
+				captionSet = {},
+				firstCapIndex = 0;
 
 			// Setup the startIndex:
-			if( prevCaption && time >= prevCaption.start ) {
-				var startIndex = this.prevIndex;
-			}else{
+			if ( prevCaption && time >= prevCaption.start ) {
+				startIndex = this.prevIndex;
+			} else {
 				// If a backwards seek start searching at the start:
-				var startIndex = 0;
+				startIndex = 0;
 			}
-			var firstCapIndex = 0;
+			firstCapIndex = 0;
 			// Start looking for the text via time, add all matches that are in range
-			for( var i = startIndex ; i < this.captions.length; i++ ) {
-				var caption = this.captions[ i ];
+			for ( i = startIndex ; i < this.captions.length; i++ ) {
+				caption = this.captions[ i ];
 				// Don't handle captions with 0 or -1 end time:
-				if( caption.end == 0 || caption.end == -1)
+				if ( caption.end === 0 || caption.end === -1 ) {
 					continue;
+				}
 
-				if( time >= caption.start &&
+				if ( time >= caption.start &&
 					time <= caption.end ) {
 					// set the earliest valid time to the current start index:
-					if( !firstCapIndex ){
+					if ( !firstCapIndex ) {
 						firstCapIndex = caption.start;
 					}
 
@@ -129,7 +135,7 @@
 					captionSet[i] = caption ;
 				}
 				// captions are stored in start order stop search if we get larger than time
-				if( caption.start > time ){
+				if ( caption.start > time ) {
 					break;
 				}
 			}
@@ -142,29 +148,26 @@
 		/**
 		 * Check if the caption is an overlay format ( and must be ontop of the player )
 		 */
-		isOverlay: function(){
-			return this.mimeType == 'text/xml';
+		isOverlay: function () {
+			return this.mimeType === 'text/xml';
 		},
 
-		getCaptions: function( data ){
+		getCaptions: function ( data ) {
 			// Detect caption data type:
-			switch( this.mimeType ){
+			switch ( this.mimeType ) {
 				case 'text/mw-srt':
 					return this.getCaptiosnFromMediaWikiSrt( data );
-					break;
 				case 'text/x-srt':
 					return this.getCaptionsFromSrt( data);
-					break;
 				case 'text/xml':
 					return this.getCaptionsFromTMML( data );
-					break;
 			}
 			// caption mime not found return empty set:
 			return [];
 		},
 
-		getStyleCssById: function( styleId ){
-			if( this.styleCss[ styleId ] ){
+		getStyleCssById: function ( styleId ) {
+			if ( this.styleCss[ styleId ] ) {
 				return this.styleCss[ styleId ];
 			}
 			return {};
@@ -175,70 +178,80 @@
 		 * @param data
 		 * @return
 		 */
-		getCaptionsFromTMML: function( data ){
-			var _this = this;
-			mw.log("TextSource::getCaptionsFromTMML", data);
-			// set up display information:
-			var captions = [];
-			var xml = ( $( data ).find("tt").length ) ? data : $.parseXML( data );
+		getCaptionsFromTMML: function ( data ) {
+			var bodyStyleId,
+				cssObject,
+				attrName,
+				cssName,
+				c,
+				content,
+				end,
+				captionObj,
+				$meta,
+				localThis = this,
+				// set up display information:
+				captions = [],
+				xml = ( $( data ).find( 'tt' ).length ) ? data : $.parseXML( data );
+
+			mw.log( 'TextSource::getCaptionsFromTMML', data );
 
 			// Check for parse error:
 			try {
-				if( !xml || $( xml ).find('parsererror').length ){
-					mw.log("Error: close caption parse error: " +  $( xml ).find('parsererror').text() );
+				if ( !xml || $( xml ).find( 'parsererror' ).length ) {
+					mw.log( 'Error: close caption parse error: ' +  $( xml ).find( 'parsererror' ).text() );
 					return captions;
 				}
 			} catch ( e ) {
-				mw.log( "Error: close caption parse error: " +  e.toString() );
+				mw.log( 'Error: close caption parse error: ' +  e.toString() );
 				return captions;
 			}
 
 			// Set the body Style
-			var bodyStyleId = $( xml ).find('body').attr('style');
+			bodyStyleId = $( xml ).find( 'body' ).attr( 'style' );
 
 			// Set style translate ttml to css
-			$( xml ).find( 'style').each( function( inx, style){
-				var cssObject = {};
+			$( xml ).find( 'style').each( function ( inx, style ) {
+				cssObject = {};
 				// Map CamelCase css properties:
-				$( style.attributes ).each(function(inx, attr){
-					var attrName = attr.name;
-					if( attrName.substr(0, 4) !== 'tts:' ){
+				$( style.attributes ).each( function ( inx, attr ) {
+					attrName = attr.name;
+					if ( attrName.substr(0, 4) !== 'tts:' ) {
 						// skip
 						return true;
 					}
-					var cssName = '';
-					for( var c = 4; c < attrName.length; c++){
-						if( attrName[c].toLowerCase() != attrName[c] ){
-							cssName += '-' +  attrName[c].toLowerCase();
+					cssName = '';
+					for ( c = 4; c < attrName.length; c++ ) {
+						if ( attrName[c].toLowerCase() !== attrName[c] ) {
+							cssName += '-' + attrName[c].toLowerCase();
 						} else {
-							cssName+= attrName[c]
+							cssName += attrName[c];
 						}
 					}
 					cssObject[ cssName ] = attr.nodeValue;
 				});
 				// for(var i =0; i< style.length )
-				_this.styleCss[ $( style).attr('id') ] = cssObject;
+				localThis.styleCss[ $( style).attr('id') ] = cssObject;
 			});
 
-			$( xml ).find( 'p' ).each( function( inx, p ){
+			$( xml ).find( 'p' ).each( function ( inx, p ) {
 				// Get text content by converting ttml node to html
-				var content = '';
-				$.each( p.childNodes, function(inx, node){
-					content+= _this.convertTTML2HTML( node );
-				});
+				content = '';
+				$.each( p.childNodes, function (inx, node ) {
+					content += localThis.convertTTML2HTML( node );
+				} );
 				// Get the end time:
-				var end = null;
-				if( $( p ).attr( 'end' ) ){
+				end = null;
+				if ( $( p ).attr( 'end' ) ) {
 					end = mw.npt2seconds( $( p ).attr( 'end' ) );
 				}
 				// Look for dur
-				if( !end && $( p ).attr( 'dur' )){
+				if ( !end && $( p ).attr( 'dur' ) ) {
 					end = mw.npt2seconds( $( p ).attr( 'begin' ) ) +
 						mw.npt2seconds( $( p ).attr( 'dur' ) );
 				}
 
 				// Create the caption object :
-				var captionObj ={
+				captionObj = {
 					'start': mw.npt2seconds( $( p ).attr( 'begin' ) ),
 					'end': end,
 					'content': content
@@ -246,75 +259,73 @@
 
 				// See if we have custom metadata for position of this caption object
 				// there are 35 columns across and 15 rows high
-				var $meta = $(p).find( 'metadata' );
-				if( $meta.length ){
-					captionObj['css'] = {
+				$meta = $( p ).find( 'metadata' );
+				if ( $meta.length ) {
+					captionObj.css = {
 						'position': 'absolute'
 					};
-					if( $meta.attr('cccol') ){
-						captionObj['css']['left'] = ( $meta.attr('cccol') / 35 ) * 100 +'%';
+					if ( $meta.attr('cccol') ) {
+						captionObj.css.left = ( $meta.attr('cccol') / 35 ) * 100 + '%';
 						// also means the width has to be reduced:
 						//captionObj['css']['width'] =  100 - parseInt( captionObj['css']['left'] ) + '%';
 					}
-					if( $meta.attr('ccrow') ){
-						captionObj['css']['top'] = ( $meta.attr('ccrow') / 15 ) * 100 +'%';
+					if ( $meta.attr('ccrow') ) {
+						captionObj.css.top = ( $meta.attr('ccrow') / 15 ) * 100 + '%';
 					}
 				}
-				if( $(p).attr('tts:textAlign') ){
-					if( !captionObj['css'] ){
-						captionObj['css'] = {};
+				if ( $( p ).attr( 'tts:textAlign' ) ) {
+					if ( !captionObj.css ) {
+						captionObj.css = {};
 					}
-					captionObj['css']['text-align'] = $(p).attr('tts:textAlign');
+					captionObj.css['text-align'] = $( p ).attr( 'tts:textAlign' );
 
 					// Remove text align is "right" flip the css left:
-					if( captionObj['css']['text-align'] == 'right' && captionObj['css']['left'] ){
+					if ( captionObj.css['text-align'] === 'right' && captionObj.css.left ) {
 						//captionObj['css']['width'] = captionObj['css']['left'];
-						captionObj['css']['left'] = null;
+						captionObj.css.left = null;
 					}
 				}
 
 				// check if this p has any style else use the body parent
-				if( $(p).attr('style') ){
-					captionObj['styleId'] = $(p).attr('style') ;
-				} else {
-					captionObj['styleId'] = bodyStyleId;
-				}
-				captions.push( captionObj);
+				captionObj.styleId = ( $( p ).attr( 'style' ) || bodyStyleId );
+				captions.push( captionObj );
 			});
 			return captions;
 		},
-		convertTTML2HTML: function( node ){
-			var _this = this;
+
+		convertTTML2HTML: function ( node ) {
+			var attr,
+				localThis = this,
+				// Setup tts mappings TODO should be static property of a ttmlSource object.
+				ttsStyleMap = {
+					'tts:color': 'color',
+					'tts:fontWeight': 'font-weight',
+					'tts:fontStyle': 'font-style'
+				},
+				nodeString = '',
+				styleVal = '';
 
 			// look for text node:
-			if( node.nodeType == 3 ){
+			if ( node.nodeType === 3 ) {
 				return node.textContent;
 			}
 			// skip metadata nodes:
-			if( node.nodeName == 'metadata' ){
+			if ( node.nodeName === 'metadata' ) {
 				return '';
 			}
 			// if a br just append
-			if( node.nodeName == 'br' ){
+			if ( node.nodeName === 'br' ) {
 				return '<br />';
 			}
-			// Setup tts mappings TODO should be static property of a ttmlSource object.
-			var ttsStyleMap = {
-				'tts:color' : 'color',
-				'tts:fontWeight' : 'font-weight',
-				'tts:fontStyle' : 'font-style'
-			};
-			if( node.childNodes.length ){
-				var nodeString = '';
-				var styleVal = '';
-				for( var attr in ttsStyleMap ){
-					if( node.getAttribute( attr ) ){
-						styleVal+= ttsStyleMap[ attr ] + ':' +  node.getAttribute( attr ) + ';';
+			if ( node.childNodes.length ) {
+				for ( attr in ttsStyleMap ) {
+					if ( node.getAttribute( attr ) ) {
+						styleVal += ttsStyleMap[ attr ] + ':' +  node.getAttribute( attr ) + ';';
 					}
 				}
 				nodeString +=  '<' + node.nodeName + ' style="' + styleVal + '" >';
-				$.each( node.childNodes, function( inx, childNode ){
-					nodeString += _this.convertTTML2HTML( childNode );
+				$.each( node.childNodes, function ( inx, childNode ) {
+					nodeString += localThis.convertTTML2HTML( childNode );
 				});
 				nodeString += '</' + node.nodeName + '>';
 				return nodeString;
@@ -324,20 +335,30 @@
 		 * srt timed text parse handle:
 		 * @param {String} data Srt string to be parsed
 		 */
-		getCaptionsFromSrt: function ( data ){
-			mw.log("TextSource::getCaptionsFromSrt");
-			var _this = this;
+		getCaptionsFromSrt: function ( data ) {
+			mw.log( 'TextSource::getCaptionsFromSrt' );
+			var xml,
+				srt,
+				captions,
+				caplist,
+				i,
+				captionText,
+				caption,
+				s,
+				m,
+				localThis = this;
+
 			// Check if the "srt" parses as an XML
-			try{
-				var xml = $.parseXML( data );
-				if( xml && $( xml ).find('parsererror').length == 0 ){
+			try {
+				xml = $.parseXML( data );
+				if ( xml && $( xml ).find('parsererror').length === 0 ) {
 					return this.getCaptionsFromTMML( data );
 				}
-			} catch ( e ){
+			} catch ( e ) {
 				// srt should not be xml
 			}
 			// Remove dos newlines
-			var srt = data.replace(/\r+/g, '');
+			srt = data.replace(/\r+/g, '');
 
 			// Trim white space start and end
 			srt = srt.replace(/^\s+|\s+$/g, '');
@@ -346,30 +367,30 @@
 			srt = srt.replace(/<[a-zA-Z\/][^>]*>/g, '');
 
 			// Get captions
-			var captions = [];
-			var caplist = srt.split('\n\n');
-			for (var i = 0; i < caplist.length; i++) {
-		 		var captionText = "";
-				var caption = false;
+			captions = [];
+			caplist = srt.split( '\n\n' );
+			for ( i = 0; i < caplist.length; i++ ) {
+				captionText = '';
+				caption = false;
 				captionText = caplist[i];
-				var s = captionText.split(/\n/);
-				if (s.length < 2) {
+				s = captionText.split( /\n/ );
+				if ( s.length < 2 ) {
 					// file format error or comment lines
 					continue;
 				}
-				if (s[0].match(/^\d+$/) && s[1].match(/\d+:\d+:\d+/)) {
+				if ( s[0].match( /^\d+$/ ) && s[1].match( /\d+:\d+:\d+/) ) {
 					// ignore caption number in s[0]
 					// parse time string
-					var m = s[1].match(/(\d+):(\d+):(\d+)(?:,(\d+))?\s*--?>\s*(\d+):(\d+):(\d+)(?:,(\d+))?/);
+					m = s[1].match(/(\d+):(\d+):(\d+)(?:,(\d+))?\s*--?>\s*(\d+):(\d+):(\d+)(?:,(\d+))?/);
 					if (m) {
-						caption = _this.match2caption( m );
+						caption = localThis.match2caption( m );
 					} else {
 						// Unrecognized timestring
 						continue;
 					}
-					if( caption ){
+					if ( caption ) {
 						// concatenate text lines to html text
-						caption['content'] = s.slice(2).join("<br>");
+						caption.content = s.slice( 2 ).join( '<br>' );
 					}
 				} else {
 					// file format error or comment lines
@@ -393,21 +414,23 @@
 		 *
 		 * TODO move to mediaWiki specific module.
 		 */
-		getCaptiosnFromMediaWikiSrt: function( data ){
-			mw.log("TimedText::getCaptiosnFromMediaWikiSrt:");
-			var _this = this;
-			var captions = [ ];
-			var curentCap = {
-				'content': ''
-			};
-			var parseNextAsTime = false;
+		getCaptiosnFromMediaWikiSrt: function ( data ) {
+			mw.log( 'TimedText::getCaptiosnFromMediaWikiSrt:' );
+			var currentPtext,
+				m,
+				localThis = this,
+				captions = [ ],
+				curentCap = {
+					'content': ''
+				};
+
 			// Note this string concatenation and html error wrapping sometimes causes
 			// parse issues where the wikitext includes many native <p /> tags without child
 			// subtitles. In prating this is not a deal breakers because the wikitext for
 			// TimedText namespace and associated srts already has a specific format.
 			// Long term we will move to server side parsing.
-			$( '<div>' + data + '</div>' ).find('p').each( function() {
-				var currentPtext = $(this).html();
+			$( '<div>' + data + '</div>' ).find('p').each( function () {
+				currentPtext = $(this).html();
 				//mw.log( 'pText: ' + currentPtext );
 
 				// We translate raw wikitext gennerated html into a matched srt time sample.
@@ -421,13 +444,13 @@
 				//
 				// We attempt to be fairly robust in our regular expression to catch a few
 				// srt variations such as omition of commas and empty text lines.
-				var m = currentPtext
-				.replace('--&gt;', '-->') // restore --&gt with --> for easier srt parsing:
-				.match(/\d+\s([\d\-]+):([\d\-]+):([\d\-]+)(?:,([\d\-]+))?\s*--?>\s*([\d\-]+):([\d\-]+):([\d\-]+)(?:,([\d\-]+))?\n?(.*)/);
+				m = currentPtext
+					.replace('--&gt;', '-->') // restore --&gt with --> for easier srt parsing:
+					.match(/\d+\s([\d\-]+):([\d\-]+):([\d\-]+)(?:,([\d\-]+))?\s*--?>\s*([\d\-]+):([\d\-]+):([\d\-]+)(?:,([\d\-]+))?\n?(.*)/);
 
-				if (m) {
+				if ( m ) {
 					captions.push(
-						_this.match2caption( m )
+						localThis.match2caption( m )
 					);
 					return true;
 				}
@@ -441,8 +464,8 @@
 				 */
 
 				// Check if we have reached the end of a multi line match
-				if( parseInt( currentPtext ) == currentPtext ) {
-					if( curentCap.content != '' ) {
+				if ( parseInt( currentPtext ) === currentPtext ) {
+					if ( curentCap.content !== '' ) {
 						captions.push( curentCap );
 					}
 					// Clear out the current caption content
@@ -452,53 +475,53 @@
 					return true;
 				}
 				// Check only for time match:
-				var m = currentPtext
+				m = currentPtext
 					.replace('--&gt;', '-->')
 					.match(/(\d+):(\d+):(\d+)(?:,(\d+))?\s*--?>\s*(\d+):(\d+):(\d+)(?:,(\d+))?/);
 				if (m) {
 					// Update the currentCap:
-					curentCap = _this.match2caption( m );
+					curentCap = localThis.match2caption( m );
 					return true;
 				}
 				// Else append contnet for the curentCap
-				if( currentPtext != '<br>' ) {
-					curentCap['content'] += currentPtext;
+				if ( currentPtext !== '<br>' ) {
+					curentCap.content += currentPtext;
 				}
 			});
 			//Push last subtitle:
-			if( curentCap.length != 0) {
+			if ( curentCap.length !== 0) {
 				captions.push( curentCap );
 			}
-			mw.log( "TimedText::getCaptiosnFromMediaWikiSrt found " + captions.length + ' captions');
+			mw.log( 'TimedText::getCaptiosnFromMediaWikiSrt found ' + captions.length + ' captions');
 			return captions;
 		},
 		/**
 		 * Takes a regular expresion match and converts it to a caption object
 		 */
-		match2caption: function( m ){
-			var caption = {};
-			// Look for ms:
-			var startMs = (m[4]) ? parseInt(m[4], 10) : 0;
-			var endMs = (m[8]) ? parseInt(m[8], 10) : 0;
-			caption['start'] = this.timeParts2seconds( m[1], m[2], m[3], startMs );
-			caption['end'] = this.timeParts2seconds( m[5], m[6], m[7], endMs );
-			if( m[9] ){
-				caption['content'] = $.trim( m[9] );
+		match2caption: function ( m ) {
+			var caption = {},
+				// Look for ms:
+				startMs = (m[4]) ? parseInt(m[4], 10) : 0,
+				endMs = (m[8]) ? parseInt(m[8], 10) : 0;
+
+			caption.start = this.timeParts2seconds( m[1], m[2], m[3], startMs );
+			caption.end = this.timeParts2seconds( m[5], m[6], m[7], endMs );
+			if ( m[9] ) {
+				caption.content = $.trim( m[9] );
 			}
 			return caption;
 		},
 		/**
 		 * Takes time parts in hours, min, seconds and milliseconds and coverts to float seconds.
 		 */
-		timeParts2seconds: function( hours, min, sec, ms ){
-			return mw.measurements2seconds({
+		timeParts2seconds: function ( hours, min, sec, ms ) {
+			return mw.measurements2seconds( {
 				'hours': hours,
 				'minutes':  min,
-				'seconds' : sec,
+				'seconds': sec,
 				'milliseconds': ms
-			});
+			} );
 		}
 	};
-
 
 } )( window.mediaWiki, window.jQuery );

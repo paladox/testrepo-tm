@@ -1,7 +1,7 @@
 /**
 * Simple script to add pop-up video dialog link support for video thumbnails
 */
-( function( mw, $ ) {
+( function ( mw, $ ) {
 	// Hook to allow dynamically resizing videos in image galleries
 	mw.hook( 'mediawiki.page.gallery.resize' ).add( function ( info ) {
 		var $mwPlayerContainer,

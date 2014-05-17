@@ -1,20 +1,20 @@
 /**
 * EmbedPlayer loader
 */
-( function( mw, $ ) {
+( function ( mw, $ ) {
 
 	/**
 	* Add a DOM ready check for player tags
 	*/
-	$(function( event ){
+	$(function ( event ) {
 		var $selected = $( mw.config.get( 'EmbedPlayer.RewriteSelector' ) );
-		if( $selected.length ){
+		if ( $selected.length ) {
 			var inx = 0;
-			var checkSetDone = function(){
-				if( inx < $selected.length ){
+			var checkSetDone = function () {
+				if ( inx < $selected.length ) {
 					// put in timeout to avoid browser lockup, and function stack
-					$selected.slice(inx, inx+1).embedPlayer( function(){
-						setTimeout(function(){
+					$selected.slice(inx, inx+1).embedPlayer( function () {
+						setTimeout(function () {
 							checkSetDone();
 						}, 5);
 					});
@@ -28,7 +28,7 @@
 	/**
 	* Add the mwEmbed jQuery loader wrapper
 	*/
-	$.fn.embedPlayer = function( readyCallback ){
+	$.fn.embedPlayer = function ( readyCallback ) {
 		var playerSet = this;
 		mw.log( 'jQuery.fn.embedPlayer :: ' + $( this ).length );
 
@@ -38,12 +38,12 @@
 		];
 
 		var rewriteElementCount = 0;
-		$( this ).each( function(inx, playerElement){
+		$( this ).each( function (inx, playerElement){
 			var skinName ='';
 			// we have javascript ( disable controls )
 			$( playerElement ).removeAttr( 'controls' );
 			// Add an overlay loader ( firefox has its own native loading spinner )
-			if( !$.browser.mozilla ){
+			if ( !$.browser.mozilla ) {
 				$( playerElement )
 					.parent()
 					.getAbsoluteOverlaySpinner()
@@ -58,13 +58,12 @@
 		dependencySet = $.uniqueArray( dependencySet );
 
 		// Do the request and process the playerElements with updated dependency set
-		mediaWiki.loader.using( dependencySet, function(){
+		mediaWiki.loader.using( dependencySet, function () {
 			// Setup the enhanced language:
 			mw.processEmbedPlayers( playerSet, readyCallback );
-		}, function( e ){
+		}, function ( e ) {
 			throw new Error( 'Error loading EmbedPlayer dependency set: ' + e.message  );
 		});
 	};
-
 
 } )( window.mediaWiki, window.jQuery );

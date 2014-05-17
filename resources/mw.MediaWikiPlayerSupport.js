@@ -1,4 +1,4 @@
-( function( mw, $ ) {
+( function ( mw, $ ) {
 	/**
 	 * Merge in the default video attributes supported by embedPlayer:
 	 */
@@ -11,16 +11,16 @@
 	});
 
 	// Add mediaWiki player support to target embedPlayer
-	$( mw ).bind( 'EmbedPlayerNewPlayer', function( event, embedPlayer ){
+	$( mw ).bind( 'EmbedPlayerNewPlayer', function ( event, embedPlayer ) {
 		mw.addMediaWikiPlayerSupport( embedPlayer );
 	});
 
 	/**
 	 * Closure function wraps mediaWiki embedPlayer bindings
 	 */
-	mw.addMediaWikiPlayerSupport = function( embedPlayer ){
+	mw.addMediaWikiPlayerSupport = function ( embedPlayer ) {
 		// Set some local variables:
-		if( ! embedPlayer['data-mwtitle'] ){
+		if ( ! embedPlayer['data-mwtitle'] ) {
 			return false;
 		} else {
 			var apiTitleKey = embedPlayer['data-mwtitle'];
@@ -29,7 +29,7 @@
 		}
 		// Set local apiProvider via config if not defined
 		var apiProvider = embedPlayer['data-mwprovider'];
-		if( !apiProvider ){
+		if ( !apiProvider ) {
 			apiProvider = mw.config.get( 'EmbedPlayer.ApiProvider' );
 		}
 
@@ -37,7 +37,7 @@
 		 * Loads mediaWiki sources for a given embedPlayer
 		 * @param {function} callback Function called once player sources have been added
 		 */
-		function loadPlayerSources( callback ){
+		function loadPlayerSources( callback ) {
 			// Setup the request
 			var request = {
 				'prop': 'imageinfo',
@@ -45,27 +45,27 @@
 				'titles': 'File:' + unescape( apiTitleKey ).replace( /^(File:|Image:)/ , '' ),
 				'iiprop': 'url|size|dimensions|metadata',
 				'iiurlwidth': embedPlayer.getWidth(),
-				'redirects' : true // automatically resolve redirects
+				'redirects': true // automatically resolve redirects
 			};
 
 			// Run the request:
-			mw.getJSON( mw.getApiProviderURL( apiProvider ), request, function( data ){
+			mw.getJSON( mw.getApiProviderURL( apiProvider ), request, function ( data ) {
 				if ( data.query.pages ) {
 					for ( var i in data.query.pages ) {
-						if( i == '-1' ) {
+						if ( i === '-1' ) {
 							callback( false );
-							return ;
+							return;
 						}
 						var page = data.query.pages[i];
 					}
 				} else {
 					callback( false );
-					return ;
+					return;
 				}
 				// Make sure we have imageinfo:
-				if( ! page.imageinfo || !page.imageinfo[0] ){
+				if ( ! page.imageinfo || !page.imageinfo[0] ) {
 					callback( false );
-					return ;
+					return;
 				}
 				var imageinfo = page.imageinfo[0];
 
@@ -82,13 +82,13 @@
 				);
 
 				// Set the duration
-				if( imageinfo.metadata[2]['name'] == 'length' ) {
+				if ( imageinfo.metadata[2]['name'] === 'length' ) {
 					embedPlayer.duration = imageinfo.metadata[2]['value'];
 				}
 
 				// Set the width height
 				// Make sure we have an accurate aspect ratio
-				if( imageinfo.height != 0 && imageinfo.width != 0 ) {
+				if ( imageinfo.height !== 0 && imageinfo.width !== 0 ) {
 					embedPlayer.height = parseInt( embedPlayer.width * ( imageinfo.height / imageinfo.width ) );
 				}
 
@@ -99,7 +99,6 @@
 			});
 		}
 
-
 		/**
 		* Build a clip credit from the resource wikiText page
 		*
@@ -107,7 +106,7 @@
 		*
 		* @param {String} resourceHTML Resource wiki text page contents
 		*/
-		function doCreditLine( resourceHTML, articleUrl ){
+		function doCreditLine( resourceHTML, articleUrl ) {
 			// Get the title string ( again a "Title" like js object could help out here. )
 			var titleStr = embedPlayer.apiTitleKey.replace(/_/g, ' ');
 
@@ -121,8 +120,8 @@
 						// get the link
 						$('<div>').append(
 							$('<a/>').attr({
-								'href' : articleUrl,
-								'title' : titleStr
+								'href': articleUrl,
+								'title': titleStr
 							})
 							.text( titleStr )
 						)[0].innerHTML
@@ -135,7 +134,7 @@
 
 			// Look for author:
 			var $author = $page.find('#fileinfotpl_aut');
-			if( $author.length ){
+			if ( $author.length ) {
 				// Get the real author sibling of fileinfotpl_aut
 				$authorText = $author.next()
 				// Remove white space:
@@ -143,8 +142,8 @@
 
 				// Update link to be absolute per page url context:
 				var $links = $authorText.find('a');
-				if( $links.length ) {
-					$links.each(function(i, authorLink) {
+				if ( $links.length ) {
+					$links.each(function (i, authorLink) {
 						var $authorLink = $(authorLink);
 						var authUrl = $authorLink.attr('href');
 						authUrl = mw.absoluteUrl( authUrl,  articleUrl );
@@ -158,7 +157,7 @@
 
 			// Look for date:
 			var $date =$page.find('#fileinfotpl_date');
-			if( $date.length ){
+			if ( $date.length ) {
 				// Get the real date sibling of fileinfotpl_date
 				$date = $date.next();
 
@@ -169,10 +168,9 @@
 				)
 			}
 
-
 			// Build out the image and credit line
 			var imgSize = { };
-			if( embedPlayer.isAudio() ){
+			if ( embedPlayer.isAudio() ) {
 				imgSize.height = imgSize.width = ( embedPlayer.controlBuilder.getOverlayWidth() < 250 ) ? 45 : 80;
 			} else{
 				imgSize.width = ( embedPlayer.controlBuilder.getOverlayWidth() < 250 ) ? 45 : 120;
@@ -181,12 +179,12 @@
 			return $( '<div/>' ).addClass( 'creditline' )
 				.append(
 					$('<a/>').attr({
-						'href' : articleUrl,
-						'title' : titleStr
+						'href': articleUrl,
+						'title': titleStr
 					}).html(
 						$('<img/>').attr( {
 							'border': 0,
-							'src' : embedPlayer.poster
+							'src': embedPlayer.poster
 						} ).css( imgSize )
 					)
 				)
@@ -199,8 +197,8 @@
 		 * Issues a request to populate the credits box
 		 */
 		var $creditsCache = false;
-		function showCredits( $target, callback ){
-			if( $creditsCache ){
+		function showCredits( $target, callback ) {
+			if ( $creditsCache ) {
 				$target.html( $creditsCache );
 				callback( true );
 				return;
@@ -213,11 +211,11 @@
 			var request = {
 				'action': 'parse',
 				'page': fileTitle,
-				'smaxage' : 3600,
-				'maxage' : 3600
+				'smaxage': 3600,
+				'maxage': 3600
 			};
 			var articleUrl = '';
-			mw.getJSON( apiUrl, request, function( data ){
+			mw.getJSON( apiUrl, request, function ( data ) {
 
 				descUrl = apiUrl.replace( 'api.php', 'index.php');
 				descUrl+= '?title=' + encodeURIComponent( fileTitle );
@@ -236,26 +234,26 @@
 		 */
 
 		// Show credits when requested
-		$( embedPlayer ).bind('showCredits', function( event, $target, callback){
-			if( $target.data('playerId') != embedPlayer.id ){
+		$( embedPlayer ).bind('showCredits', function ( event, $target, callback){
+			if ( $target.data('playerId') !== embedPlayer.id ) {
 				// bad event trigger
-				return ;
+				return;
 			}
 			// Only request the credits once:
 			showCredits( $target, callback);
 		});
 
 		// Show credits on clip complete:
-		$( embedPlayer ).bind('onEndedDone', function( event, id ){
-			if( embedPlayer.id != id ){
+		$( embedPlayer ).bind('onEndedDone', function ( event, id ) {
+			if ( embedPlayer.id !== id ) {
 				// possible event trigger error. ( skip )
-				return ;
+				return;
 			}
 			// dont show credits for audio elements,
 			// seek to begining instead
-			if( embedPlayer.isAudio() ){
+			if ( embedPlayer.isAudio() ) {
 				embedPlayer.setCurrentTime(0);
-				return ;
+				return;
 			}
 			var cb = embedPlayer.controlBuilder;
 			cb.checkMenuOverlay();
@@ -263,7 +261,7 @@
 			cb.showMenuItem( 'credits' );
 		});
 
-		$( embedPlayer ).bind('showInlineDownloadLink', function(){
+		$( embedPlayer ).bind('showInlineDownloadLink', function () {
 			// Add recommend HTML5 player if we have non-native playback:
 			if ( embedPlayer.controlBuilder.checkNativeWarning( ) ) {
 				embedPlayer.controlBuilder.addWarningBinding(
@@ -272,7 +270,7 @@
 						$('<div>').append(
 							$('<a />').attr({
 								'href': 'http://www.mediawiki.org/wiki/Extension:TimedMediaHandler/Client_download',
-								'target' : '_new'
+								'target': '_new'
 							})
 						)[0].innerHTML
 					),
@@ -281,17 +279,17 @@
 			}
 		});
 
-		$( embedPlayer ).bind( 'TimedText_BuildCCMenu', function(event, $menu, id ){
-			if( id != embedPlayer.id ){
-				_this = $('#' + id )[0].timedText;
-				embedPlayer = _this.embedPlayer;
+		$( embedPlayer ).bind( 'TimedText_BuildCCMenu', function (event, $menu, id ) {
+			if ( id !== embedPlayer.id ) {
+				localThis = $('#' + id )[0].timedText;
+				embedPlayer = localThis.embedPlayer;
 			}
 			// Put in the "Make Transcript" link if config enabled and we have an api key
-			if( embedPlayer.apiTitleKey ){
+			if ( embedPlayer.apiTitleKey ) {
 				// check if not already there:
-				if( $menu.find( '.add-timed-text' ).length ){
+				if ( $menu.find( '.add-timed-text' ).length ) {
 					// add text link already present
-					return ;
+					return;
 				}
 
 				var pageTitle = 'TimedText:' +
@@ -300,7 +298,7 @@
 									.replace( 'api.php', 'index.php') +
 									'?title=' + encodeURIComponent( pageTitle );
 
-				var $li = $.getLineItem( mw.msg( 'mwe-timedtext-upload-timed-text'), 'script', function() {
+				var $li = $.getLineItem( mw.msg( 'mwe-timedtext-upload-timed-text'), 'script', function () {
 					window.location = addTextPage;
 				});
 
@@ -308,7 +306,7 @@
 					.find( "a" )
 					.attr( {
 						'href': addTextPage,
-						'target' : '_new'
+						'target': '_new'
 					});
 				$menu.append(
 					$li
@@ -316,19 +314,19 @@
 			}
 		});
 
-		$( embedPlayer ).bind( 'checkPlayerSourcesEvent', function(event, callback){
+		$( embedPlayer ).bind( 'checkPlayerSourcesEvent', function (event, callback){
 			// Only load source if none are available:
-			if( embedPlayer.mediaElement.sources.length == 0 ){
+			if ( embedPlayer.mediaElement.sources.length === 0 ) {
 				loadPlayerSources( callback );
 			} else {
 				// No source to load, issue callback directly
 				callback();
 			}
 		});
-		$( mw ).bind( 'TimedText_LoadTextSource', function( event, source, callback ){
-			if( !source['mwtitle'] || !source['mwprovider'] ){
+		$( mw ).bind( 'TimedText_LoadTextSource', function ( event, source, callback ) {
+			if ( !source['mwtitle'] || !source['mwprovider'] ) {
 				callback();
-				return ;
+				return;
 			}
 			// Load via api
 			var apiUrl = mw.getApiProviderURL( source['mwprovider'] );
@@ -336,11 +334,11 @@
 			var request = {
 				'action': 'parse',
 				'page': source['mwtitle'],
-				'smaxage' : 3600,
-				'maxage' : 3600
+				'smaxage': 3600,
+				'maxage': 3600
 			};
-			mw.getJSON( apiUrl, request, function( data ){
-				if( data && data['parse'] && data['parse']['text'] &&  data['parse']['text']['*'] ){
+			mw.getJSON( apiUrl, request, function ( data ) {
+				if ( data && data['parse'] && data['parse']['text'] &&  data['parse']['text']['*'] ) {
 					source.loaded = true;
 					source.mimeType = 'text/mw-srt';
 					source.captions = source.getCaptions(  data['parse']['text']['*'] );
@@ -352,24 +350,23 @@
 			});
 		});
 
-
-		$( embedPlayer ).bind( 'getShareIframeSrc', function(event, callback, id){
-			if( id != embedPlayer.id ){
+		$( embedPlayer ).bind( 'getShareIframeSrc', function (event, callback, id){
+			if ( id !== embedPlayer.id ) {
 				embedPlayer = $('#' + id)[0];
 			}
 			var iframeUrl = false;
 			// Do a special check for wikimediacommons provider as a known shared reop
-			if( embedPlayer['data-mwprovider'] == 'wikimediacommons' ){
+			if ( embedPlayer['data-mwprovider'] === 'wikimediacommons' ) {
 				iframeUrl = '//commons.wikimedia.org/wiki/File:' + unescape( embedPlayer.apiTitleKey ).replace( /^(File:|Image:)/ , '' );
 			} else {
 				// use the local wiki:
-				if( mw.config.get('wgServer') && mw.config.get('wgArticlePath') ){
+				if ( mw.config.get('wgServer') && mw.config.get('wgArticlePath') ) {
 					iframeUrl =  mw.config.get('wgServer') +
 						mw.config.get('wgArticlePath').replace( /\$1/, 'File:' +
 							unescape( embedPlayer.apiTitleKey ).replace( /^(File:|Image:)/ , '' ) )
 				}
 			}
-			if( iframeUrl ){
+			if ( iframeUrl ) {
 				iframeUrl += '?embedplayer=yes';
 			}
 			callback( iframeUrl );

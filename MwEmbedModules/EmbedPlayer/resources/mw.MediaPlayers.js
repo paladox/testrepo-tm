@@ -3,9 +3,9 @@
  *
  * @constructor
  */
-( function( mw, $ ) { "use strict";
+( function ( mw, $ ) { "use strict";
 
-mw.MediaPlayers = function(){
+mw.MediaPlayers = function () {
 	this.init();
 };
 
@@ -23,8 +23,8 @@ mw.MediaPlayers.prototype = {
 	 * Initializartion function sets the default order for players for a given
 	 * mime type
 	 */
-	init: function() {
-		this.players = new Array();
+	init: function () {
+		this.players = [];
 		this.loadPreferences();
 
 		// Set up default players order for each library type
@@ -58,11 +58,11 @@ mw.MediaPlayers.prototype = {
 	 * @param {Object}
 	 *      player Player object to be added
 	 */
-	addPlayer: function( player ) {
+	addPlayer: function ( player ) {
 		for ( var i = 0; i < this.players.length; i++ ) {
-			if ( this.players[i].id == player.id ) {
+			if ( this.players[i].id === player.id ) {
 				// Player already found
-				return ;
+				return;
 			}
 		}
 		// Add the player:
@@ -72,9 +72,9 @@ mw.MediaPlayers.prototype = {
 	/**
 	 * Checks if a player is supported by id
 	 */
-	isSupportedPlayer: function( playerId ){
-		for( var i=0; i < this.players.length; i++ ){
-			if( this.players[i].id == playerId ){
+	isSupportedPlayer: function ( playerId ) {
+		for( var i=0; i < this.players.length; i++ ) {
+			if ( this.players[i].id === playerId ) {
 				return true;
 			}
 		}
@@ -88,16 +88,16 @@ mw.MediaPlayers.prototype = {
 	 *      mimeType Mime type of player set
 	 * @return {Array} Array of players that support a the requested mime type
 	 */
-	getMIMETypePlayers: function( mimeType ) {
-		var mimePlayers = new Array();
-		var _this = this;
+	getMIMETypePlayers: function ( mimeType ) {
+		var mimePlayers = [];
+		var localThis = this;
 		var baseMimeType = mimeType.split( ';' )[0];
 		if ( this.defaultPlayers[ baseMimeType ] ) {
-			$.each( this.defaultPlayers[ baseMimeType ], function( d, lib ) {
-				var library = _this.defaultPlayers[ baseMimeType ][ d ];
-				for ( var i = 0; i < _this.players.length; i++ ) {
-					if ( _this.players[i].library == library && _this.players[i].supportsMIMEType( mimeType ) ) {
-						mimePlayers.push( _this.players[i] );
+			$.each( this.defaultPlayers[ baseMimeType ], function ( d /*, lib*/ ) {
+				var library = localThis.defaultPlayers[ baseMimeType ][ d ];
+				for ( var i = 0; i < localThis.players.length; i++ ) {
+					if ( localThis.players[i].library === library && localThis.players[i].supportsMIMEType( mimeType ) ) {
+						mimePlayers.push( localThis.players[i] );
 					}
 				}
 			} );
@@ -112,7 +112,7 @@ mw.MediaPlayers.prototype = {
 	 *      mimeType Mime type of the requested player
 	 * @return Player for mime type null if no player found
 	 */
-	defaultPlayer : function( mimeType ) {
+	defaultPlayer : function ( mimeType ) {
 		// mw.log( "get defaultPlayer for " + mimeType );
 		var mimePlayers = this.getMIMETypePlayers( mimeType );
 		if ( mimePlayers.length > 0 )
@@ -120,11 +120,11 @@ mw.MediaPlayers.prototype = {
 			// Select the default player:
 			for ( var i = 0; i < mimePlayers.length; i++ ) {
 				// Check for native:
-				if(  mimePlayers[i].librayr == 'Native' ){
+				if ( mimePlayers[i].library === 'Native' ) {
 					return  mimePlayers[i];
 				}
 				// else check for preference
-				if ( mimePlayers[i].id == this.preference[mimeType] ){
+				if ( mimePlayers[i].id === this.preference[mimeType] ) {
 					return mimePlayers[i];
 				}
 			}
@@ -143,8 +143,8 @@ mw.MediaPlayers.prototype = {
 	 *      mimeFormat Prefered format
 	 */
 	setFormatPreference : function ( mimeFormat ) {
-		 this.preference['formatPreference'] = mimeFormat;
-		 $.cookie( 'EmbedPlayer.Preference', JSON.stringify( this.preference) );
+		this.preference.formatPreference = mimeFormat;
+		$.cookie( 'EmbedPlayer.Preference', JSON.stringify( this.preference) );
 	},
 
 	/**
@@ -153,7 +153,7 @@ mw.MediaPlayers.prototype = {
 	loadPreferences : function ( ) {
 		this.preference = { };
 		// See if we have a cookie set to a clientSupported type:
-		if( $.cookie( 'EmbedPlayer.Preference' ) ) {
+		if ( $.cookie( 'EmbedPlayer.Preference' ) ) {
 			this.preference = JSON.parse( $.cookie( 'EmbedPlayer.Preference' ) );
 		}
 	},
@@ -166,10 +166,10 @@ mw.MediaPlayers.prototype = {
 	 * @param {String}
 	 *      mimeType Mime type for the associated player stream
 	 */
-	setPlayerPreference : function( playerId, mimeType ) {
+	setPlayerPreference : function ( playerId, mimeType ) {
 		var selectedPlayer = null;
 		for ( var i = 0; i < this.players.length; i++ ) {
-			if ( this.players[i].id == playerId ) {
+			if ( this.players[i].id === playerId ) {
 				selectedPlayer = this.players[i];
 				mw.log( 'EmbedPlayer::setPlayerPreference: choosing ' + playerId + ' for ' + mimeType );
 				this.preference[ mimeType ] = playerId;
@@ -179,11 +179,12 @@ mw.MediaPlayers.prototype = {
 		}
 		// Update All the player instances on the page
 		if ( selectedPlayer ) {
-			$('.mwEmbedPlayer').each(function(inx, playerTarget ){
+			$('.mwEmbedPlayer').each(function (inx, playerTarget ) {
 				var embedPlayer = $( playerTarget ).get( 0 );
-				if ( embedPlayer.mediaElement.selectedSource
-						&& ( embedPlayer.mediaElement.selectedSource.mimeType == mimeType ) )
-				{
+				if (
+						embedPlayer.mediaElement.selectedSource &&
+						embedPlayer.mediaElement.selectedSource.mimeType === mimeType
+					) {
 					embedPlayer.selectPlayer( selectedPlayer );
 				}
 			});

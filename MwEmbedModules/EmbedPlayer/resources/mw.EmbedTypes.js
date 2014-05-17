@@ -3,7 +3,7 @@
  * closely mirrors OggHandler so that its easier to share efforts in this area:
  * http://svn.wikimedia.org/viewvc/mediawiki/trunk/extensions/OggHandler/OggPlayer.js
  */
-( function( mw, $ ) { "use strict";
+( function ( mw, $ ) { "use strict";
 
 /**
  * Setup local players and supported mime types In an ideal world we would query the plugin
@@ -79,7 +79,6 @@ var imageOverlayPlayer = new mw.MediaPlayer( 'imageOverlay', [
 // Generic plugin
 //var oggPluginPlayer = new mw.MediaPlayer( 'oggPlugin', ['video/ogg', 'application/ogg'], 'Generic' );
 
-
 mw.EmbedTypes = {
 
 	// MediaPlayers object ( supports methods for quering set of browser players )
@@ -93,14 +92,14 @@ mw.EmbedTypes = {
 	 *
 	 * @constructor
 	 */
-	 init: function() {
+	 init: function () {
 		// detect supported types
 		this.detect();
 		this.detect_done = true;
 	},
 
-	getMediaPlayers: function(){
-		if( this.mediaPlayers  ){
+	getMediaPlayers: function () {
+		if ( this.mediaPlayers  ) {
 			return this.mediaPlayers;
 		}
 		this.mediaPlayers = new mw.MediaPlayers();
@@ -115,22 +114,22 @@ mw.EmbedTypes = {
 	 * @param {String}
 	 *      mimeType Mime type for browser plug-in check
 	 */
-	supportedMimeType: function( mimeType ) {
+	supportedMimeType: function ( mimeType ) {
 		for ( var i =0; i < navigator.plugins.length; i++ ) {
 			var plugin = navigator.plugins[i];
-			if ( typeof plugin[ mimeType ] != "undefined" ){
+			if ( typeof plugin[ mimeType ] !== "undefined" ) {
 				return true;
 			}
 		}
 		return false;
 	},
-	addFlashPlayer: function(){
-		if( !mw.config.get( 'EmbedPlayer.DisableHTML5FlashFallback' ) ){
+	addFlashPlayer: function () {
+		if ( !mw.config.get( 'EmbedPlayer.DisableHTML5FlashFallback' ) ) {
 			this.mediaPlayers.addPlayer( kplayer );
 		}
 	},
-	addJavaPlayer: function(){
-		if( !mw.config.get( 'EmbedPlayer.DisableJava' ) ){
+	addJavaPlayer: function () {
+		if ( !mw.config.get( 'EmbedPlayer.DisableJava' ) ) {
 			mw.log("EmbedTypes::addJavaPlayer: adding cortadoPlayer");
 			this.mediaPlayers.addPlayer( cortadoPlayer );
 		}
@@ -138,7 +137,7 @@ mw.EmbedTypes = {
 	/**
 	 * Detects what plug-ins the client supports
 	 */
-	detectPlayers: function() {
+	detectPlayers: function () {
 		mw.log( "EmbedTypes::detectPlayers running detect" );
 
 		// All players support for playing "images"
@@ -148,7 +147,7 @@ mw.EmbedTypes = {
 		// search navigator.mimeTypes to see if it's installed
 		try{
 			var javaEnabled = navigator.javaEnabled();
-		} catch ( e ){
+		} catch ( e ) {
 
 		}
 		// Some browsers filter out duplicate mime types, hiding some plugins
@@ -157,12 +156,12 @@ mw.EmbedTypes = {
 		// Opera will switch off javaEnabled in preferences if java can't be
 		// found. And it doesn't register an application/x-java-applet mime type like
 		// Mozilla does.
-		if ( javaEnabled && ( navigator.appName == 'Opera' ) ) {
+		if ( javaEnabled && ( navigator.appName === 'Opera' ) ) {
 			this.addJavaPlayer();
 		}
 
 		// Use core mw.supportsFlash check:
-		if( mw.supportsFlash() ){
+		if ( mw.supportsFlash() ) {
 			this.addFlashPlayer();
 		}
 
@@ -187,17 +186,17 @@ mw.EmbedTypes = {
 		if ( ! mw.config.get('EmbedPlayer.DisableVideoTagSupport' ) // to support testing limited / old browsers
 				&&
 				(
-				typeof HTMLVideoElement == 'object' // Firefox, Safari
+				typeof HTMLVideoElement === 'object' // Firefox, Safari
 					||
-				typeof HTMLVideoElement == 'function' // Opera
+				typeof HTMLVideoElement === 'function' // Opera
 				)
 		){
 			// Test what codecs the native player supports:
 			try {
 				var dummyvid = document.createElement( "video" );
-				if( dummyvid.canPlayType ) {
+				if ( dummyvid.canPlayType ) {
 					// Add the webm player
-					if( dummyvid.canPlayType('video/webm; codecs="vp8, vorbis"') ){
+					if ( dummyvid.canPlayType('video/webm; codecs="vp8, vorbis"') ) {
 						this.mediaPlayers.addPlayer( webmNativePlayer );
 					}
 
@@ -214,10 +213,10 @@ mw.EmbedTypes = {
 					// Test for h264:
 					if ( dummyvid.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"' ) ) {
 						this.mediaPlayers.addPlayer( h264NativePlayer );
-						// Check for iOS for vdn player support ( apple adaptive ) or vdn canPlayType != '' ( ie maybe/probably )
-						if( mw.isIOS() || dummyvid.canPlayType('application/vnd.apple.mpegurl; codecs="avc1.42E01E"' ) ){
+						// Check for iOS for vdn player support ( apple adaptive ) or vdn canPlayType !== '' ( ie maybe/probably )
+						if ( mw.isIOS() || dummyvid.canPlayType('application/vnd.apple.mpegurl; codecs="avc1.42E01E"' ) ) {
 							// Android 3x lies about HLS support ( only add if not Android 3.x )
-							if( navigator.userAgent.indexOf( 'Android 3.') == -1 ){
+							if ( navigator.userAgent.indexOf( 'Android 3.') === -1 ) {
 								this.mediaPlayers.addPlayer( appleVdnPlayer );
 							}
 						}
@@ -225,7 +224,7 @@ mw.EmbedTypes = {
 					}
 					// For now if Android assume we support h264Native (FIXME
 					// test on real devices )
-					if ( mw.isAndroid2() ){
+					if ( mw.isAndroid2() ) {
 						this.mediaPlayers.addPlayer( h264NativePlayer );
 					}
 
@@ -262,23 +261,23 @@ mw.EmbedTypes = {
 					// In case it is null or undefined
 					pluginName = '';
 				}
-				//if ( pluginName.toLowerCase() == 'vlc multimedia plugin' || pluginName.toLowerCase() == 'vlc multimedia plug-in' ) {
+				//if ( pluginName.toLowerCase() === 'vlc multimedia plugin' || pluginName.toLowerCase() === 'vlc multimedia plug-in' ) {
 				//	this.mediaPlayers.addPlayer( vlcPlayer );
 				//	continue;
 				//}
 
-				if ( type == 'application/x-java-applet' ) {
+				if ( type === 'application/x-java-applet' ) {
 					this.addJavaPlayer();
 					continue;
 				}
 
-				if ( (type == 'video/mpeg' || type == 'video/x-msvideo') ){
-					//pluginName.toLowerCase() == 'vlc multimedia plugin' ) {
+				if ( (type === 'video/mpeg' || type === 'video/x-msvideo') ) {
+					//pluginName.toLowerCase() === 'vlc multimedia plugin' ) {
 					//this.mediaPlayers.addPlayer( vlcMozillaPlayer );
 				}
 
-				if ( type == 'application/ogg' ) {
-					//if ( pluginName.toLowerCase() == 'vlc multimedia plugin' ) {
+				if ( type === 'application/ogg' ) {
+					//if ( pluginName.toLowerCase() === 'vlc multimedia plugin' ) {
 						//this.mediaPlayers.addPlayer( vlcMozillaPlayer );
 					//else if ( pluginName.indexOf( 'QuickTime' ) > -1 )
 						//this.mediaPlayers.addPlayer(quicktimeMozillaPlayer);
@@ -287,10 +286,10 @@ mw.EmbedTypes = {
 					//}
 					continue;
 				} else if ( uniqueMimesOnly ) {
-					if ( type == 'application/x-vlc-player' ) {
+					if ( type === 'application/x-vlc-player' ) {
 						// this.mediaPlayers.addPlayer( vlcMozillaPlayer );
 						continue;
-					} else if ( type == 'video/quicktime' ) {
+					} else if ( type === 'video/quicktime' ) {
 						// this.mediaPlayers.addPlayer(quicktimeMozillaPlayer);
 						continue;
 					}
@@ -322,6 +321,5 @@ mw.EmbedTypes = {
 		return hasObj;
 	}
 };
-
 
 } )( mediaWiki, jQuery );
