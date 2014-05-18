@@ -170,6 +170,9 @@ $wgEnabledAudioTranscodeSet = array(
 // If mp4 source assets can be ingested:
 $wgTmhEnableMp4Uploads = false;
 
+// How long to wait for job to be run before retrying
+$wgTranscodeJobWaitTime = 3600 * 72;
+
 /******************* CONFIGURATION ENDS HERE **********************/
 
 
