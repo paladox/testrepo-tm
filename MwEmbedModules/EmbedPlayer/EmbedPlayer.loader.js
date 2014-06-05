@@ -39,18 +39,9 @@
 
 		var rewriteElementCount = 0;
 		$( this ).each( function(inx, playerElement){
-			var skinName = '',
-				profile = $.client.profile();
-
+			var skinName = '';
 			// we have javascript ( disable controls )
 			$( playerElement ).removeAttr( 'controls' );
-			// Add an overlay loader ( firefox has its own native loading spinner )
-			if ( profile.name !== 'firefox' ){
-				$( playerElement )
-					.parent()
-					.getAbsoluteOverlaySpinner()
-					.attr('id', 'loadingSpinner_' + $( playerElement ).attr('id') );
-			}
 			// Allow other modules update the dependencies
 			$( mw ).trigger( 'EmbedPlayerUpdateDependencies',
 					[ playerElement, dependencySet ] );
