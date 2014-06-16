@@ -1,0 +1,9 @@
+Verified+2: jenkins-bot
+Code-Review+1: Mdale <mdale@wikimedia.org>
+Verified+2: Mdale <mdale@wikimedia.org>
+Code-Review+2: Gilles <gdubuc@wikimedia.org>
+Submitted-by: jenkins-bot
+Submitted-at: Mon, 16 Jun 2014 09:14:19 +0000
+Reviewed-on: https://gerrit.wikimedia.org/r/108172
+Project: mediawiki/extensions/TimedMediaHandler
+Branch: refs/heads/master
