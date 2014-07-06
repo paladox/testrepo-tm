@@ -676,8 +676,9 @@ mw.EmbedPlayerNative = {
 				$( vid ).bind( 'loadedmetadata' + switchBindPostfix, function(){
 					$( vid ).unbind( 'loadedmetadata' + switchBindPostfix);
 					mw.log("EmbedPlayerNative:: playerSwitchSource> loadedmetadata callback for:" + src + ' switchCallback: ' + switchCallback );
-					// Update the duration ( if not android 4 which gives bad duration )
-					if( !mw.isAndroid40() ){
+					// Android native browser reports a bad duration of 1 here.
+					// Don't reduce duration to 1 if its currently higher.
+					if( !( vid.duration === 1 && _this.duration && vid.duration < _this.duration ) ) {
 						_this.duration = vid.duration;
 					}
 					// keep going towards playback! if  switchCallback has not been called yet
@@ -1024,8 +1025,9 @@ mw.EmbedPlayerNative = {
 
 		if ( this.playerElement && !isNaN( this.playerElement.duration ) && isFinite( this.playerElement.duration) ) {
 			mw.log( 'EmbedPlayerNative :onloadedmetadata metadata ready Update duration:' + this.playerElement.duration + ' old dur: ' + this.getDuration() );
-			// update duration if not android 4 ( gives bad duration )
-			if( !mw.isAndroid40() ){
+			// Android native browser (but not chrome app) gives bad duration of precisely 1 here.
+			// So don't change duration if the new value is exactly 1 and is less than current duration.
+			if( !( this.playerElement.duration === 1 && this.duration && this.playerElement.duration < this.duration ) ) {
 				this.duration = this.playerElement.duration;
 			}
 		}
