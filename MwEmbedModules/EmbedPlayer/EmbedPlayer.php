@@ -1,5 +1,4 @@
 <?php
-	global $wgVideoPlayerSkinModule;
 	// Register all the EmbedPlayer modules
 	return array(
 			"mw.MediaElement" => array( 'scripts' => 'resources/mw.MediaElement.js' ),
@@ -8,74 +7,111 @@
 				'scripts' => 'resources/mw.MediaPlayers.js',
 				'dependencies' => 'mw.MediaPlayer'
 			),
-			"mw.MediaSource" => array( 'scripts' => 'resources/mw.MediaSource.js' ),
+			
+			"mw.MediaSource" => array( 
+					'scripts' => 'resources/mw.MediaSource.js',
+					'dependencies' => 'mw.MwEmbedSupport'
+			),
 			"mw.EmbedTypes" => array(
 				'scripts' => 'resources/mw.EmbedTypes.js',
 				'dependencies' =>  array(
 					'mw.MediaPlayers',
-					'mediawiki.Uri',
-					'jquery.client',
+					'mediawiki.Uri'
 				)
 			),
 			"mw.EmbedPlayer" => array(
 				'scripts' => array(
 					"resources/mw.processEmbedPlayers.js",
 					"resources/mw.EmbedPlayer.js",
-					"resources/skins/mw.PlayerControlBuilder.js",
+					"resources/mw.FullScreenManager.js",
+					"resources/mw.PlayerLayoutBuilder.js",
 				),
 				'dependencies' => array(
 					// mwEmbed support module
 					'mediawiki.client',
 					'mediawiki.UtilitiesTime',
 					'mediawiki.Uri',
-					'mediawiki.absoluteUrl',
+					'mediawiki.UtilitiesUrl',
 					'mediawiki.jqueryMsg',
-
+				
 					// Browser fullscreen api support:
-					'fullScreenApi',
+					'screenfull',
 
 					// We always end up loading native player
 					'mw.EmbedPlayerNative',
+					// Always load imageOverlay for capturing user gestures in source switches
+					'mw.EmbedPlayerImageOverlay',
+
+					// Native player component
+					'mw.EmbedPlayerNativeComponent',
 
 					// Sub classes:
 					'mw.MediaElement',
 					'mw.MediaPlayers',
 					'mw.MediaSource',
 					'mw.EmbedTypes',
-
+				
 					// jQuery dependencies:
 					'jquery.client',
 					'jquery.hoverIntent',
 					'jquery.cookie',
-					'jquery.ui.mouse',
 					'jquery.debouncedresize',
-					'jquery.embedMenu',
-					'jquery.ui.slider',
 					'jquery.ui.touchPunch',
+					'jquery.ui.slider',
+					'jquery.ui.tooltip',
+					'jquery.naturalSize',
 
-					// Set to mw.PlayerSkinKskin or mw.PlayerSkinMvpcf in config
-					$wgVideoPlayerSkinModule
+					'mw.PlayerElementHTML',
+					'mw.PlayerElementFlash',
+					'mw.PlayerElementSilverlight',
 				),
-				'styles' => "resources/skins/EmbedPlayer.css",
+				'styles' => "resources/EmbedPlayer.css",
 				'messageDir' => 'i18n',
 			),
 
+			'mw.PluginManager' => array(
+				'scripts' => 'resources/mw.PluginManager.js'
+			),
+
+			"mw.EmbedPlayerSilverlight"	=> array( 'scripts'=> "resources/mw.EmbedPlayerSilverlight.js",
+			'dependencies' => array(
+				"mw.PlayerElementSilverlight"
+			) ),
 			"mw.EmbedPlayerKplayer"	=> array( 'scripts'=> "resources/mw.EmbedPlayerKplayer.js" ),
 			"mw.EmbedPlayerGeneric"	=> array( 'scripts'=> "resources/mw.EmbedPlayerGeneric.js" ),
 			"mw.EmbedPlayerJava" => array( 'scripts'=> "resources/mw.EmbedPlayerJava.js"),
 			"mw.EmbedPlayerNative"	=> array( 'scripts'=> "resources/mw.EmbedPlayerNative.js" ),
 			"mw.EmbedPlayerImageOverlay" => array( 'scripts'=> "resources/mw.EmbedPlayerImageOverlay.js" ),
+			"mw.EmbedPlayerNativeComponent" => array( 'scripts' =>  
+				array(
+					"resources/mw.EmbedPlayerNativeComponent.js"
+				),
+				'dependencies' => array(
+					"nativeBridge"
+				)
+			),
+			'nativeBridge' => array( 'scripts' => "binPlayers/nativeBridge.js" ),
 
 			"mw.EmbedPlayerVlc" => array( 'scripts'=> "resources/mw.EmbedPlayerVlc.js" ),
 
-			"mw.PlayerSkinKskin" => array(
-				'scripts' => "resources/skins/kskin/mw.PlayerSkinKskin.js",
-				'styles' => "resources/skins/kskin/PlayerSkinKskin.css"
+			"mw.PlayerElement" => array(
+				'scripts' => 'resources/playerElement/mw.PlayerElement.js',
+				'dependencies' =>  array( 'class' )
 			),
-
-			"mw.PlayerSkinMvpcf" => array(
-				'scripts'=> "resources/skins/mvpcf/mw.PlayerSkinMvpcf.js",
-				'styles'=> "resources/skins/mvpcf/PlayerSkinMvpcf.css"
+			"mw.PlayerElementHTML" => array(
+				'scripts' => 'resources/playerElement/mw.PlayerElementHTML.js',
+				'dependencies' =>  array( 'mw.PlayerElement' )
 			),
+			"mw.PlayerElementFlash" => array(
+				'scripts' => 'resources/playerElement/mw.PlayerElementFlash.js',
+				'dependencies' =>  array( 'mw.PlayerElement' )
+			),
+			"mw.PlayerElementSilverlight" => array(
+				'scripts' => array(
+					'resources/playerElement/Silverlight.js',
+					'resources/playerElement/mw.PlayerElementSilverlight.js'
+				),
+				'dependencies' =>  array( 'mw.PlayerElement' )
+			)
 	);
 ?>
