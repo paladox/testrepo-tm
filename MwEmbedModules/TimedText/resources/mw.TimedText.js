@@ -15,9 +15,9 @@
 
 	// Merge in timed text related attributes:
 	mw.mergeConfig( 'EmbedPlayer.SourceAttributes', [
-  	   'srclang',
-  	   'kind',
-	   'label'
+		'srclang',
+		'kind',
+		'label'
 	]);
 
 	/**
@@ -37,7 +37,7 @@
 		*/
 		config: {
 			// Layout for basic "timedText" type can be 'ontop', 'off', 'below'
-			'layout' : 'ontop',
+			'layout' : 'off',
 
 			//Set the default local ( should be grabbed from the browser )
 			'userLanguage' : mw.config.get( 'wgUserLanguage' ) || 'en',
@@ -46,22 +46,28 @@
 			'userKind' : 'subtitles'
 		},
 
-		// The default display mode is 'ontop'
-		defaultDisplayMode : 'ontop',
+		// The default display mode is 'off'
+		defaultDisplayMode: 'off',
 
 		// Save last layout mode
-		lastLayout : 'ontop',
+		lastLayout: 'ontop',
 
 		// The bind prefix:
 		bindPostFix: '.timedText',
 
+		// Config Prefix
+	 	confPrefix: 'TimedText',
+
+	 	 // When making changes to layout behavior this variable should be bumped. 
+	 	timedTextPrefKey: 'TimedText.Preferences1',
+	 	
 		// Default options are empty
 		options: {},
 
 		/**
 		 * The list of enabled sources
 		 */
-		enabledSources: [],
+		enabledSource: null,
 
 		// First loading flag - To set the layout at first load
 		firstLoad: true,
@@ -70,11 +76,6 @@
 		 * The current language key
 		 */
 		currentLangKey : null,
-
-		/**
-		 * The direction of the current language
-		 */
-		currentLangDir : null,
 
 		/**
 		 * Stores the last text string per kind to avoid dom checks for updated text
@@ -112,20 +113,13 @@
 			var _this = this;
 			mw.log("TimedText: init() ");
 			this.embedPlayer = embedPlayer;
-			// don't display captions on native player:
-			if( embedPlayer.useNativePlayerControls() ){
-				return this;
-			}
-
 			// Load user preferences config:
-			var preferenceConfig = $.cookie( 'TimedText.Preferences' );
+			var preferenceConfig = $.cookie( this.timedTextPrefKey );
 			if( preferenceConfig !== "false" && preferenceConfig != null ) {
-				this.config = JSON.parse(  preferenceConfig );
+				this.setPersistentConfig( JSON.parse(  preferenceConfig ) );
+			} else {
+				this.setPersistentConfig( this.config );
 			}
-			// remove any old bindings on change media:
-			$( this.embedPlayer ).bind( 'onChangeMedia' + this.bindPostFix , function(){
-				_this.destroy();
-			});
 
 			// Remove any old bindings before we add the current bindings:
 			_this.destroy();
@@ -134,11 +128,35 @@
 			_this.addPlayerBindings();
 			return this;
 		},
+		setPersistentConfig: function( key, value ) {
+			if ( !this.embedPlayer[ this.confPrefix ] ) {
+				this.embedPlayer[ this.confPrefix ] = {};
+			}
+			if ( typeof key == "object" ) {
+				$.extend( this.embedPlayer[ this.confPrefix ], key );
+			} else {
+				this.embedPlayer[ this.confPrefix ][ key ] = value;
+			}
+		},
+		getPersistentConfig: function( attr ) {
+			if ( !this.embedPlayer[ this.confPrefix ] ) {
+				return null;
+			}
+			if ( !attr ) {
+				return this.embedPlayer[ this.confPrefix ];
+			}
+			return this.embedPlayer[ this.confPrefix ][ attr ];
+		},
 		destroy: function(){
+			var $menuButton = this.embedPlayer.getInterface().find( '.timed-text' );
+			if ( $menuButton && $menuButton[0] && $menuButton[0].m ) {
+				$menuButton[0].m = null;
+			}
+
 			// remove any old player bindings;
 			$( this.embedPlayer ).unbind( this.bindPostFix );
 			// Clear out enabled sources:
-			this.enabledSources = [];
+			this.enabledSource = null;
 			// Clear out text sources:
 			this.textSources = [];
 		},
@@ -153,20 +171,15 @@
 			// Check for timed text support:
 			_this.addInterface();
 
-			$( embedPlayer ).bind( 'timeupdate' + this.bindPostFix, function( event, jEvent, id ) {
-				// regain scope
-				_this = $('#' + id)[0].timedText;
-				// monitor text updates
+			$( embedPlayer ).bind( 'monitorEvent' + this.bindPostFix, function() {
 				_this.monitor();
 			} );
 
-			$( embedPlayer ).bind( 'firstPlay' + this.bindPostFix, function(event, id ) {
-				// regain scope
-				_this = $('#' + id)[0].timedText;
+			$( embedPlayer ).bind( 'firstPlay' + this.bindPostFix, function() {
 				// Will load and setup timedText sources (if not loaded already loaded )
-				_this.setupTextSources();
+				// _this.setupTextSources();
 				// Hide the caption menu if presently displayed
-				$( '#textMenuContainer_' + _this.embedPlayer.id ).hide();
+				$( '#textMenuContainer_' + embedPlayer.id ).hide();
 			} );
 
 			// Re-Initialize when changing media
@@ -181,7 +194,7 @@
 			$( embedPlayer ).bind( 'onCloseFullScreen' + this.bindPostFix + ' onOpenFullScreen' + this.bindPostFix, function() {
 				// Check if we are in fullscreen or not, if so add an additional bottom offset of
 				// double the default bottom padding.
-				var textOffset = _this.embedPlayer.controlBuilder.inFullScreen ?
+				var textOffset = _this.embedPlayer.layoutBuilder.inFullScreen ?
 						mw.config.get("TimedText.BottomPadding") * 2 :
 						mw.config.get("TimedText.BottomPadding");
 
@@ -191,8 +204,8 @@
 				});
 
 				mw.log( 'TimedText::set text size for: : ' + embedPlayer.getInterface().width() + ' = ' + textCss['font-size'] );
-				if ( embedPlayer.controlBuilder.isOverlayControls() && !embedPlayer.getInterface().find( '.control-bar' ).is( ':hidden' ) ) {
-					textOffset += _this.embedPlayer.controlBuilder.getHeight();
+				if ( embedPlayer.isOverlayControls() && !embedPlayer.getInterface().find( '.control-bar' ).is( ':hidden' ) ) {
+					textOffset += _this.embedPlayer.layoutBuilder.getHeight();
 				}
 				embedPlayer.getInterface().find( '.track' )
 				.css( textCss )
@@ -200,6 +213,13 @@
 					// Get the text size scale then set it to control bar height + TimedText.BottomPadding;
 					'bottom': textOffset + 'px'
 				});
+				// check if below caption location, and update container size 
+				if( _this.getLayoutMode() == 'below' ){
+					// give time for the dom to update: 
+					setTimeout(function(){
+						_this.updateBelowVideoCaptionContainer();	
+					},50)
+				}
 			});
 
 			// Update the timed text size
@@ -215,10 +235,8 @@
 			});
 
 			// Setup display binding
-			$( embedPlayer ).bind( 'onShowControlBar'+ this.bindPostFix, function(event, layout, id ){
-				// update embedPlayer ref:
-				var embedPlayer = $('#' + id )[0];
-				if ( embedPlayer.controlBuilder.isOverlayControls() ) {
+			$( embedPlayer ).bind( 'onShowControlBar'+ this.bindPostFix, function(event, layout ){
+				if ( embedPlayer.isOverlayControls() ) {
 					// Move the text track if present
 					embedPlayer.getInterface().find( '.track' )
 					.stop()
@@ -226,9 +244,8 @@
 				}
 			});
 
-			$( embedPlayer ).bind( 'onHideControlBar' + this.bindPostFix, function(event, layout, id ){
-				var embedPlayer = $('#' + id )[0];
-				if ( embedPlayer.controlBuilder.isOverlayControls() ) {
+			$( embedPlayer ).bind( 'onHideControlBar' + this.bindPostFix, function(event, layout ){
+				if ( embedPlayer.isOverlayControls() ) {
 					// Move the text track down if present
 					embedPlayer.getInterface().find( '.track' )
 					.stop()
@@ -261,8 +278,7 @@
 			var _this = this;
 			// By default we include a button in the control bar.
 			$( _this.embedPlayer ).bind( 'addControlBarComponent' + this.bindPostFix, function(event, controlBar ){
-				if( controlBar.supportedComponents['timedText'] !== false &&
-					_this.includeCaptionButton() ) {
+				if( _this.includeCaptionButton() ){
 					controlBar.supportedComponents['timedText'] = true;
 					controlBar.components['timedText'] = _this.getTimedTextButton();
 				}
@@ -280,18 +296,6 @@
 		getCurrentLangKey: function(){
 			return this.currentLangKey;
 		},
-		/**
-		 * Get the current language direction
-		 * @return
-		 * @type {string}
-		 */
-		getCurrentLangDir: function(){
-			if ( !this.currentLangDir ) {
-				var source = this.getSourceByLanguage( this.getCurrentLangKey() );
-				this.currentLangDir = source.dir;
-			}
-			return this.currentLangDir;
-		},
 
 		/**
 		 * The timed text button to be added to the interface
@@ -302,8 +306,7 @@
 			* The closed captions button
 			*/
 			return {
-				'w': 30,
-				'position': 6.9,
+				'w': 28,
 				'o': function( ctrlObj ) {
 					var $textButton = $( '<div />' )
 						.attr( 'title', mw.msg( 'mwe-embedplayer-timed_text' ) )
@@ -323,8 +326,8 @@
 		bindTextButton: function( $textButton ){
 			var _this = this;
 			$textButton.unbind('click.textMenu').bind('click.textMenu', function() {
-                _this.showTextMenu();
-            return true;
+				_this.showTextMenu();
+				return true;
 			} );
 		},
 
@@ -347,11 +350,8 @@
 			mw.log('TimedText::showTextMenu:: ' + embedPlayer.id + ' location: ', loc);
 			// TODO: Fix menu animation
 			var $menuButton = this.embedPlayer.getInterface().find( '.timed-text' );
-			// Check if a menu has already been built out for the menu button:
-			if ( $menuButton[0].m ) {
-				$menuButton.embedMenu( 'show' );
-			} else {
-				// Bind the text menu:
+			// Check if a menu has already been built out for the menu button and if not, rebuild it
+			if ( !$menuButton[0].m ) {
 				this.buildMenu( true );
 			}
 		},
@@ -365,11 +365,11 @@
 						.attr( 'id', textMenuId )
 						.css( {
 							'position' 	: 'absolute',
+							'z-index' 	: 10,
 							'height'	: '180px',
 							'width' 	: '180px',
 							'font-size'	: '12px',
-							'display' : 'none',
-							'overflow' : 'auto'
+							'display' : 'none'
 						} )
 
 				);
@@ -384,7 +384,7 @@
 		 */
 		getInterfaceSizePercent: function( size ) {
 			// This is a ugly hack we should read "original player size" and set based
-			// on some standard ish normal 31 columns 15 rows
+			// on some standard normal 31 columns 15 rows
 			var sizeFactor = 4;
 			if( size.height / size.width < .7 ){
 				sizeFactor = 6;
@@ -406,15 +406,15 @@
 		* @param {Function} callback Function to be called once text sources are setup.
 		*/
 		setupTextSources: function( callback ) {
-			mw.log( 'TimedText::setupTextSources');
 			var _this = this;
+			mw.log( 'TimedText::setupTextSources');
 			// Load textSources
 			_this.loadTextSources( function() {
 				// Enable a default source and issue a request to "load it"
 				_this.autoSelectSource();
 
-				// Load and parse the text value of enabled text sources:
-				_this.loadEnabledSources();
+				// Load and parse the text value of enabled text source:
+				_this.loadEnabledSource();
 
 				if( callback ) {
 					callback();
@@ -433,14 +433,14 @@
 			var _this = this;
 			var embedPlayer = this.embedPlayer;
 			// Setup text sources ( will callback inline if already loaded )
-			_this.setupTextSources( function() {
-				var $menuButton = _this.embedPlayer.getInterface().find( '.timed-text' );
+			var localBuildMenu = function() {
+				var $menuButton = embedPlayer.getInterface().find( '.timed-text' );
 
 				var positionOpts = { };
 				if( _this.embedPlayer.supports[ 'overlays' ] ){
 					var positionOpts = {
 						'directionV' : 'up',
-						'offsetY' : _this.embedPlayer.controlBuilder.getHeight(),
+						'offsetY' : _this.embedPlayer.layoutBuilder.getHeight(),
 						'directionH' : 'left',
 						'offsetX' : -28
 					};
@@ -451,7 +451,8 @@
 					return ;
 				}
 				var $menuButton = _this.embedPlayer.getInterface().find( '.timed-text' );
-				var ctrlObj = _this.embedPlayer.controlBuilder;
+				var ctrlObj = _this.embedPlayer.layoutBuilder;
+
 				// NOTE: Button target should be an option or config
 				$menuButton.embedMenu( {
 					'content'	: _this.getMainMenu(),
@@ -461,11 +462,16 @@
 					'keepPosition' : true,
 					'showSpeed': 0,
 					'height' : 100,
-					'width' : 300,
+					'width' : 200,
 					'targetMenuContainer' : _this.getTextMenuContainer(),
 					'positionOpts' : positionOpts,
 					'backLinkText' : mw.msg( 'mwe-timedtext-back-btn' ),
 					'createMenuCallback' : function(){
+						// if off mark active
+						if( _this.getLayoutMode() == 'off' ){ 
+							_this.markLayoutActive(  _this.getLayoutMode() );
+						}
+						
 						var $interface = _this.embedPlayer.getInterface();
 						var $textContainer =  _this.getTextMenuContainer();
 						var textHeight = 130;
@@ -475,29 +481,31 @@
 						}
 						// check for audio
 						if(  _this.embedPlayer.isAudio() ){
-							top = _this.embedPlayer.controlBuilder.getHeight() + 4;
+							top = _this.embedPlayer.layoutBuilder.getHeight() + 4;
 						}
 						$textContainer.css({
 							'top' : top,
 							'height': textHeight,
 							'position' : 'absolute',
-							'left': $menuButton[0].offsetLeft - 165,
-							'bottom': ctrlObj.getHeight()
-						})
-						ctrlObj.showControlBar( true );
+							'left': $menuButton[0].offsetLeft - 75,
+							'bottom': ctrlObj.getHeight(),
+						});
+						embedPlayer.disableComponentsHover();
 					},
 					'closeMenuCallback' : function(){
-						ctrlObj.restoreControlsHover();
+						embedPlayer.restoreComponentsHover();
 					}
 				});
-			});
+			};
+
+			//localBuildMenu();
+			_this.setupTextSources( localBuildMenu );
 		},
 
 		/**
 		* Monitor video time and update timed text filed[s]
 		*/
-		monitor: function() {
-			//mw.log(" timed Text monitor: " + this.enabledSources.length );
+		monitor: function( ) {
 			var embedPlayer = this.embedPlayer;
 			// Setup local reference to currentTime:
 			var currentTime = embedPlayer.currentTime;
@@ -505,7 +513,7 @@
 			// Get the text per kind
 			var textCategories = [ ];
 
-			var source = this.enabledSources[ 0 ];
+			var source = this.enabledSource;
 			if( source ) {
 				this.updateSourceDisplay( source, currentTime );
 			}
@@ -516,6 +524,7 @@
 		 * @param {Function} callback Function to call once text sources are loaded
 		 */
 		loadTextSources: function( callback ) {
+			mw.log( 'TimedText::loadTextSources' );
 			var _this = this;
 			// check if text sources are already loaded ( not em )
 			if( this.textSources.length ){
@@ -540,10 +549,15 @@
 		*/
 		getLayoutMode: function() {
 		 	// Re-map "ontop" to "below" if player does not support
-		 	if( this.config.layout == 'ontop' && !this.embedPlayer.supports['overlays'] ) {
-		 		this.config.layout = 'below';
+		 	if( this.getPersistentConfig( 'layout' ) == 'ontop' 
+		 		&&
+		 		!$.isEmptyObject( this.embedPlayer.supports )
+		 		&&
+		 		!this.embedPlayer.supports['overlays'] 
+		 	) {
+		 		this.setPersistentConfig( 'layout', 'below' );
 		 	}
-		 	return this.config.layout;
+		 	return this.getPersistentConfig( 'layout' );
 		},
 
 		/**
@@ -553,32 +567,41 @@
 		* In the future we could support multiple "enabled sources"
 		*/
 		autoSelectSource: function() {
+			mw.log( "TimedText::autoSelectSource: from text sources:" + this.textSources.length );
 			var _this = this;
 			// If a source is enabled then don't auto select
-			if ( this.enabledSources.length ) {
+			if ( this.enabledSource ) {
 				return false;
 			}
-			this.enabledSources = [];
+			// Check that we have text sources to chose from:
+			if( ! this.textSources.length ){
+				mw.log("Error:: autoSelectSource no textSources set" );
+				return ;
+			}
 
+			this.enabledSource = null;
 			var setDefault = false;
 			// Check if any source is marked default:
 			$.each( this.textSources, function(inx, source){
-				if( source['default'] ){
+				if( source[ 'default' ] ){
 					_this.enableSource( source );
 					setDefault = true;
 					return false;
 				}
 			});
+			// If no default caption is set, start with captions turned off (Same as KDP)
 			if ( setDefault ) {
+				this.setLayoutMode( this.defaultDisplayMode );
 				return true;
 			}
-
+			
+			this.setLayoutMode( 'off' );
 			var setLocalPref = false;
 			// Check if any source matches our "local" pref
 			$.each( this.textSources, function(inx, source){
-				if(	_this.config.userLanguage == source.srclang.toLowerCase()
+				if(	_this.getPersistentConfig( 'userLanguage' ) == source.srclang.toLowerCase()
 					&&
-					_this.config.userKind == source.kind
+					_this.getPersistentConfig( 'userKind' ) == source.kind
 				) {
 					_this.enableSource( source );
 					setLocalPref = true;
@@ -591,7 +614,7 @@
 
 			var setEnglish = false;
 			// If no userLang, source try enabling English:
-			if( this.enabledSources.length == 0 ) {
+			if( this.enabledSource == null ) {
 				for( var i=0; i < this.textSources.length; i++ ) {
 					var source = this.textSources[ i ];
 					if( source.srclang.toLowerCase() == 'en' ) {
@@ -607,7 +630,7 @@
 
 			var setFirst = false;
 			// If still no source try the first source we get;
-			if( this.enabledSources.length == 0 ) {
+			if( this.enabledSource == null ) {
 				for( var i=0; i < this.textSources.length; i++ ) {
 					var source = this.textSources[ i ];
 					_this.enableSource( source );
@@ -629,24 +652,9 @@
 		enableSource: function( source ){
 			var _this = this;
 			// check if we have any source set yet:
-			if( !_this.enabledSources.length ){
-				_this.enabledSources.push( source );
-				_this.currentLangKey = source.srclang;
-				_this.currentLangDir = null;
-				return ;
-			}
-			var sourceEnabled = false;
-			// Make sure the source is not already enabled
-			$.each( this.enabledSources, function( inx, enabledSource ){
-				if( source.id == enabledSource.id ){
-					sourceEnabled = true;
-				}
-			});
-			if ( !sourceEnabled ) {
-				_this.enabledSources.push( source );
-				_this.currentLangKey = source.srclang;
-				_this.currentLangDir = null;
-			}
+			_this.enabledSource = source;
+			_this.currentLangKey = source.srclang;
+			return ;
 		},
 
 		/**
@@ -654,15 +662,13 @@
 		 * @param {function} callback function called once source is loaded
 		 */
 		loadCurrentSubSource: function( callback ){
-			mw.log("loadCurrentSubSource:: enabled source:" + this.enabledSources.length);
-			for( var i =0; i < this.enabledSources.length; i++ ){
-				var source = this.enabledSources[i];
-				if( source.kind == 'SUB' ){
-					source.load( function(){
-						callback( source);
-						return ;
-					});
-				}
+			mw.log("loadCurrentSubSource:: enabled source:" + this.enabledSource);
+			var source = this.enabledSource;
+			if( source.kind == 'SUB' ){
+				source.load( function(){
+					callback( source);
+					return ;
+				});
 			}
 			return false;
 		},
@@ -686,23 +692,25 @@
 		},
 
 		/**
-		* Issue a request to load all enabled Sources
-		*  Should be called anytime enabled Source list is updated
+		* Issue a request to load all enabled Source
+		*  Should be called anytime enabled Source is updated
 		*/
-		loadEnabledSources: function() {
+		loadEnabledSource: function() {
 			var _this = this;
-			mw.log( "TimedText:: loadEnabledSources " +  this.enabledSources.length );
-			$.each( this.enabledSources, function( inx, enabledSource ) {
+			mw.log( "TimedText:: loadEnabledSource " +  this.enabledSource );
+			var enabledSource = this.enabledSource;
+			if (enabledSource) {
 				// check if the source requires ovelray ( ontop ) layout mode:
 				if( enabledSource.isOverlay() && _this.config.layout== 'ontop' ){
 					_this.setLayoutMode( 'ontop' );
 				}
 				enabledSource.load(function(){
-				  	// Trigger the text loading event:
-				  	$( _this.embedPlayer ).trigger('loadedTextSource', enabledSource);
+					// Trigger the text loading event:
+					$( _this.embedPlayer ).trigger('loadedTextSource', enabledSource);
 				});
-			});
+			}
 		},
+
 		/**
 		* Checks if a source is "on"
 		* @return {Boolean}
@@ -714,20 +722,7 @@
 			if( this.getLayoutMode() == 'off'  ){
 				return false;
 			}
-			var isEnabled = false;
-			$.each( this.enabledSources, function( inx, enabledSource ) {
-				if( source.id ) {
-					if( source.id === enabledSource.id ){
-						isEnabled = true;
-					}
-				}
-				if( source.src ){
-					if( source.src == enabledSource.src ){
-						isEnabled = true;
-					}
-				}
-			});
-			return isEnabled;
+			return (source.id === this.enabledSource.id);
 		},
 
 		/**
@@ -749,6 +744,7 @@
 
 		/**
 		 * Marks the active layout mode in the menu
+		 * @param {string} layoutMode The layout mode
 		 */
 		markLayoutActive: function ( layoutMode ) {
 			var $menu = $( '#textMenuContainer_' + this.embedPlayer.id );
@@ -799,10 +795,8 @@
 		*/
 		getMainMenu: function() {
 			var _this = this;
-
-			// Set the menut to avaliable languages:
+			// Set the menu to available languages:
 			var $menu = _this.getLanguageMenu();
-
 			if(  _this.textSources.length == 0 ){
 				$menu.append(
 					$.getLineItem( mw.msg( 'mwe-timedtext-no-subs'), 'close' )
@@ -822,7 +816,7 @@
 				)
 			}
 			// Allow other modules to add to the timed text menu:
-			$( _this.embedPlayer ).trigger( 'TimedText_BuildCCMenu', [ $menu, _this.embedPlayer.id ] ) ;
+			$( _this.embedPlayer ).trigger( 'TimedText_BuildCCMenu', [ $menu ] ) ;
 
 			// Test if only one menu item move its children to the top level
 			if( $menu.children('li').length == 1 ){
@@ -849,6 +843,9 @@
 			//See if the source is currently "on"
 			var sourceIcon = ( this.isSourceEnabled( source ) )? 'bullet' : 'radio-on';
 			if( source.title ) {
+				if( !source.id ){
+					source.id = source.srclang;
+				}
 				return $.getLineItem( source.title, sourceIcon, function() {
 					_this.selectTextSource( source );
 				}, 'captionRow', { 'caption-id' : source.id } );
@@ -870,15 +867,14 @@
 
 		/**
 	 	 * Get language name from language key
-	 	 * @param {String} lang_key Language key
+	 	 * @param {String} langKey Language key
 	 	 */
-	 	getLanguageName: function( lang_key ) {
-	 		if( mw.Language.names[ lang_key ]) {
-	 			return mw.Language.names[ lang_key ];
+	 	getLanguageName: function( langKey ) {
+	 		if(  mw.Language && mw.Language.names[ langKey ]) {
+	 			return mw.Language.names[ langKey ];
 	 		}
 	 		return false;
 	 	},
-
 
 		/**
 		* set the layout mode
@@ -886,20 +882,23 @@
 		*/
 		setLayoutMode: function( layoutMode ) {
 			var _this = this;
-			mw.log("TimedText:: setLayoutMode: " + layoutMode + ' ( old mode: ' + _this.config.layout + ' )' );
-			if( ( layoutMode != _this.config.layout ) || _this.firstLoad ) {
+			if( layoutMode == 'ontop' || layoutMode == 'below' ){
+				_this.lastLayout = layoutMode;
+			}
+			mw.log("TimedText:: setLayoutMode: " + layoutMode + ' ( old mode: ' +  _this.getPersistentConfig( 'layout' ) + ' )' );
+			if( ( layoutMode != _this.getPersistentConfig( 'layout' ) ) || _this.firstLoad ) {
+				_this.firstLoad = false;
 				// Update the config and redraw layout
-				_this.config.layout = layoutMode;
+				_this.setPersistentConfig( 'layout', layoutMode );
 				// Update the display:
 				_this.updateLayout();
-				_this.firstLoad = false;
 			}
 			_this.markLayoutActive( layoutMode );
 		},
 
 		toggleCaptions: function(){
 			mw.log( "TimedText:: toggleCaptions was:" + this.config.layout );
-			if( this.config.layout == 'off' ){
+			if(  this.getPersistentConfig( 'layout' ) == 'off' ){
 				this.setLayoutMode( this.defaultDisplayMode );
 			} else {
 				this.setLayoutMode( 'off' );
@@ -911,10 +910,10 @@
 		updateLayout: function() {
 			mw.log( "TimedText:: updateLayout " );
 			var $playerTarget = this.embedPlayer.getInterface();
-            if( $playerTarget ) {
-            	// remove any existing caption containers:
-                $playerTarget.find('.captionContainer,.captionsOverlay').remove();
-            }
+			if( $playerTarget ) {
+				// remove any existing caption containers:
+				$playerTarget.find('.captionContainer,.captionsOverlay').remove();
+			}
 			this.refreshDisplay();
 		},
 
@@ -934,23 +933,20 @@
 			this.bindTextButton( this.embedPlayer.getInterface().find('timed-text') );
 
 			this.currentLangKey =  source.srclang;
-			this.currentLangDir = null;
 
 			// Update the config language if the source includes language
 			if( source.srclang ){
-				this.config.userLanguage = source.srclang;
+				this.setPersistentConfig( 'userLanguage', source.srclang );
 			}
 
 			if( source.kind ){
-				this.config.userKind = source.kind;
+				this.setPersistentConfig( 'userKind', source.kind );
 			}
 
 			// (@@todo update kind & setup kind language buckets? )
 
 			// Remove any other sources selected in sources kind
-			this.enabledSources = [];
-
-			this.enabledSources.push( source );
+			this.enabledSource = source;
 
 			// Set any existing text target to "loading"
 			if( !source.loaded ) {
@@ -978,8 +974,10 @@
 		* Called after a user option change
 		*/
 		refreshDisplay: function() {
+			mw.log( "TimedText::refreshDisplay" );
 			// Update the configuration object
-			$.cookie( 'TimedText.Preferences',  JSON.stringify( this.config ) );
+			this.embedPlayer.setCookie( this.timedTextPrefKey, JSON.stringify( this.getPersistentConfig() ) );
+			//$.cookie( 'TimedText.Preferences', JSON.stringify( this.getPersistentConfig() ) );
 
 			// Empty out previous text to force an interface update:
 			this.prevText = [];
@@ -987,10 +985,10 @@
 			// Refresh the Menu (if it has a target to refresh)
 			mw.log( 'TimedText:: bind menu refresh display' );
 			this.buildMenu();
-            this.resizeInterface();
+			this.resizeInterface();
 
-            // add an empty catption:
-            this.displayTextTarget( $( '<span /> ').text( '') );
+			// add an empty caption:
+			this.displayTextTarget( $( '<span /> ').text( '') );
 
 			// Issues a "monitor" command to update the timed text for the new layout
 			this.monitor();
@@ -1043,11 +1041,6 @@
 						);
 					}
 					// Append a cat menu item for each kind list
-					// Give grep a chance to find the usages:
-					// mwe-timedtext-textcat-cc, mwe-timedtext-textcat-sub, mwe-timedtext-textcat-tad,
-					// mwe-timedtext-textcat-ktv, mwe-timedtext-textcat-tik, mwe-timedtext-textcat-ar,
-					// mwe-timedtext-textcat-nb, mwe-timedtext-textcat-meta, mwe-timedtext-textcat-trx,
-					// mwe-timedtext-textcat-lrc, mwe-timedtext-textcat-lin, mwe-timedtext-textcat-cue
 					$langMenu.append(
 						$.getLineItem( mw.msg( 'mwe-timedtext-textcat-' + categoryKey.toLowerCase() ) ).append(
 							$catChildren
@@ -1063,7 +1056,7 @@
 					}
 				}
 			}
-			// Add any remaning sources that did nto have a category
+			// Add any remaining sources that did nto have a category
 			for(var i=0; i < sourcesWithoutCategory.length; i++) {
 				$langMenu.append( sourcesWithoutCategory[i] );
 			}
@@ -1085,13 +1078,10 @@
 			// Get the source text for the requested time:
 			var activeCaptions = source.getCaptionForTime( time );
 			var addedCaption = false;
+
 			// Show captions that are on:
 			$.each( activeCaptions, function( capId, caption ){
-				var $cap =  _this.embedPlayer.getInterface().find( '.track[data-capId="' + capId +'"]');
-				if( caption.content != $cap.html() ){
-					// remove old
-					$cap.remove();
-					// add the updated value:
+				if( _this.embedPlayer.getInterface().find( '.track[data-capId="' + capId +'"]').length == 0){
 					_this.addCaption( source, capId, caption );
 					addedCaption = true;
 				}
@@ -1124,19 +1114,17 @@
 			// include html formating
 			// TOOD we should scrub this for non-formating html
 			$textTarget.append(
-				$('<span>')
+				$('<span />')
 					.addClass( 'ttmlStyled' )
 					.css( 'pointer-events', 'auto')
 					.css( this.getCaptionCss() )
 					.append(
-						$('<span>')
+							$('<span>')
 							// Prevent background (color) overflowing TimedText
 							// http://stackoverflow.com/questions/9077887/avoid-overlapping-rows-in-inline-element-with-a-background-color-applied
 							.css( 'position', 'relative' )
-							.html( caption.content )
-					)
+					.html( caption.content )
 			);
-
 
 			// Add/update the lang option
 			$textTarget.attr( 'lang', source.srclang.toLowerCase() );
@@ -1174,7 +1162,7 @@
 		displayTextTarget: function( $textTarget ){
 			var embedPlayer = this.embedPlayer;
 			var $interface = embedPlayer.getInterface();
-			var controlBarHeight = embedPlayer.controlBuilder.getHeight();
+			var controlBarHeight = embedPlayer.layoutBuilder.getHeight();
 
 			if( this.getLayoutMode() == 'off' ){
 				// sync player size per audio player:
@@ -1184,6 +1172,8 @@
 				}
 				return;
 			}
+
+			var layoutMode = this.getLayoutMode();
 
 			if( this.getLayoutMode() == 'ontop' ){
 				this.addTextOverlay(
@@ -1201,14 +1191,14 @@
 				$interface.css( 'height', 80 );
 
 				$interface.find('.captionsOverlay' )
-						.css('bottom', embedPlayer.controlBuilder.getHeight() )
+						.css('bottom', embedPlayer.layoutBuilder.getHeight() )
 			}
 
 		},
 		getDefaultStyle: function(){
 			var defaultBottom = 15;
-			if( this.embedPlayer.controlBuilder.isOverlayControls() && !this.embedPlayer.getInterface().find( '.control-bar' ).is( ':hidden' ) ) {
-				defaultBottom += this.embedPlayer.controlBuilder.getHeight();
+			if( this.embedPlayer.isOverlayControls() && !this.embedPlayer.getInterface().find( '.control-bar' ).is( ':hidden' ) ) {
+				defaultBottom += this.embedPlayer.layoutBuilder.getHeight();
 			}
 			var baseCss =  {
 					'position':'absolute',
@@ -1216,7 +1206,8 @@
 					'width': '100%',
 					'display': 'block',
 					'opacity': .8,
-					'text-align': 'center'
+					'text-align': 'center',
+					'z-index': 2
 				};
 			baseCss =$.extend( baseCss, this.getInterfaceSizeTextCss({
 				'width' :  this.embedPlayer.getInterface().width(),
@@ -1232,8 +1223,7 @@
 				'top': 0,
 				'bottom': 0,
 				'right': 0,
-				'position': 'absolute',
-				'direction': this.getCurrentLangDir()
+				'position': 'absolute'
 			};
 
 			if( $captionsOverlayTarget.length == 0 ){
@@ -1253,10 +1243,10 @@
 		 */
 		addTextBelowVideo: function( $textTarget ) {
 			var $playerTarget = this.embedPlayer.getInterface();
-			// Get the relative positioned player class from the controlBuilder:
-			this.embedPlayer.controlBuilder.keepControlBarOnScreen = true;
+			// Get the relative positioned player class from the layoutBuilder:
+			this.embedPlayer.layoutBuilder.keepControlBarOnScreen = true;
 			if( !$playerTarget.find('.captionContainer').length || this.embedPlayer.useNativePlayerControls() ) {
-				this.addBelowVideoCaptionContainer();
+				this.updateBelowVideoCaptionContainer();
 			}
 			$playerTarget.find('.captionContainer').html(
 				$textTarget.css( {
@@ -1264,43 +1254,47 @@
 				} )
 			);
 		},
-		addBelowVideoCaptionContainer: function(){
+		updateBelowVideoCaptionContainer: function(){
 			var _this = this;
-			mw.log( "TimedText:: addBelowVideoCaptionContainer" );
-			var $playerTarget = this.embedPlayer.getInterface();
-			if( $playerTarget.find('.captionContainer').length ) {
-				return ;
-			}
+			mw.log( "TimedText:: updateBelowVideoCaptionContainer" );
 			// Append after video container
-			this.embedPlayer.getVideoHolder().after(
-				$('<div>').addClass( 'captionContainer block' )
+			var $cc = _this.embedPlayer.getInterface().find('.captionContainer' );
+			if( !$cc.length ){
+				$cc = $('<div>').addClass( 'captionContainer block' )
 				.css({
 					'width' : '100%',
-					'height' : mw.config.get( 'TimedText.BelowVideoBlackBoxHeight' ) + 'px',
 					'background-color' : '#000',
 					'text-align' : 'center',
 					'padding-top' : '5px'
-				} )
-			);
-
-			_this.embedPlayer.triggerHelper('updateLayout');
+				})
+				_this.embedPlayer.getVideoHolder().after( $cc );
+			}
+			var height = ( _this.getInterfaceSizePercent({
+				'width' :  _this.embedPlayer.getInterface().width(),
+				'height' : _this.embedPlayer.getInterface().height()
+			}) / 100 ) *  mw.config.get( 'TimedText.BelowVideoBlackBoxHeight' );
+			$cc.css( 'height',  height + 'px')
+			
+			// update embedPlayer layout per updated caption container size.
+			 _this.embedPlayer.doUpdateLayout();
 		},
-        /**
-         * Resize the interface for layoutMode == 'below' ( if not in full screen)
-         */
-        resizeInterface: function(){
-            var _this = this;
-            if( !_this.embedPlayer.controlBuilder ){
-            	// too soon
-            	return ;
-            }
-            if( !_this.embedPlayer.controlBuilder.inFullScreen && _this.originalPlayerHeight ){
-                _this.embedPlayer.triggerHelper( 'resizeIframeContainer', [{'height' : _this.originalPlayerHeight}] );
-            } else {
-            	// removed resize on container content, since syncPlayerSize calls now handle keeping player aspect.
-				 _this.embedPlayer.triggerHelper('updateLayout');
-            }
-        },
+		/**
+		 * Resize the interface for layoutMode == 'below' ( if not in full screen)
+		 */
+		resizeInterface: function(){
+			var _this = this;
+			if( !_this.embedPlayer.layoutBuilder ){
+				//too soon
+				return ;
+			}
+
+			if( !_this.embedPlayer.layoutBuilder.inFullScreen && _this.originalPlayerHeight ){
+				_this.embedPlayer.triggerHelper( 'resizeIframeContainer', [{'height' : _this.originalPlayerHeight}] );
+			} else {
+				//removed resize on container content, since syncPlayerSize calls now handle keeping player aspect.
+				 _this.embedPlayer.doUpdateLayout();
+			}
+		},
 		/**
 		 * Build css for caption using this.options
 		 */

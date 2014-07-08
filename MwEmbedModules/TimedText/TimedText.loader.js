@@ -28,19 +28,9 @@
 	 * @param {object} embedPlayer The player to be checked for timedText properties
 	 */
 	mw.isTimedTextSupported = function( embedPlayer ) {
-		//EmbedPlayerNewPlayer passes a div with data-mwprovider set,
-		//EmbedPlayerUpdateDependencies passes video element with data attribute
-		//catch both
-		var mwprovider = embedPlayer['data-mwprovider'] || $( embedPlayer ).data('mwprovider');
-		var showInterface = mw.config.get( 'TimedText.ShowInterface.' + mwprovider  ) ||
-			 mw.config.get( 'TimedText.ShowInterface' );
-
-		if ( showInterface == 'always' ) {
+		if( mw.config.get( 'TimedText.ShowInterface' ) == 'always' ) {
 			return true;
-		} else if ( showInterface == 'off' ) {
-			return false;
 		}
-
 		// Check for standard 'track' attribute:
 		if ( $( embedPlayer ).find( 'track' ).length != 0 ) {
 			return true;
