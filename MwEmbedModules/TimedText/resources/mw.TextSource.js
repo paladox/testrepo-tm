@@ -10,27 +10,27 @@
 		return this.init( source );
 	};
 	mw.TextSource.prototype = {
-
-		//The load state:
-		loaded: false,
-
-		// Container for the captions
-		// captions include "start", "end" and "content" fields
-		captions: [],
-
-		// The css style for captions ( some file formats specify display types )
-		styleCss: {},
-
-		// The previous index of the timed text served
-		// Avoids searching the entire array on time updates.
-		prevIndex: 0,
-
 		/**
 		 * @constructor Inherits mediaSource from embedPlayer
 		 * @param {source} Base source element
 		 * @param {Object} Pointer to the textProvider
 		 */
 		init: function( source , textProvider) {
+
+			//The load state:
+			this.loaded = false;
+
+			// Container for the captions
+			// captions include "start", "end" and "content" fields
+			this.captions = [];
+
+			// The previous index of the timed text served
+			// Avoids searching the entire array on time updates.
+			this.prevIndex = 0;
+
+			// The css style for captions ( some file formats specify display types )
+			this.styleCss = {};
+
 			//	Inherits mediaSource
 			for( var i in source){
 				this[ i ] =  source[ i ];
@@ -40,7 +40,7 @@
 			if( ! this.kind ) {
 				this.kind = 'subtitle';
 			}
-			//Set the textProvider if provided
+			// Set the textProvider if provided
 			if( textProvider ) {
 				this.textProvider = textProvider;
 			}
@@ -53,7 +53,7 @@
 		 */
 		load: function( callback ) {
 			var _this = this;
-			mw.log("TextSource:: load src "+ _this.getSrc() );
+		//	mw.log("TextSource:: load caption: " + _this.title + ", src: " + _this.getSrc() );
 
 			// Setup up a callback ( in case it was not defined )
 			if( !callback ){
@@ -66,34 +66,31 @@
 			}
 
 			// Try to load src via XHR source
-			if( !this.getSrc() ) {
+			if(!this.getSrc || !this.getSrc() ) {
 				mw.log( "Error: TextSource no source url for text track");
 				return callback();
 			}
-
+			
 			// Check type for special loaders:
 			$( mw ).triggerQueueCallback( 'TimedText_LoadTextSource', _this, function(){
-				if( _this.loaded ){
-					callback();
-				} else {
-					// if no module loaded the text source use the normal ajax proxy:
-					new mw.ajaxProxy({
-						url: _this.getSrc(),
-						success: function( resultXML ) {
-							_this.captions = _this.getCaptions( resultXML );
-							_this.loaded = true;
-							mw.log("mw.TextSource :: loaded from " +  _this.getSrc() + " Found: " + _this.captions.length + ' captions' );
-							callback();
-						},
-						error: function() {
-							mw.log("Error: TextSource Error with http response");
-							_this.loaded = true;
-							callback();
-						}
-					});
-				}
-			})
+				// if no module loaded the text source use the normal ajax proxy:
+				new mw.ajaxProxy({
+					url: _this.getSrc(),
+					success: function( resultXML ) {
+						_this.captions = _this.getCaptions( resultXML );
+						_this.loaded = true;
+						mw.log("mw.TextSource :: loaded from " +  _this.getSrc() + " Found: " + _this.captions.length + ' captions' );
+						callback();
+					},
+					error: function() {
+						mw.log("Error: TextSource Error with http response");
+						_this.loaded = true;
+						callback();
+					}
+				});
+			});
 		},
+
 		/**
 		* Returns the text content for requested time
 		*
@@ -106,7 +103,7 @@
 			// Setup the startIndex:
 			if( prevCaption && time >= prevCaption.start ) {
 				var startIndex = this.prevIndex;
-			}else{
+			} else {
 				// If a backwards seek start searching at the start:
 				var startIndex = 0;
 			}
@@ -159,6 +156,16 @@
 					return this.getCaptionsFromTMML( data );
 					break;
 			}
+			// check for other indicators ( where the caption is missing metadata )
+			if( this.src && (
+				this.src.substr(this.src.length - 4) == 'ttml' ||
+				this.src.substr(this.src.length - 2) == "tt") ||
+				this.src.substr(this.src.length - 4) == 'dfxp' ){
+				return this.getCaptionsFromTMML( data );
+			}
+			if( this.src && this.src.substr(this.src.length - 3) == 'srt' ){
+				return this.getCaptionsFromSrt( data );
+			}
 			// caption mime not found return empty set:
 			return [];
 		},
@@ -181,7 +188,6 @@
 			// set up display information:
 			var captions = [];
 			var xml = ( $( data ).find("tt").length ) ? data : $.parseXML( data );
-
 			// Check for parse error:
 			try {
 				if( !xml || $( xml ).find('parsererror').length ){
@@ -217,7 +223,7 @@
 					cssObject[ cssName ] = attr.nodeValue;
 				});
 				// for(var i =0; i< style.length )
-				_this.styleCss[ $( style).attr('id') ] = cssObject;
+				_this.styleCss[ $(style).attr('id') ] = cssObject;
 			});
 
 			$( xml ).find( 'p' ).each( function( inx, p ){
@@ -285,10 +291,9 @@
 		},
 		convertTTML2HTML: function( node ){
 			var _this = this;
-
-			// look for text node:
-			if( node.nodeType == 3 ){
-				return node.textContent;
+			// look for text node (type=3) or CDATA node (type=4):
+			if( node.nodeType == 3 || node.nodeType == 4){
+				return node.nodeValue;
 			}
 			// skip metadata nodes:
 			if( node.nodeName == 'metadata' ){
@@ -478,8 +483,8 @@
 		match2caption: function( m ){
 			var caption = {};
 			// Look for ms:
-			var startMs = (m[4]) ? parseInt(m[4], 10) : 0;
-			var endMs = (m[8]) ? parseInt(m[8], 10) : 0;
+			var startMs = (m[4])? (parseInt(m[4], 10) / 1000): 0;
+			var endMs = (m[8])? (parseInt(m[8], 10) / 1000) : 0;
 			caption['start'] = this.timeParts2seconds( m[1], m[2], m[3], startMs );
 			caption['end'] = this.timeParts2seconds( m[5], m[6], m[7], endMs );
 			if( m[9] ){
