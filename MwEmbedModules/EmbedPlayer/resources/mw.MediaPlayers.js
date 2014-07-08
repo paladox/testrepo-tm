@@ -20,7 +20,7 @@ mw.MediaPlayers.prototype = {
 	defaultPlayers : { },
 
 	/**
-	 * Initializartion function sets the default order for players for a given
+	 * Initialization function sets the default order for players for a given
 	 * mime type
 	 */
 	init: function() {
@@ -28,27 +28,35 @@ mw.MediaPlayers.prototype = {
 		this.loadPreferences();
 
 		// Set up default players order for each library type
+		this.defaultPlayers['video/wvm'] = ['Kplayer'];
+		this.defaultPlayers['video/live'] = ['Kplayer'];
+		this.defaultPlayers['video/kontiki'] = ['Kplayer'];
 		this.defaultPlayers['video/x-flv'] = ['Kplayer', 'Vlc'];
-		this.defaultPlayers['video/h264'] = ['Native', 'Kplayer', 'Vlc'];
+		this.defaultPlayers['video/h264'] = ['NativeComponent', 'Native', 'Kplayer', 'Vlc'];
+		this.defaultPlayers['video/mp4'] = ['NativeComponent', 'Native', 'Kplayer', 'Vlc'];		
+		this.defaultPlayers['application/vnd.apple.mpegurl'] = ['NativeComponent', 'Native'];
+		this.defaultPlayers['application/x-shockwave-flash'] = ['Kplayer'];
 
-		this.defaultPlayers['application/vnd.apple.mpegurl'] = ['Native'];
-
-		this.defaultPlayers['video/ogg'] = ['Native', 'Vlc', 'Java', 'Generic', 'VLCApp'];
-		this.defaultPlayers['video/webm'] = ['Native', 'Vlc', 'VLCApp'];
-		this.defaultPlayers['application/ogg'] = ['Native', 'Vlc', 'Java', 'Generic', 'VLCApp'];
-		this.defaultPlayers['audio/ogg'] = ['Native', 'Vlc', 'Java', 'VLCApp'];
+		this.defaultPlayers['video/ogg'] = ['Native', 'Vlc', 'Java', 'Generic'];
+		this.defaultPlayers['video/webm'] = ['Native', 'Vlc'];
+		this.defaultPlayers['application/ogg'] = ['Native', 'Vlc', 'Java', 'Generic'];
+		this.defaultPlayers['audio/ogg'] = ['Native', 'Vlc', 'Java' ];
 		this.defaultPlayers['audio/mpeg']= ['Native', 'Kplayer'];
 		this.defaultPlayers['audio/mp3']= ['Native', 'Kplayer'];
-		this.defaultPlayers['audio/mp4']= ['Native'];
-		this.defaultPlayers['video/mp4'] = ['Native', 'Vlc'];
 		this.defaultPlayers['video/mpeg'] = ['Vlc'];
 		this.defaultPlayers['video/x-msvideo'] = ['Vlc'];
-
+		this.defaultPlayers['video/multicast'] = ['Silverlight'];
+		this.defaultPlayers['video/ism'] = ['Silverlight'];
+		this.defaultPlayers['video/playreadySmooth'] = ['Silverlight'];
 		// this.defaultPlayers['text/html'] = ['Html'];
 		//this.defaultPlayers['image/svg'] = ['ImageOverlay'];
 
 		this.defaultPlayers['image/jpeg'] = ['ImageOverlay'];
 		this.defaultPlayers['image/png'] = ['ImageOverlay'];
+
+		if ( mw.config.get("LeadWithHLSOnFlash") ) {
+			this.defaultPlayers['application/vnd.apple.mpegurl'].push('Kplayer');
+		}
 
 	},
 
@@ -56,7 +64,7 @@ mw.MediaPlayers.prototype = {
 	 * Adds a Player to the player list
 	 *
 	 * @param {Object}
-	 *      player Player object to be added
+	 *	  player Player object to be added
 	 */
 	addPlayer: function( player ) {
 		for ( var i = 0; i < this.players.length; i++ ) {
@@ -85,16 +93,15 @@ mw.MediaPlayers.prototype = {
 	 * get players that support a given mimeType
 	 *
 	 * @param {String}
-	 *      mimeType Mime type of player set
+	 *	  mimeType Mime type of player set
 	 * @return {Array} Array of players that support a the requested mime type
 	 */
 	getMIMETypePlayers: function( mimeType ) {
 		var mimePlayers = new Array();
 		var _this = this;
-		var baseMimeType = mimeType.split( ';' )[0];
-		if ( this.defaultPlayers[ baseMimeType ] ) {
-			$.each( this.defaultPlayers[ baseMimeType ], function( d, lib ) {
-				var library = _this.defaultPlayers[ baseMimeType ][ d ];
+		if ( this.defaultPlayers[mimeType] ) {
+			$.each( this.defaultPlayers[ mimeType ], function( d, lib ) {
+				var library = _this.defaultPlayers[ mimeType ][ d ];
 				for ( var i = 0; i < _this.players.length; i++ ) {
 					if ( _this.players[i].library == library && _this.players[i].supportsMIMEType( mimeType ) ) {
 						mimePlayers.push( _this.players[i] );
@@ -109,24 +116,29 @@ mw.MediaPlayers.prototype = {
 	 * Default player for a given mime type
 	 *
 	 * @param {String}
-	 *      mimeType Mime type of the requested player
+	 *	  mimeType Mime type of the requested player
 	 * @return Player for mime type null if no player found
 	 */
 	defaultPlayer : function( mimeType ) {
 		// mw.log( "get defaultPlayer for " + mimeType );
+		if ( mw.config.get( 'EmbedPlayer.ForceNativeComponent' )) {
+			return mw.EmbedTypes.getNativeComponentPlayerVideo();
+		}
+
+		if ( mw.config.get( 'EmbedPlayer.ForceKPlayer' ) && this.isSupportedPlayer( 'kplayer' ) ) {
+			return mw.EmbedTypes.getKplayer();
+		}
+		if (mw.config.get( 'EmbedPlayer.ForceSPlayer') && this.isSupportedPlayer('splayer')) {
+			return mw.EmbedTypes.getSilverlightPlayer();
+		}
+
 		var mimePlayers = this.getMIMETypePlayers( mimeType );
-		if ( mimePlayers.length > 0 )
-		{
-			// Select the default player:
+
+		if ( mimePlayers.length > 0 ){
+			// Check for prior preference for this mime type
 			for ( var i = 0; i < mimePlayers.length; i++ ) {
-				// Check for native:
-				if(  mimePlayers[i].librayr == 'Native' ){
-					return  mimePlayers[i];
-				}
-				// else check for preference
-				if ( mimePlayers[i].id == this.preference[mimeType] ){
+				if ( mimePlayers[i].id == this.preference[mimeType] )
 					return mimePlayers[i];
-				}
 			}
 			// Otherwise just return the first compatible player
 			// (it will be chosen according to the defaultPlayers list
@@ -140,7 +152,7 @@ mw.MediaPlayers.prototype = {
 	 * Sets the format preference.
 	 *
 	 * @param {String}
-	 *      mimeFormat Prefered format
+	 *	  mimeFormat Prefered format
 	 */
 	setFormatPreference : function ( mimeFormat ) {
 		 this.preference['formatPreference'] = mimeFormat;
@@ -162,9 +174,9 @@ mw.MediaPlayers.prototype = {
 	 * Sets the player preference
 	 *
 	 * @param {String}
-	 *      playerId Preferred player id
+	 *	  playerId Prefered player id
 	 * @param {String}
-	 *      mimeType Mime type for the associated player stream
+	 *	  mimeType Mime type for the associated player stream
 	 */
 	setPlayerPreference : function( playerId, mimeType ) {
 		var selectedPlayer = null;
