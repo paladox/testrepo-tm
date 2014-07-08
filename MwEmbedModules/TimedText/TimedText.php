@@ -1,14 +1,14 @@
-<?php
+<?php 
 
-	// Register all the timedText modules
-	return array(
+	// Register all the timedText modules 
+	return array(			
 		"mw.TimedText" => array(
 			'scripts' => "resources/mw.TimedText.js",
 			'styles' => "resources/mw.style.TimedText.css",
 			'dependencies' => array(
 				'mw.EmbedPlayer',
-				'jquery.ui.dialog',
-				'mw.TextSource'
+				'mw.TextSource',
+				'mw.Language.names'
 			),
 			'messageDir' => 'i18n',
 		),
@@ -18,5 +18,8 @@
 				'mediawiki.UtilitiesTime',
 				"mw.ajaxProxy",
 			)
+		),
+		"mw.Language.names" => array(
+			'scripts' => "resources/mw.Language.names.js"
 		)
-	);
+	);	
