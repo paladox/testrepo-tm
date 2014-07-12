@@ -89,6 +89,15 @@ class TimedMediaHandlerHooks {
 				'loaderScripts' => 'resources/mw.MediaWikiPlayer.loader.js',
 			),
 		);
+
+		// Add the MobileFrontend-specific shim for iOS
+		$wgResourceModules += array(
+			'ext.tmh.iosMediaShim' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.iosMediaShim.js',
+				'targets' => array( 'mobile' ),
+			),
+		);
+
 		// Setup a hook for iframe embed handling:
 		$wgHooks['ArticleFromTitle'][] = 'TimedMediaIframeOutput::iframeHook';
 
@@ -396,6 +405,7 @@ class TimedMediaHandlerHooks {
 		if ( $addModules ) {
 			$out->addModuleScripts( 'mw.PopUpMediaTransform' );
 			$out->addModuleStyles( 'mw.PopUpMediaTransform' );
+			$out->addModules( 'ext.tmh.iosMediaShim' );
 		}
 
 		return true;
