@@ -89,6 +89,16 @@ var vlcAppPlayer = new mw.MediaPlayer( 'vlcAppPlayer', [
 	'video/webm; codecs="vp8, vorbis"',
 ], 'VLCApp' );
 
+var ogvJsPlayer = new mw.MediaPlayer( 'ogvJsPlayer', [
+	'video/ogg',
+	'video/ogg; codecs="theora"',
+	'video/ogg; codecs="theora, vorbis"',
+	'audio/ogg',
+	'audio/ogg; codecs="vorbis"',
+	'audio/ogg; codecs="opus"',
+	'application/ogg'
+], 'OgvJs' );
+
 // Generic plugin
 //var oggPluginPlayer = new mw.MediaPlayer( 'oggPlugin', ['video/ogg', 'application/ogg'], 'Generic' );
 
@@ -314,6 +324,10 @@ mw.EmbedTypes = {
 		if ( mw.isIOS() ) {
 			this.mediaPlayers.addPlayer( vlcAppPlayer );
 		}
+		if ( typeof Uint32Array !== 'undefined' ) {
+			this.mediaPlayers.addPlayer( ogvJsPlayer );
+		}
+
 		// Allow extensions to detect and add their own "players"
 		mw.log("EmbedPlayer::trigger:embedPlayerUpdateMediaPlayersEvent");
 		$( mw ).trigger( 'embedPlayerUpdateMediaPlayersEvent' , this.mediaPlayers );
