@@ -258,7 +258,7 @@ mw.MediaElement.prototype = {
 		$.each( playableSources, function(inx, source ){
 			var mimeType = source.mimeType;
 			var player = mw.EmbedTypes.getMediaPlayers().defaultPlayer( mimeType );
-			if ( player && player.library == 'Native'	) {
+			if ( player && ( player.library == 'Native' || player.library == 'OgvJs' || player.library == 'OgvSwf' ) ) {
 				switch( player.id	){
 					case 'mp3Native':
 						var shortName = 'mp3';
@@ -267,6 +267,8 @@ mw.MediaElement.prototype = {
 						var shortName = 'aac';
 						break;
 					case 'oggNative':
+					case 'ogvJsPlayer':
+					case 'ogvSwfPlayer':
 						var shortName = 'ogg';
 						break;
 					case 'webmNative':
@@ -312,6 +314,11 @@ mw.MediaElement.prototype = {
 					if( this.parentEmbedId ){
 						var displayWidth = $('#' + this.parentEmbedId).width();
 						$.each( namedSourceSet[ codec ], function(inx, source ){
+							if ( codec == 'ogg' && source.height > 240 && mw.isIOS() ) {
+								// On iOS, large videos decoded in JavaScript are a bad idea!
+								// continue
+								return true;
+							}
 							if( source.width && displayWidth ){
 								var sizeDelta =  Math.abs( source.width - displayWidth );
 								mw.log('MediaElement::autoSelectSource: size delta : ' + sizeDelta + ' for s:' + source.width );

@@ -89,6 +89,25 @@ var vlcAppPlayer = new mw.MediaPlayer( 'vlcAppPlayer', [
 	'video/webm; codecs="vp8, vorbis"',
 ], 'VLCApp' );
 
+var ogvJsPlayer = new mw.MediaPlayer( 'ogvJsPlayer', [
+	'video/ogg',
+	'video/ogg; codecs="theora"',
+	'video/ogg; codecs="theora, vorbis"',
+	'audio/ogg',
+	'audio/ogg; codecs="vorbis"',
+	'audio/ogg; codecs="opus"',
+	'application/ogg'
+], 'OgvJs' );
+
+var ogvSwfPlayer = new mw.MediaPlayer( 'ogvSwfPlayer', [
+	'video/ogg',
+	'video/ogg; codecs="theora"',
+	'video/ogg; codecs="theora, vorbis"',
+	'audio/ogg',
+	'audio/ogg; codecs="vorbis"',
+	'application/ogg'
+], 'OgvSwf' );
+
 // Generic plugin
 //var oggPluginPlayer = new mw.MediaPlayer( 'oggPlugin', ['video/ogg', 'application/ogg'], 'Generic' );
 
@@ -314,6 +333,32 @@ mw.EmbedTypes = {
 		if ( mw.isIOS() ) {
 			this.mediaPlayers.addPlayer( vlcAppPlayer );
 		}
+
+		// ogv.js / ogv.swf detection
+		var hasTypedArrays = ( window.Uint32Array ),
+			hasWebAudio = ( window.AudioContext || window.webkitAudioContext );
+
+		// don't use mw.supportsFlash() as it's hardcoded to false
+		// we want to use Flash for free codecs here!
+		var reallyHasFlash = false;
+		if ( $.client.profile().name === 'msie' ) {
+			reallyHasFlash = this.testActiveX( 'ShockwaveFlash.ShockwaveFlash' );
+		} else {
+			// check plugins...
+		}
+
+		if ( hasTypedArrays ) {
+			// ogv.js emscripten version
+			if ( hasWebAudio || reallyHasFlash ) {
+				this.mediaPlayers.addPlayer( ogvJsPlayer );
+			}
+		} else {
+			// ogv.swf crossbridge version
+			if ( reallyHasFlash ) {
+				this.mediaPlayers.addPlayer( ogvSwfPlayer );
+			}
+		}
+
 		// Allow extensions to detect and add their own "players"
 		mw.log("EmbedPlayer::trigger:embedPlayerUpdateMediaPlayersEvent");
 		$( mw ).trigger( 'embedPlayerUpdateMediaPlayersEvent' , this.mediaPlayers );
