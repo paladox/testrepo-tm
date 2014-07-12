@@ -255,10 +255,11 @@ mw.MediaElement.prototype = {
 
 		// Prefer native playback ( and prefer WebM over ogg and h.264 )
 		var namedSourceSet = {};
+		var useBogoSlow = false; // use benchmark only for ogv.js/ogv.swf
 		$.each( playableSources, function(inx, source ){
 			var mimeType = source.mimeType;
 			var player = mw.EmbedTypes.getMediaPlayers().defaultPlayer( mimeType );
-			if ( player && player.library == 'Native'	) {
+			if ( player && ( player.library == 'Native' || player.library == 'OgvJs' || player.library == 'OgvSwf' ) ) {
 				switch( player.id	){
 					case 'mp3Native':
 						var shortName = 'mp3';
@@ -267,6 +268,11 @@ mw.MediaElement.prototype = {
 						var shortName = 'aac';
 						break;
 					case 'oggNative':
+						var shortName = 'ogg';
+						break;
+					case 'ogvJsPlayer':
+					case 'ogvSwfPlayer':
+						useBogoSlow = true;
 						var shortName = 'ogg';
 						break;
 					case 'webmNative':
@@ -309,9 +315,67 @@ mw.MediaElement.prototype = {
 					// select based on size:
 					// Set via embed resolution closest to relative to display size
 					var minSizeDelta = null;
+
+					// unless we're really slow...
+					// @fixme move most of this to ogv.js embed code
+					// @fixme avoid rerunning benchmark all the time, but don't get
+					// weirdly stuck at slow speed by mistake if opened in debug mode
+					var bench = function() {
+						var timer;
+						if (window.performance && window.performance.now) {
+							timer = function() {
+								return window.performance.now();
+							}
+						} else {
+							timer = function() {
+								return Date.now();
+							}
+						}
+
+						var ops = 0;
+						var fibonacci = function(n) {
+							ops++;
+							if (n < 2) {
+								return n;
+							} else {
+								return fibonacci(n - 2) + fibonacci(n - 1);
+							}
+						};
+
+						var start = timer();
+						var result = fibonacci(30);
+						var delta = timer() - start;
+						var bogoSpeed = (ops / delta);
+
+						// 2012 Retina MacBook Pro (Safari 7)  ~150,000
+						// 2009 Dell T5500         (IE 11)     ~100,000
+						// iPad Air                (iOS 8)      ~65,000
+						//   ^ these play 360p ok
+						// ----------- line of moderate doom ----------
+						//   v these play 160p ok
+						// iPad Mini non-Retina    (iOS 8 beta) ~25,000
+						// Dell Inspiron Duo       (IE 11)      ~25,000
+						// Surface RT              (IE 11)      ~18,000
+						// iPod Touch 5th-gen      (iOS 8 beta) ~16,000
+						// ------------ line of total doom ------------
+						//   v these play only audio, if that
+						// iPod 4th-gen            (iOS 6.1)     ~6,750
+						// iPhone 3Gs              (iOS 6.1)     ~4,500
+						var bogoSpeedCutoff = 50000;
+
+						mw.log('MediaElement::autoSelectSource::bench: ' + bogoSpeed + ' ops per ms bogo test (' + ops + ' / '  + delta + ')');
+						return (bogoSpeed < bogoSpeedCutoff);
+					};
+					var isBogoSlow = (useBogoSlow ? bench() : false);
+
 					if( this.parentEmbedId ){
 						var displayWidth = $('#' + this.parentEmbedId).width();
 						$.each( namedSourceSet[ codec ], function(inx, source ){
+							if ( isBogoSlow && source.height > 240 ) {
+								// On iOS or slow Windows devices, large videos decoded in JavaScript are a bad idea!
+								// continue
+								return true;
+							}
 							if( source.width && displayWidth ){
 								var sizeDelta =  Math.abs( source.width - displayWidth );
 								mw.log('MediaElement::autoSelectSource: size delta : ' + sizeDelta + ' for s:' + source.width );
