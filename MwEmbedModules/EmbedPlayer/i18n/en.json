@@ -50,6 +50,7 @@
     "mwe-embedplayer-ogg-player-webmNative": "HTML5 WebM player",
     "mwe-embedplayer-ogg-player-oggPlugin": "Generic Ogg plugin",
     "mwe-embedplayer-ogg-player-vlcAppPlayer": "VLC for iOS app",
+    "mwe-embedplayer-ogg-player-ogvJsPlayer": "ogv.js JavaScript player",
     "mwe-embedplayer-ogg-player-quicktime-mozilla": "QuickTime plugin",
     "mwe-embedplayer-ogg-player-quicktime-activex": "QuickTime ActiveX",
     "mwe-embedplayer-ogg-player-cortado": "Java Cortado",
