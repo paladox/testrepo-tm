@@ -68,6 +68,7 @@
 				'scripts'=> "resources/mw.EmbedPlayerVLCApp.js",
 				'dependencies' => array( 'mediawiki.Uri' )
 			),
+			"mw.EmbedPlayerOgvJs"	=> array( 'scripts'=> "resources/mw.EmbedPlayerOgvJs.js" ),
 			"mw.EmbedPlayerImageOverlay" => array( 'scripts'=> "resources/mw.EmbedPlayerImageOverlay.js" ),
 
 			"mw.EmbedPlayerVlc" => array( 'scripts'=> "resources/mw.EmbedPlayerVlc.js" ),
