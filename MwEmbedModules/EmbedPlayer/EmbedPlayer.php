@@ -68,6 +68,7 @@
 				'scripts'=> "resources/mw.EmbedPlayerVLCApp.js",
 				'dependencies' => array( 'mediawiki.Uri' )
 			),
+			"mw.EmbedPlayerOgvJs"	=> array( 'scripts'=> "resources/mw.EmbedPlayerOgvJs.js" ),
 			"mw.EmbedPlayerImageOverlay" => array( 'scripts'=> "resources/mw.EmbedPlayerImageOverlay.js" ),
 
 			"mw.EmbedPlayerVlc" => array( 'scripts'=> "resources/mw.EmbedPlayerVlc.js" ),
@@ -80,6 +81,10 @@
 			"mw.PlayerSkinMvpcf" => array(
 				'scripts'=> "resources/skins/mvpcf/mw.PlayerSkinMvpcf.js",
 				'styles'=> "resources/skins/mvpcf/PlayerSkinMvpcf.css"
+			),
+			"ext.ogv.js"	=> array(
+				// Warning: this is large
+				'scripts'=> "binPlayers/ogv.js/ogvjs.js"
 			),
 	);
 ?>
