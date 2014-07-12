@@ -2218,8 +2218,10 @@ mw.PlayerControlBuilder.prototype = {
 			// Output the player select code:
 			var supportingPlayers = mw.EmbedTypes.getMediaPlayers().getMIMETypePlayers( source.getMIMEType() );
 			for ( var i = 0; i < supportingPlayers.length ; i++ ) {
-				if( supportingPlayers[i].library == 'Native' ){
+				var lib = supportingPlayers[i].library;
+				if( lib === 'Native' || lib === 'OgvJs' || lib === 'OgvSwf' ){ // @fixme use supports.sourceSwitch ... if preloaded?
 					addToSourceMenu( source );
+					continue;
 				}
 			}
 		});
