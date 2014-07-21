@@ -1,0 +1,8 @@
+Verified+2: jenkins-bot
+Code-Review+2: MarkTraceur <mtraceur@member.fsf.org>
+Code-Review+1: Siebrand <siebrand@kitano.nl>
+Submitted-by: jenkins-bot
+Submitted-at: Mon, 21 Jul 2014 21:29:21 +0000
+Reviewed-on: https://gerrit.wikimedia.org/r/148091
+Project: mediawiki/extensions/TimedMediaHandler
+Branch: refs/heads/wmf/1.24wmf14
