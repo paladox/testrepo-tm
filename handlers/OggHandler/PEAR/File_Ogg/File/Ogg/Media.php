@@ -114,6 +114,10 @@ abstract class File_Ogg_Media extends File_Ogg_Bitstream
         for ($i = 0; $i < $comment_list_length['data']; ++$i) {
             // Unpack the length of this comment.
             $comment_length = unpack("Vdata", fread($this->_filePointer, 4));
+			// If the comment length is greater than a kilobyte, skip it
+			if ( $comment_length > pow( 2, 10 ) ) {
+				continue;
+			}
             // Comments are in the format 'ARTIST=Super Furry Animals', so split it on the equals character.
             // NOTE: Equals characters are strictly prohibited in either the COMMENT or DATA parts.
             $comment        = explode("=", fread($this->_filePointer, $comment_length['data']));
