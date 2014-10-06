@@ -75,7 +75,7 @@
 			'EmbedPlayer.TimeDisplayWidth' => 85,
 
 			// If the video player should attribute kaltura
-			"EmbedPlayer.KalturaAttribution" => true,
+			"EmbedPlayer.KalturaAttribution" => false,
 
 			// The attribution button
 			'EmbedPlayer.AttributionButton' => array(
