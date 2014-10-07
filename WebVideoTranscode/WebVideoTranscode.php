@@ -156,7 +156,7 @@ class WebVideoTranscode {
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
 		WebVideoTranscode::ENC_WEBM_720P =>
-			 array(
+			array(
 				'maxSize'                    => '1280x720',
 				'videoQuality'               => 7,
 				'audioQuality'               => 3,
@@ -283,8 +283,9 @@ class WebVideoTranscode {
 	/**
 	 * Get url for a transcode.
 	 *
-	 * @param $file
-	 * @param $suffix Transcode key
+	 * @param $file File
+	 * @param $suffix string Transcode key
+	 * @return string
 	 */
 	static public function getTranscodedUrlForFile( $file, $suffix = '' ) {
 		return $file->getTranscodedUrl( self::getTranscodeFileBaseName( $file, $suffix ) );
@@ -785,8 +786,6 @@ class WebVideoTranscode {
 	 * @return array
 	 */
 	static public function getDerivativeSourceAttributes($file, $transcodeKey, $options = array() ){
-		$dataPrefix = in_array( 'nodata', $options )? '': 'data-';
-
 		$fileName = $file->getTitle()->getDbKey();
 
 		$src = self::getTranscodedUrlForFile( $file, $transcodeKey );
