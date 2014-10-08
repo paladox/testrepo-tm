@@ -2,7 +2,12 @@
 	global $wgVideoPlayerSkinModule;
 	// Register all the EmbedPlayer modules
 	return array(
-			"mw.MediaElement" => array( 'scripts' => 'resources/mw.MediaElement.js' ),
+			"mw.MediaElement" => array(
+				'scripts' => 'resources/mw.MediaElement.js',
+				'dependencies' => array(
+					'ext.tmh.bogoslow',
+				)
+			),
 			"mw.MediaPlayer" => array( 'scripts' => 'resources/mw.MediaPlayer.js' ),
 			"mw.MediaPlayers" => array(
 				'scripts' => 'resources/mw.MediaPlayers.js',
@@ -67,6 +72,27 @@
 			"mw.EmbedPlayerVLCApp"	=> array(
 				'scripts'=> "resources/mw.EmbedPlayerVLCApp.js",
 				'dependencies' => array( 'mediawiki.Uri' )
+			),
+			"mw.EmbedPlayerOgvJsCommon" => array(
+				'scripts' => 'resources/mw.EmbedPlayerOgvJsCommon.js',
+				'dependencies' => array(
+					'jquery.spinner',
+				),
+			),
+			"mw.EmbedPlayerOgvJs" => array(
+				'scripts' => 'resources/mw.EmbedPlayerOgvJs.js',
+				'dependencies' => array(
+					'mw.EmbedPlayerOgvJsCommon',
+					'ext.tmh.OgvJsSupport',
+				),
+			),
+			"mw.EmbedPlayerOgvSwf" => array(
+				'scripts'=> 'resources/mw.EmbedPlayerOgvSwf.js',
+				'dependencies' => array(
+					'jquery.client',
+					'mw.EmbedPlayerOgvJsCommon',
+					'ext.tmh.OgvJsSupport',
+				),
 			),
 			"mw.EmbedPlayerImageOverlay" => array( 'scripts'=> "resources/mw.EmbedPlayerImageOverlay.js" ),
 
