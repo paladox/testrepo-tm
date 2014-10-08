@@ -96,6 +96,7 @@ class TimedMediaHandlerHooks {
 		$wgResourceModules += array(
 			'ext.tmh.bogoslow' => $baseExtensionResource + array(
 				'scripts' => 'resources/ext.tmh.bogoslow.js',
+				'targets' => array( 'mobile', 'desktop' ),
 			),
 			'ext.tmh.OgvJsSupport' => $baseExtensionResource + array(
 				'scripts' => array(
@@ -103,6 +104,36 @@ class TimedMediaHandlerHooks {
 					'resources/ext.tmh.OgvJsSupport.js',
 				),
 				'targets' => array( 'mobile', 'desktop' ),
+			),
+		);
+
+		// Add the MobileFrontend-specific lightweight player
+		$wgResourceModules += array(
+			'ext.tmh.mobile' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.mobile.js',
+				'styles' => array(
+					'resources/ext.tmh.mobile.css',
+					'resources/PopUpThumbVideo.css',
+				),
+				'dependencies' => array(
+					'mobile.startup',
+					'ext.tmh.OgvJsSupport',
+					'ext.tmh.bogoslow',
+				),
+				'targets' => array( 'mobile' ),
+			),
+		);
+		$wgResourceModules += array(
+			'ext.tmh.mobile.MediaOverlay' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.mobile.MediaOverlay.js',
+				'styles' => 'resources/ext.tmh.mobile.MediaOverlay.less',
+				'dependencies' => array(
+					'ext.tmh.mobile',
+					'mobile.mediaViewer',
+					'mobile.overlays',
+					'mediawiki.Title',
+				),
+				'targets' => array( 'mobile' ),
 			),
 		);
 
@@ -413,6 +444,7 @@ class TimedMediaHandlerHooks {
 		if ( $addModules ) {
 			$out->addModuleScripts( 'mw.PopUpMediaTransform' );
 			$out->addModuleStyles( 'mw.PopUpMediaTransform' );
+			$out->addModules( 'ext.tmh.mobile' );
 		}
 
 		return true;

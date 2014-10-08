@@ -1,0 +1,16 @@
+.overlay.timedmedia-viewer {
+	video, audio, ogvjs {
+		// get rid of a small bottom margin and vertical scrollbar
+		vertical-align: bottom;
+
+		&.ratio-width {
+			width: 100% !important;
+			height: auto !important;
+		}
+
+		&.ratio-height {
+			height: 100% !important;
+			width: auto !important;
+		}
+	}
+}
