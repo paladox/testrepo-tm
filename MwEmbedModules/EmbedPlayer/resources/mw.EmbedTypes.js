@@ -91,6 +91,26 @@ var vlcAppPlayer = new mw.MediaPlayer( 'vlcAppPlayer', [
 	'video/webm; codecs="vp8, vorbis"',
 ], 'VLCApp' );
 
+var ogvJsPlayer = new mw.MediaPlayer( 'ogvJsPlayer', [
+	'video/ogg',
+	'video/ogg; codecs="theora"',
+	'video/ogg; codecs="theora, vorbis"',
+	'video/ogg; codecs="theora, opus"',
+	'audio/ogg',
+	'audio/ogg; codecs="vorbis"',
+	'audio/ogg; codecs="opus"',
+	'application/ogg'
+], 'OgvJs' );
+
+var ogvSwfPlayer = new mw.MediaPlayer( 'ogvSwfPlayer', [
+	'video/ogg',
+	'video/ogg; codecs="theora"',
+	'video/ogg; codecs="theora, vorbis"',
+	'audio/ogg',
+	'audio/ogg; codecs="vorbis"',
+	'application/ogg'
+], 'OgvSwf' );
+
 // Generic plugin
 //var oggPluginPlayer = new mw.MediaPlayer( 'oggPlugin', ['video/ogg', 'application/ogg'], 'Generic' );
 
@@ -316,6 +336,47 @@ mw.EmbedTypes = {
 		if ( mw.isIOS() ) {
 			this.mediaPlayers.addPlayer( vlcAppPlayer );
 		}
+
+		// ogv.js / ogv.swf detection
+		var hasTypedArrays = ( window.Uint32Array ),
+			hasWebAudio = ( window.AudioContext || window.webkitAudioContext );
+
+		// don't use mw.supportsFlash() as it's hardcoded to false
+		// we want to use Flash for free codecs here!
+		var reallyHasFlash = false;
+		if ( $.client.profile().name === 'msie' ) {
+			reallyHasFlash = this.testActiveX( 'ShockwaveFlash.ShockwaveFlash' );
+		} else {
+			// check plugins...
+		}
+
+		if ( hasTypedArrays && ( hasWebAudio || reallyHasFlash ) ) {
+			// ogv.js emscripten version
+			//
+			// Works great in Safari, as fast or faster than Flash.
+			//
+			// Current Firefox, Chrome, Opera all work great, but use
+			// native playback by default of course!
+			//
+			// Works in IE 10/11 but requires a Flash audio shim and
+			// doesn't perform quite as well as the pure-Flash build
+			// on slower machines. However it's much more powerful, with
+			// seeking support that doesn't work in Flash.
+			//
+			this.mediaPlayers.addPlayer( ogvJsPlayer );
+		}
+		if ( reallyHasFlash ) {
+			// ogv.swf crossbridge version
+			//
+			// Currently used for IE 9. Older IE browsers might work,
+			// but IE 8 doesn't seem to run the base player code.
+			//
+			// Other browsers without Web Audio might work, but are currently
+			// not detected.
+			//
+			this.mediaPlayers.addPlayer( ogvSwfPlayer );
+		}
+
 		// Allow extensions to detect and add their own "players"
 		mw.log("EmbedPlayer::trigger:embedPlayerUpdateMediaPlayersEvent");
 		$( mw ).trigger( 'embedPlayerUpdateMediaPlayersEvent' , this.mediaPlayers );
