@@ -91,6 +91,17 @@ var vlcAppPlayer = new mw.MediaPlayer( 'vlcAppPlayer', [
 	'video/webm; codecs="vp8, vorbis"',
 ], 'VLCApp' );
 
+var ogvJsPlayer = new mw.MediaPlayer( 'ogvJsPlayer', [
+	'video/ogg',
+	'video/ogg; codecs="theora"',
+	'video/ogg; codecs="theora, vorbis"',
+	'video/ogg; codecs="theora, opus"',
+	'audio/ogg',
+	'audio/ogg; codecs="vorbis"',
+	'audio/ogg; codecs="opus"',
+	'application/ogg'
+], 'OgvJs' );
+
 // Generic plugin
 //var oggPluginPlayer = new mw.MediaPlayer( 'oggPlugin', ['video/ogg', 'application/ogg'], 'Generic' );
 
@@ -316,6 +327,39 @@ mw.EmbedTypes = {
 		if ( mw.isIOS() ) {
 			this.mediaPlayers.addPlayer( vlcAppPlayer );
 		}
+
+		// ogv.js compatibility detection...
+		// emscripten-compiled code requires typed arrays
+		var hasTypedArrays = ( window.Uint32Array ),
+			hasWebAudio = ( window.AudioContext || window.webkitAudioContext );
+
+		// don't use mw.supportsFlash() as it's hardcoded to false
+		// we want to use Flash for free codecs here!
+		var reallyHasFlash = false;
+		if ( $.client.profile().name === 'msie' ) {
+			// We only do the ActiveX test because we only need Flash in
+			// Internet Explorer 10/11. Other browsers use Web Audio directly
+			// (Safari) or native playback, so there's no need to test other
+			// ways of loading Flash.
+			reallyHasFlash = this.testActiveX( 'ShockwaveFlash.ShockwaveFlash' );
+		}
+
+		if ( hasTypedArrays && ( hasWebAudio || reallyHasFlash ) ) {
+			// ogv.js emscripten version
+			//
+			// Works in:
+			// * Safari 6.1+ on Mac OS X
+			// * Safari on iOS 7+ (best on 64-bit devices)
+			// * IE 10/11 on Windows 7/8/8.1 (requires Flash for audio)
+			//
+			// IE 12 should work Flash-free (yet to be released).
+			//
+			// Current Firefox, Chrome, Opera all work great too, but use
+			// native playback by default of course!
+			//
+			this.mediaPlayers.addPlayer( ogvJsPlayer );
+		}
+
 		// Allow extensions to detect and add their own "players"
 		mw.log("EmbedPlayer::trigger:embedPlayerUpdateMediaPlayersEvent");
 		$( mw ).trigger( 'embedPlayerUpdateMediaPlayersEvent' , this.mediaPlayers );
