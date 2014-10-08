@@ -1,0 +1,66 @@
+.overlay.timedmedia-viewer {
+	background: #000;
+	padding-top: 0;
+
+	.main {
+		height: auto;
+		position: relative;
+		width: 100%;
+	}
+
+	.media-wrapper {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: 0;
+	}
+
+	.media-inner-wrapper {
+		width: 100%;
+		height: 100%;
+		display: table;
+		text-align: center;
+
+		.media {
+			display: table-cell;
+			vertical-align: middle;
+			height: 100%;
+			width: 100%;
+		}
+	}
+
+	video, audio, ogvjs {
+		// get rid of a small bottom margin and vertical scrollbar
+		vertical-align: bottom;
+
+		&.ratio-width {
+			width: 100% !important;
+			height: auto !important;
+		}
+
+		&.ratio-height {
+			height: 100% !important;
+			width: auto !important;
+		}
+	}
+
+	// FIXME: change styling after overlay overhaul
+	.cancel {
+		position: absolute;
+		right: 10px;
+		top: 10px;
+	}
+	.details {
+		bottom: 0;
+		height: auto;
+		position: fixed;
+		width: 100%;
+		padding: 8px 10px;
+		margin: 0;
+		background: white;
+
+		.button {
+			float: right;
+		}
+	}
+}
