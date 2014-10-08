@@ -68,6 +68,27 @@
 				'scripts'=> "resources/mw.EmbedPlayerVLCApp.js",
 				'dependencies' => array( 'mediawiki.Uri' )
 			),
+			"mw.EmbedPlayerOgvJsCommon" => array(
+				'scripts' => 'resources/mw.EmbedPlayerOgvJsCommon.js',
+				'dependencies' => array(
+					'jquery.spinner',
+				),
+			),
+			"mw.EmbedPlayerOgvJs"	=> array(
+				'scripts' => 'resources/mw.EmbedPlayerOgvJs.js',
+				'dependencies' => array(
+					'mw.EmbedPlayerOgvJsCommon',
+					'ext.tmh.OgvJsSupport',
+				),
+			),
+			"mw.EmbedPlayerOgvSwf"	=> array(
+				'scripts'=> 'resources/mw.EmbedPlayerOgvSwf.js',
+				'dependencies' => array(
+					'jquery.client',
+					'mw.EmbedPlayerOgvJsCommon',
+					'ext.tmh.OgvJsSupport',
+				),
+			),
 			"mw.EmbedPlayerImageOverlay" => array( 'scripts'=> "resources/mw.EmbedPlayerImageOverlay.js" ),
 
 			"mw.EmbedPlayerVlc" => array( 'scripts'=> "resources/mw.EmbedPlayerVlc.js" ),
