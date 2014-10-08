@@ -1,0 +1,21 @@
+/* Force these to fit onscreen */
+.mediaContainer {
+	max-width: 100% !important;
+}
+.mediaContainer video {
+	max-width: 100% !important;
+	height: 100% !important;
+}
+.PopUpMediaTransform {
+	max-width: 100% !important;
+	text-align: center;
+}
+.PopUpMediaTransform img {
+	max-width: 100% !important;
+	height: auto !important;
+}
+
+.timedmedia-mobile-viewer video {
+	max-width: 100% !important;
+	height: auto !important;
+}

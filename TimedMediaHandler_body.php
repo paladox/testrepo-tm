@@ -217,6 +217,7 @@ class TimedMediaHandler extends MediaHandler {
 		$outputPage->addModuleScripts( 'mw.PopUpMediaTransform' );
 		$outputPage->addModuleStyles( 'mw.PopUpMediaTransform' );
 		$outputPage->addModules( 'mw.TMHGalleryHook.js' );
+		$outputPage->addModules( 'ext.tmh.mobile' );
 	}
 
 	/**

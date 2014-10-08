@@ -78,7 +78,7 @@
 				} else if ( context.createJavaScriptNode ) {
 					node = context.createJavaScriptNode( 1024, 0, 2 );
 				} else {
-					throw new Error( "Bad version of web audio API?" );
+					throw new Error( 'Bad version of web audio API?' );
 				}
 
 				// Don't actually run any audio, just start & stop the node
@@ -90,6 +90,6 @@
 				return null;
 			}
 		}
-	}
+	};
 
 } )( jQuery, mw );
