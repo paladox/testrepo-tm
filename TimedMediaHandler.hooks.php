@@ -98,6 +98,65 @@ class TimedMediaHandlerHooks {
 			),
 		);
 
+		// Add the MobileFrontend-specific lightweight player
+		$wgResourceModules += array(
+			'ext.tmh.mobile' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.mobile.js',
+				'styles' => array(
+					'resources/ext.tmh.mobile.css',
+					'resources/PopUpThumbVideo.css',
+				),
+				'dependencies' => array(
+					'mobile.startup',
+					'ext.tmh.OgvJsSupport',
+				),
+				'targets' => array( 'mobile' ),
+			),
+		);
+		$wgResourceModules += array(
+			'ext.tmh.mobile.MediaOverlay' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.mobile.MediaOverlay.js',
+				'styles' => 'resources/ext.tmh.mobile.MediaOverlay.less',
+				'dependencies' => array(
+					'ext.tmh.mobile',
+					'mobile.overlays',
+					'mediawiki.Title',
+				),
+				'messages' => 'timedmedia-mobile-overlay-details',
+				'targets' => array( 'mobile' ),
+			),
+		);
+
+
+		// Add the MobileFrontend-specific lightweight player
+		$wgResourceModules += array(
+			'ext.tmh.mobile' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.mobile.js',
+				'styles' => array(
+					'resources/ext.tmh.mobile.css',
+					'resources/PopUpThumbVideo.css',
+				),
+				'dependencies' => array(
+					'mobile.startup',
+					'ext.tmh.OgvJsSupport',
+				),
+				'targets' => array( 'mobile' ),
+			),
+		);
+		$wgResourceModules += array(
+			'ext.tmh.mobile.MediaOverlay' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.mobile.MediaOverlay.js',
+				'styles' => 'resources/ext.tmh.mobile.MediaOverlay.less',
+				'dependencies' => array(
+					'ext.tmh.mobile',
+					'mobile.overlays',
+					'mediawiki.Title',
+				),
+				'messages' => 'timedmedia-mobile-overlay-details',
+				'targets' => array( 'mobile' ),
+			),
+		);
+
 		// Setup a hook for iframe embed handling:
 		$wgHooks['ArticleFromTitle'][] = 'TimedMediaIframeOutput::iframeHook';
 
@@ -405,6 +464,7 @@ class TimedMediaHandlerHooks {
 		if ( $addModules ) {
 			$out->addModuleScripts( 'mw.PopUpMediaTransform' );
 			$out->addModuleStyles( 'mw.PopUpMediaTransform' );
+			$out->addModules( 'ext.tmh.mobile' );
 		}
 
 		return true;
