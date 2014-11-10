@@ -64,10 +64,11 @@ class TimedMediaHandlerHooks {
 		$wgResourceModules+= array(
 			'mw.PopUpMediaTransform' => $baseExtensionResource + array(
 				'scripts' => 'resources/mw.PopUpThumbVideo.js',
-				'dependencies' => array( 'mw.MwEmbedSupport', 'mediawiki.Title' ),
+				'dependencies' => array( 'mw.MwEmbedSupport', 'mediawiki.Title', 'mw.PopUpMediaTransform.styles' ),
+				'position' => 'top',
 			),
 			'mw.PopUpMediaTransform.styles' => $baseExtensionResource + array(
-				'position' => 'top',
+				'position' => 'bottom',
 				'styles' => 'resources/PopUpThumbVideo.css',
 			),
 			'mw.TMHGalleryHook.js' => $baseExtensionResource + array(
@@ -77,6 +78,13 @@ class TimedMediaHandlerHooks {
 			),
 			'embedPlayerIframeStyle'=> $baseExtensionResource + array(
 				'styles' => 'resources/embedPlayerIframe.css',
+			),
+			'ext.tmh.embedPlayerIframe' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.embedPlayerIframe.js',
+				'dependencies' => array(
+					'jquery.embedPlayer',
+					'mw.MwEmbedSupport',
+				),
 			),
 			'ext.tmh.transcodetable' => $baseExtensionResource + array(
 				'scripts' => 'resources/ext.tmh.transcodetable.js',
@@ -99,7 +107,8 @@ class TimedMediaHandlerHooks {
 			),
 			// adds support MediaWikiPlayerSupport player bindings
 			"mw.MediaWikiPlayer.loader" =>  $baseExtensionResource + array(
-				'loaderScripts' => 'resources/mw.MediaWikiPlayer.loader.js',
+				'scripts' => 'resources/mw.MediaWikiPlayer.loader.js',
+				'position' => 'top',
 			),
 		);
 
@@ -125,9 +134,6 @@ class TimedMediaHandlerHooks {
 
 		// When image page is deleted so that we remove transcode settings / files.
 		$wgHooks['FileDeleteComplete'][] = 'TimedMediaHandlerHooks::onFileDeleteComplete';
-
-		// Add parser hook
-		$wgParserOutputHooks['TimedMediaHandler'] = array( 'TimedMediaHandler', 'outputHook' );
 
 		// Use a BeforePageDisplay hook to load the styles in pages that pull in media dynamically.
 		// (Special:Upload, for example, when there is an "existing file" warning.)
@@ -186,7 +192,13 @@ class TimedMediaHandlerHooks {
 	public static function onImageOpenShowImageInlineBefore( $imagePage, $out ) {
 		$handler = $imagePage->getDisplayedFile()->getHandler();
 		if ( $handler !== false && $handler instanceof TimedMediaHandler ) {
-			TimedMediaHandler::outputHook( $out, null, null );
+			$out->addModules( array(
+				'mw.TimedText.loader',
+				'mw.MediaWikiPlayer.loader',
+				'mw.EmbedPlayer.loader',
+				'mw.PopUpMediaTransform',
+				'mw.TMHGalleryHook.js',
+			) );
 		}
 		return true;
 	}
@@ -420,8 +432,12 @@ class TimedMediaHandlerHooks {
 		}
 
 		if ( $addModules ) {
-			$out->addModuleScripts( 'mw.PopUpMediaTransform' );
-			$out->addModuleStyles( 'mw.PopUpMediaTransform.styles' );
+			$out->addModules( array(
+				'mw.TimedText.loader',
+				'mw.MediaWikiPlayer.loader',
+				'mw.EmbedPlayer.loader',
+				'mw.PopUpMediaTransform',
+			) );
 		}
 
 		return true;
