@@ -93,7 +93,8 @@ class TimedMediaHandlerHooks {
 			),
 			// adds support MediaWikiPlayerSupport player bindings
 			"mw.MediaWikiPlayer.loader" =>  $baseExtensionResource + array(
-				'loaderScripts' => 'resources/mw.MediaWikiPlayer.loader.js',
+				'scripts' => 'resources/mw.MediaWikiPlayer.loader.js',
+				'position' => 'top',
 			),
 		);
 		// Setup a hook for iframe embed handling:
@@ -107,9 +108,6 @@ class TimedMediaHandlerHooks {
 
 		// When image page is deleted so that we remove transcode settings / files.
 		$wgHooks['FileDeleteComplete'][] = 'TimedMediaHandlerHooks::onFileDeleteComplete';
-
-		// Add parser hook
-		$wgParserOutputHooks['TimedMediaHandler'] = array( 'TimedMediaHandler', 'outputHook' );
 
 		// Use a BeforePageDisplay hook to load the styles in pages that pull in media dynamically.
 		// (Special:Upload, for example, when there is an "existing file" warning.)
@@ -168,7 +166,13 @@ class TimedMediaHandlerHooks {
 	public static function onImageOpenShowImageInlineBefore( $imagePage, $out ) {
 		$handler = $imagePage->getDisplayedFile()->getHandler();
 		if ( $handler !== false && $handler instanceof TimedMediaHandler ) {
-			TimedMediaHandler::outputHook( $out, null, null );
+			$out->addModules( array(
+				'mw.EmbedPlayer.loader',
+				'mw.TimedText.loader',
+				'mw.MediaWikiEmbedPlayer.loader',
+				'mw.PopUpMediaTransform',
+				'mw.TMHGalleryHook.js',
+			) );
 		}
 		return true;
 	}
