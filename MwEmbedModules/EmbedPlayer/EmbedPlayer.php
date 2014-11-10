@@ -2,6 +2,12 @@
 	global $wgVideoPlayerSkinModule;
 	// Register all the EmbedPlayer modules
 	return array(
+			"jquery.embedPlayer" => array( 'scripts' => 'resources/jquery.embedPlayer.js' ),
+			"mw.EmbedPlayer.loader" => array(
+				'scripts' => 'resources/mw.EmbedPlayer.loader.js',
+				'dependencies' => 'jquery.embedPlayer',
+				'position' => 'top',
+			),
 			"mw.MediaElement" => array( 'scripts' => 'resources/mw.MediaElement.js' ),
 			"mw.MediaPlayer" => array( 'scripts' => 'resources/mw.MediaPlayer.js' ),
 			"mw.MediaPlayers" => array(
