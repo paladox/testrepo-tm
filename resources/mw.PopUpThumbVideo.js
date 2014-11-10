@@ -2,7 +2,7 @@
 * Simple script to add pop-up video dialog link support for video thumbnails
 */
 ( function ( mw, $ ) {
-	$( document ).ready( function () {
+	mw.hook( 'wikipage.content' ).add( function () {
 		$('.PopUpMediaTransform a').each( function () {
 			var parent = $( this ).parent();
 			if ( parent.attr( 'videopayload' ) ) {
