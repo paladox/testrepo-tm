@@ -5,7 +5,7 @@
 	/**
 	* Add a DOM ready check for player tags
 	*/
-	$( function() {
+	var embedPlayerInit = function( $content ) {
 		var $selected = $( mw.config.get( 'EmbedPlayer.RewriteSelector' ) );
 		if ( $selected.length ) {
 			var inx = 0;
@@ -23,7 +23,8 @@
 
 			checkSetDone();
 		}
-	} );
+	}
+	mw.hook( 'wikipage.content' ).add( embedPlayerInit );
 
 	/**
 	* Add the mwEmbed jQuery loader wrapper

@@ -101,9 +101,6 @@ class TimedMediaHandlerHooks {
 		// When image page is deleted so that we remove transcode settings / files.
 		$wgHooks['FileDeleteComplete'][] = 'TimedMediaHandlerHooks::onFileDeleteComplete';
 
-		// Add parser hook
-		$wgParserOutputHooks['TimedMediaHandler'] = array( 'TimedMediaHandler', 'outputHook' );
-
 		// Use a BeforePageDisplay hook to load the styles in pages that pull in media dynamically.
 		// (Special:Upload, for example, when there is an "existing file" warning.)
 		$wgHooks['BeforePageDisplay'][] = 'TimedMediaHandlerHooks::pageOutputHook';
@@ -161,7 +158,11 @@ class TimedMediaHandlerHooks {
 	public static function onImageOpenShowImageInlineBefore( $imagePage, $out ) {
 		$handler = $imagePage->getDisplayedFile()->getHandler();
 		if ( $handler !== false && $handler instanceof TimedMediaHandler ) {
-			TimedMediaHandler::outputHook( $out, null, null );
+			$out->addModules( array(
+				'mw.EmbedPlayer',
+				'mw.PopUpMediaTransform',
+				'mw.TMHGalleryHook.js',
+			) );
 		}
 		return true;
 	}
