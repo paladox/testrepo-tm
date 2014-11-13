@@ -34,7 +34,7 @@ mw.MediaPlayers.prototype = {
 		this.defaultPlayers['application/vnd.apple.mpegurl'] = ['Native'];
 
 		this.defaultPlayers['video/ogg'] = ['Native', 'Vlc', 'Java', 'Generic', 'VLCApp'];
-		this.defaultPlayers['video/webm'] = ['Native', 'Vlc', 'VLCApp'];
+		this.defaultPlayers['video/webm'] = ['Native', 'Vlc', 'VLCApp', 'IEWebMPrompt'];
 		this.defaultPlayers['application/ogg'] = ['Native', 'Vlc', 'Java', 'Generic', 'VLCApp'];
 		this.defaultPlayers['audio/ogg'] = ['Native', 'Vlc', 'Java', 'VLCApp'];
 		this.defaultPlayers['audio/mpeg']= ['Native', 'Kplayer'];
