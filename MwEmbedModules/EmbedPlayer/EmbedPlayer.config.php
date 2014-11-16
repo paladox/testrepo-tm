@@ -192,6 +192,21 @@
 
 			// When there is no in-browser playback mechanism provide a download link for the play button
 			'EmbedPlayer.NotPlayableDownloadLink' => true,
+			
+			// The location of the large 'Play' button.
+			// Expected to be an integer value between 0 and 4,
+			// 0 being the center, and 1-4 the corners clockwise from top left.
+			// Defaults to the center if an invalid value is supplied.
+			
+			'EmbedPlayer.PlayButtonLocation' => 0,
+			
+			// If the timeline/volume control bar should be shown on hover before the video has been started
+			// If the play button is moved to the bottom of the video, you might want to set this to FALSE for a cleaner UI.
+			'EmbedPlayer.ShowControlBarBeforePlayback' => true,
+			
+			// If the large 'Play' button should be scaled down when the player is smaller than 480 * 360.
+			// Can prevent the button obscuring the thumbnail, allowing videos to be used like static images in articles.
+			'EmbedPlayer.ScalePlayButton' => false,
 
 			// A black pixel for source switching
 			'EmbedPlayer.BlackPixel' => "data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%01%00%00%00%01%08%02%00%00%00%90wS%DE%00%00%00%01sRGB%00%AE%CE%1C%E9%00%00%00%09pHYs%00%00%0B%13%00%00%0B%13%01%00%9A%9C%18%00%00%00%07tIME%07%DB%0B%0A%17%041%80%9B%E7%F2%00%00%00%19tEXtComment%00Created%20with%20GIMPW%81%0E%17%00%00%00%0CIDAT%08%D7c%60%60%60%00%00%00%04%00%01'4'%0A%00%00%00%00IEND%AEB%60%82"
