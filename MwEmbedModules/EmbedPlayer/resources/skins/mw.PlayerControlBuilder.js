@@ -29,6 +29,59 @@ mw.PlayerControlBuilder.prototype = {
 	// Default control bar height
 	height: mw.config.get( 'EmbedPlayer.ControlsHeight' ),
 
+	playButtonPositionCases : {
+		// Center of player
+		0 : {
+				'top'    : '50%',
+				'left'   : '50%'
+			},
+		// Top-left corner
+		1 : {
+				'left'    : '0',
+				'top'     : '0',
+				'margin-left' : '0',
+				'margin-top'  : '0',
+				'transform-origin' : 'top left'
+			},
+		// Top-right corner
+		2 : {
+				'right'   : '0',
+				'top'     : '0',
+				'margin-left' : '0',
+				'margin-top'  : '0',
+				'transform-origin' : 'top right'
+			},
+		// Bottom-right corner
+		3 : {
+				'right'   : '0',
+				'bottom'  : '0',
+				'margin-left' : '0',
+				'margin-top'  : '0',
+				'transform-origin' : 'bottom right'
+			},
+		// Bottom-left corner
+		4 : {
+				'left'   : '0',
+				'bottom' : '0',
+				'margin-left' : '0',
+				'margin-top'  : '0',
+				'transform-origin' : 'bottom left'
+			}
+	},
+
+	// Location of large 'Play' button
+	playButtonLocation : mw.config.get( 'EmbedPlayer.PlayButtonLocation' ),
+
+	// Whether to show the control bar before playback has been started
+	showControlBarBeforePlayback : mw.config.get( 'EmbedPlayer.ShowControlBarBeforePlayback' ),
+
+	// Whether to scale down the 'Play' button for small players
+	scalePlayButton : mw.config.get( 'EmbedPlayer.ScalePlayButton' ),
+
+	// Standard player diagonal dimension that scaling of the Play button is based on
+	// sqrt(360^2 + 480^2)
+	defaultPlayerDiagonal : 600,
+
 	// Default supported components is merged with embedPlayer set of supported types
 	supportedComponents: {
 		// All playback types support options
@@ -88,6 +141,22 @@ mw.PlayerControlBuilder.prototype = {
 		}
 		// Return the controlBuilder Object:
 		return _this;
+	},
+
+	/**
+	* Returns true if playback stopped & we're not in an ad sequence, false otherwise.
+	*/
+	playbackStopped: function(){
+		var embedPlayer = this.embedPlayer;
+		return ( embedPlayer.isStopped() &&
+						(
+							embedPlayer.preSequence === false ||
+								(
+									embedPlayer.sequenceProxy &&
+									embedPlayer.sequenceProxy.isInSequence === false
+								)
+						)
+				)
 	},
 
 	/**
@@ -369,12 +438,26 @@ mw.PlayerControlBuilder.prototype = {
 	*/
 	getPlayButtonPosition: function() {
 		var _this = this;
-		return {
-			'left' : '50%',
-			'top' : '50%',
+		var vidHeight = this.embedPlayer.getHeight();
+		var vidWidth = this.embedPlayer.getWidth();
+		if (this.scalePlayButton){
+			var playButtonScale = Math.min(1, Math.sqrt(vidHeight*vidHeight + vidWidth*vidWidth)/this.defaultPlayerDiagonal);
+		} else {
+			var playButtonScale = 1;
+		}
+		var styleObj = {
+			'position'    : 'absolute',
 			'margin-left' : - .5 * this.getComponentWidth( 'playButtonLarge' ),
-			'margin-top' : - .5 * this.getComponentHeight( 'playButtonLarge' )
+			'margin-top'  : - .5 * this.getComponentHeight( 'playButtonLarge' ),
+			'transform'   : 'scale(' + playButtonScale + ')'
 		};
+		if ( this.playButtonPositionCases[this.playButtonLocation] ){
+			$.extend(styleObj, this.playButtonPositionCases[this.playButtonLocation]);
+		} else{
+			$.extend(styleObj, this.playButtonPositionCases[0]);
+		}
+
+		return styleObj;
 	},
 
 	/**
@@ -1076,7 +1159,14 @@ mw.PlayerControlBuilder.prototype = {
 							_this.hideControlBarCallback = false;
 						}
 						// Show controls with a set timeout ( avoid fade in fade out on short mouse over )
-						_this.showControlBar();
+						// so long as playback is active, and we've not been told to suppress
+						if ( _this.playbackStopped() ){
+							if (_this.showControlBarBeforePlayback ){
+								_this.showControlBar();
+							}
+						} else{
+							_this.showControlBar();
+						}
 						bindSpaceUp();
 					},
 					'out' : function(e){
@@ -1652,12 +1742,7 @@ mw.PlayerControlBuilder.prototype = {
 		} );
 
 		// Show the big play button: ( if not in an ad .. TODO clean up )
-		if( embedPlayer.isStopped() &&
-				(
-					embedPlayer.sequenceProxy &&
-					embedPlayer.sequenceProxy.isInSequence == false
-				)
-		){
+		if (this.playbackStopped()){
 			embedPlayer.getInterface().find( '.play-btn-large' ).fadeIn( 'slow' );
 		}
 

@@ -21,7 +21,7 @@
 /* large play button */
 .k-player .play-btn-large {
 	width: 70px;
-	height: 55px;
+	height: 54px;
 	background: url(images/ksprite.png) no-repeat 0px -433px;
 	position: absolute;
 	cursor: pointer;
