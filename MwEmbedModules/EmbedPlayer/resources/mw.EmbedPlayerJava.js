@@ -1,13 +1,10 @@
 ( function( mw, $ ) { "use strict";
 /**
-* List of domains and hosted location of cortado.
-* Lets clients avoid the security warning
+* List of domains and hosted location of cortado. Lets clients avoid the security warning
 * for cross domain java applet loading.
-* The warning can also be avoided by providing crossdomain.xml.
-* This is the case with upload.wikimedia.org:
-* http://upload.wikimedia.org/crossdomain.xml
 */
 window.cortadoDomainLocations = {
+		'upload.wikimedia.org' : 'http://upload.wikimedia.org/jars/cortado.jar'
 };
 
 // Set the default location for CortadoApplet
@@ -45,7 +42,7 @@ mw.EmbedPlayerJava = {
 		'<applet id="' + this.pid + '" ' +
 		'code="com.fluendo.player.Cortado.class" ' +
 		'width="' + parseInt( this.getWidth() ) + '" ' +
-		'height="' + parseInt( this.getHeight() - this.controlBuilder.getHeight() ) + '"	' +
+		'height="' + parseInt( this.getVideoHolder().height() ) + '"	' +
 		'archive="' + mw.absoluteUrl(  this.getAppletLocation() ) + '" >'+
 			'<param name="url" value="' + mw.absoluteUrl( this.getSrc() ) + '" /> ' + "\n" +
 			'<param name="local" value="false"/>' +
@@ -77,21 +74,18 @@ mw.EmbedPlayerJava = {
 	getAppletLocation: function() {
 		var mediaSrc = this.getSrc();
 		var appletLoc = false;
-		// Check for wgCortadoJarFile override
-		if( mw.config.get( 'wgCortadoJarFile' ) !== false ){
-			return mw.config.get('wgCortadoJarFile' );
-		}
 		if (
-			(
 			!mw.isLocalDomain( mediaSrc )
 			||
-			!mw.isLocalDomain( mw.getMwEmbedPath() )
+			!mw.isLocalDomain( mw.getMwEmbedPath()
 			||
-			mw.config.get( 'relativeCortadoAppletPath' ) === false
-            ) &&
-			window.cortadoDomainLocations[ new mw.Uri( mediaSrc ).host ]
+			mw.config.get( 'relativeCortadoAppletPath' ) === false )
 		){
-		    return window.cortadoDomainLocations[ new mw.Uri( mediaSrc ).host ];
+			if ( window.cortadoDomainLocations[ new mw.Uri( mediaSrc ).host ] ) {
+				return window.cortadoDomainLocations[ new mw.Uri( mediaSrc ).host ];
+			} else {
+				return 'http://theora.org/cortado.jar';
+			}
 		} else {
 			// Get the local relative cortado applet location:
 			return mw.config.get( 'relativeCortadoAppletPath' );
@@ -144,7 +138,7 @@ mw.EmbedPlayerJava = {
 		}
 
 		// Run the onSeeking interface update
-		this.controlBuilder.onSeek();
+		this.layoutBuilder.onSeek();
 	},
 
 	/**
