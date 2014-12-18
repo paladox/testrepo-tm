@@ -2,18 +2,20 @@
  * Selector based embedPlayer processing
  *
  * @param {Function=}
- *      callback Optional Function to be called once video interfaces
- *      are ready
+ *	  callback Optional Function to be called once video interfaces
+ *	  are ready
  *
  */
 
 ( function( mw, $ ) { "use strict";
 
-mw.processEmbedPlayers = function( playerSet, callback ) {
-	mw.log( 'processEmbedPlayers:: playerSet: ', playerSet);
+mw.processEmbedPlayers = function( playerSelect, callback ) {
+	mw.log( 'processEmbedPlayers:: playerSelector: '+ playerSelect);
+	// trigger the start of ProcessEmbedPlayers
+	$( mw ).trigger('ProcessEmbedPlayers', [playerSelect] ); 
 	// The player id list container
 	var playerIdList = [];
-	
+
 	// Check if the selected player set is ready if ready issue the parent callback
 	var areSelectedPlayersReady = function(){
 		var playersLoaded = true;
@@ -46,7 +48,7 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 	 * _this.showPlayer()
 	 *
 	 * @param {Element}
-	 *      playerElement DOM element to be swapped
+	 *	  playerElement DOM element to be swapped
 	 */
 	var addPlayerElement = function( playerElement ) {
 		var _this = this;
@@ -89,12 +91,12 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 
 			// Allow plugins to add bindings to the inDomPlayer
 			$( mw ).trigger ( 'EmbedPlayerNewPlayer', inDomPlayer );
+			
+			// Retain support for legacy new embed player trigger name:
+			$( mw ).trigger ( 'newEmbedPlayerEvent', inDomPlayer );
 
 			// Add a player ready binding:
-			$( inDomPlayer ).bind( 'playerReady.swap', function(event, id){
-				$( inDomPlayer ).unbind( 'playerReady.swap' );
-				areSelectedPlayersReady();
-			});
+			$( inDomPlayer ).bind( 'playerReady', areSelectedPlayersReady );
 
 			//
 			// Allow modules to block player build out
@@ -213,9 +215,9 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 	 * Takes a video element as input and swaps it out with an embed player interface
 	 *
 	 * @param {Element}
-	 *      targetElement Element to be swapped
+	 *	  targetElement Element to be swapped
 	 * @param {Object}
-	 *      playerInterface Interface to swap into the target element
+	 *	  playerInterface Interface to swap into the target element
 	 */
 	var swapEmbedPlayerElement =  function( targetElement, playerInterface ) {
 		mw.log( 'processEmbedPlayers::swapEmbedPlayerElement: ' + targetElement.id );
@@ -231,8 +233,15 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 				swapPlayerElement[ method ] = playerInterface[ method ];
 			}
 		}
+		// set width and height attr:
+		if( $( targetElement ).attr('width') ){
+			$( swapPlayerElement ).css('width',  $( targetElement ).attr('width') );
+		}
+		if( $( targetElement ).attr('height') ){
+			$( swapPlayerElement ).css('height',  $( targetElement ).attr('height') );
+		}
 		// copy over css text:
-		swapPlayerElement.style.cssText = targetElement.style.cssText;
+		swapPlayerElement.style.cssText += targetElement.style.cssText;
 		// player element must always be relative to host video and image layout
 		swapPlayerElement.style.position = 'relative';
 
@@ -246,7 +255,7 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 			});
 		}
 		// Check for Persistent native player ( should keep the video embed around )
-		if(  playerInterface.isPersistentNativePlayer()
+		if(  ( playerInterface.isPersistentNativePlayer() && !mw.config.get( 'EmbedPlayer.DisableVideoTagSupport' ) )
 				||
 			// Also check for native controls on a video or audio tag
 			( playerInterface.useNativePlayerControls()
@@ -268,7 +277,7 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 		}
 
 		// If we don't already have a loadSpiner add one:
-		if( $('#loadingSpinner_' + playerInterface.id ).length == 0 && $.client.profile().name !== 'firefox' ){
+		if( $('#loadingSpinner_' + playerInterface.id ).length == 0 ){
 			if( playerInterface.useNativePlayerControls() || playerInterface.isPersistentNativePlayer() ) {
 				var $spinner = $( targetElement )
 					.getAbsoluteOverlaySpinner();
@@ -281,12 +290,8 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 	};
 
 	// Add a loader for <div /> embed player rewrites:
-	$( playerSet ).each( function( index, playerElement) {
+	$( playerSelect ).each( function( index, playerElement) {
 
-		// Make sure the playerElement has an id:
-		if( !$( playerElement ).attr('id') ){
-			$( playerElement ).attr( "id", 'mwe_vid' + ( index ) );
-		}
 		// Add the player Id to the playerIdList
 		playerIdList.push( $( playerElement ).attr( "id") );
 
@@ -323,9 +328,9 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 
 	// Make sure we have user preference setup for setting preferences on video selection
 	var addedPlayersFlag = false;
-	mw.log("processEmbedPlayers:: Do: " + $( playerSet ).length + ' players ');
+	//mw.log("processEmbedPlayers:: Do: " + $( playerSelect ).length + ' players ');
 	// Add each selected element to the player manager:
-	$( playerSet ).each( function( index, playerElement) {
+	$( playerSelect ).each( function( index, playerElement) {
 		// Make sure the video tag was not generated by our library:
 		if( $( playerElement ).hasClass( 'nativeEmbedPlayerPid' ) ){
 			$( '#loadingSpinner_' + $( playerElement ).attr('id') ).remove();
