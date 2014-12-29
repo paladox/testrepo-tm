@@ -28,11 +28,11 @@
 					'mediawiki.client',
 					'mediawiki.UtilitiesTime',
 					'mediawiki.Uri',
-					'mediawiki.absoluteUrl',
+					'mediawiki.UtilitiesUrl',
 					'mediawiki.jqueryMsg',
 
 					// Browser fullscreen api support:
-					'fullScreenApi',
+					'screenfull',
 
 					// We always end up loading native player
 					'mw.EmbedPlayerNative',
