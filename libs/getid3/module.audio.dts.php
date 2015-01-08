@@ -3,6 +3,7 @@
 /// getID3() by James Heinrich <info@getid3.org>               //
 //  available at http://getid3.sourceforge.net                 //
 //            or http://www.getid3.org                         //
+//          also https://github.com/JamesHeinrich/getID3       //
 /////////////////////////////////////////////////////////////////
 // See readme.txt for more details                             //
 /////////////////////////////////////////////////////////////////
@@ -17,24 +18,23 @@
 /**
 * @tutorial http://wiki.multimedia.cx/index.php?title=DTS
 */
-
 class getid3_dts extends getid3_handler
 {
 	/**
 	* Default DTS syncword used in native .cpt or .dts formats
 	*/
-	const syncword = "\x7F\xFE\x80\x01";
+    const syncword = "\x7F\xFE\x80\x01";
 
 	private $readBinDataOffset = 0;
 
-	/**
-	* Possible syncwords indicating bitstream encoding
-	*/
-	public static $syncwords = array(
-		0 => "\x7F\xFE\x80\x01",  // raw big-endian
-		1 => "\xFE\x7F\x01\x80",  // raw little-endian
-		2 => "\x1F\xFF\xE8\x00",  // 14-bit big-endian
-		3 => "\xFF\x1F\x00\xE8"); // 14-bit little-endian
+    /**
+    * Possible syncwords indicating bitstream encoding
+    */
+    public static $syncwords = array(
+    	0 => "\x7F\xFE\x80\x01",  // raw big-endian
+    	1 => "\xFE\x7F\x01\x80",  // raw little-endian
+    	2 => "\x1F\xFF\xE8\x00",  // 14-bit big-endian
+    	3 => "\xFF\x1F\x00\xE8"); // 14-bit little-endian
 
 	public function Analyze() {
 		$info = &$this->getid3->info;
@@ -45,18 +45,18 @@ class getid3_dts extends getid3_handler
 
 		// check syncword
 		$sync = substr($DTSheader, 0, 4);
-		if (($encoding = array_search($sync, self::$syncwords)) !== false) {
+        if (($encoding = array_search($sync, self::$syncwords)) !== false) {
 
-			$info['dts']['raw']['magic'] = $sync;
+        	$info['dts']['raw']['magic'] = $sync;
 			$this->readBinDataOffset = 32;
 
-		} elseif ($this->isDependencyFor('matroska')) {
+        } elseif ($this->isDependencyFor('matroska')) {
 
 			// Matroska contains DTS without syncword encoded as raw big-endian format
 			$encoding = 0;
 			$this->readBinDataOffset = 0;
 
-		} else {
+        } else {
 
 			unset($info['fileformat']);
 			return $this->error('Expecting "'.implode('| ', array_map('getid3_lib::PrintHexBytes', self::$syncwords)).'" at offset '.$info['avdataoffset'].', found "'.getid3_lib::PrintHexBytes($sync).'"');
