@@ -80,7 +80,7 @@ class ID3Handler extends TimedMediaHandler {
 	 */
 	function getLength( $file ) {
 		$metadata = $this->unpackMetadata( $file->getMetadata() );
-		if ( !$metadata || isset( $metadata['error'] ) ) {
+		if ( !$metadata || isset( $metadata['error'] ) || !isset( $metadata['playtime_seconds'] ) ) {
 			return 0;
 		} else {
 			return $metadata['playtime_seconds'];
