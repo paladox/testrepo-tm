@@ -382,10 +382,8 @@ class WebVideoTranscodeJob extends Job {
 		$this->output( "Running cmd: \n\n" .$cmd . "\n" );
 
 		// Right before we output remove the old file
-		wfProfileIn( 'ffmpeg_encode' );
 		$retval = 0;
 		$shellOutput = $this->runShellExec( $cmd, $retval );
-		wfProfileOut( 'ffmpeg_encode' );
 
 		if( $retval != 0 ){
 			return $cmd .
@@ -668,10 +666,8 @@ class WebVideoTranscodeJob extends Job {
 
 		$this->output( "Running cmd: \n\n" .$cmd . "\n" );
 
-		wfProfileIn( 'ffmpeg2theora_encode' );
 		$retval = 0;
 		$shellOutput = $this->runShellExec( $cmd, $retval );
-		wfProfileOut( 'ffmpeg2theora_encode' );
 
 		// ffmpeg2theora returns 0 status on some errors, so also check for file
 		if( $retval != 0 || !is_file( $outputFile ) || filesize( $outputFile ) === 0 ){
@@ -691,7 +687,7 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $retval String, refrence variable to return the exit code
 	 * @return string
 	 */
-	public function runShellExec( $cmd, &$retval){
+	public function runShellExec( $cmd, &$retval ){
 		global $wgTranscodeBackgroundTimeLimit,
 			$wgTranscodeBackgroundMemoryLimit,
 			$wgTranscodeBackgroundSizeLimit,
@@ -704,7 +700,8 @@ class WebVideoTranscodeJob extends Job {
 				"memory" => $wgTranscodeBackgroundMemoryLimit,
 				"time" => $wgTranscodeBackgroundTimeLimit
 			);
-			return wfShellExec( $cmd . ' 2>&1', $retval , array(), $limits );
+			return wfShellExec( $cmd . ' 2>&1', $retval , array(), $limits,
+				array( 'profileMethod' => wfGetCaller() ) );
 		}
 
 		$encodingLog = $this->getTargetEncodePath() . '.stdout.log';
