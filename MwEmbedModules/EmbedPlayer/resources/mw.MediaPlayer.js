@@ -42,9 +42,25 @@ mw.MediaPlayer.prototype = {
 	 *     unsupported
 	 */
 	supportsMIMEType: function( type ) {
-		for ( var i = 0; i < this.supportedTypes.length; i++ ) {
-			if ( this.supportedTypes[i] == type )
+		var baseType = type.replace( /;.*$/, '' ),
+			codecs = type.match( /codecs="([^"]*)"|codecs=([^\s;=]*)/ ),
+			codecArray = [];
+
+		if ( codecs && ( codecs[1] || codecs[1] ) ) {
+			codecArray = codecs[codecs[1] ? 1 : 2].split( /,\s*/ );
+		}
+
+		outer: for ( var i = 0; i < this.supportedTypes.length; i++ ) {
+			if ( this.supportedTypes[i].indexOf( baseType ) === 0 ) {
+				for ( var j = 0; j < codecArray.length; j++ ) {
+					// If it advertises supporting video/webm; codecs="vp8, vorbis"
+					// and we have a video/webm; codecs="vp8", we still want to return true.
+					if ( !this.supportedTypes[i].match( new RegExp( 'codecs[^;]*[=",\\s]' + codecArray[j] + '([",]|$)' ) ) ) {
+						continue outer;
+					}
+				}
 				return true;
+			}
 		}
 		return false;
 	},
