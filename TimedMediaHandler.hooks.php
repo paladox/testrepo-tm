@@ -62,6 +62,9 @@ class TimedMediaHandlerHooks {
 
 		// Add the PopUpMediaTransform module ( specific to timedMedia handler ( no support in mwEmbed modules )
 		$wgResourceModules+= array(
+			'ext.tmh.thumbnail.styles' => $baseExtensionResource + array(
+				'styles' => 'resources/ext.tmh.thumbnail.css',
+			),
 			'mw.PopUpMediaTransform' => $baseExtensionResource + array(
 				'scripts' => 'resources/mw.PopUpThumbVideo.js',
 				'styles' => 'resources/PopUpThumbVideo.css',
@@ -177,6 +180,7 @@ class TimedMediaHandlerHooks {
 	public static function onImageOpenShowImageInlineBefore( $imagePage, $out ) {
 		$handler = $imagePage->getDisplayedFile()->getHandler();
 		if ( $handler !== false && $handler instanceof TimedMediaHandler ) {
+			$out->addModuleStyles( 'ext.tmh.thumbnail.styles' );
 			$out->addModules( array(
 				'mw.TimedText.loader',
 				'mw.MediaWikiPlayer.loader',
@@ -416,6 +420,7 @@ class TimedMediaHandlerHooks {
 		}
 
 		if ( $addModules ) {
+			$out->addModuleStyles( 'ext.tmh.thumbnail.styles' );
 			$out->addModules( array(
 				'mw.TimedText.loader',
 				'mw.MediaWikiPlayer.loader',
