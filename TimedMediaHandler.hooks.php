@@ -63,6 +63,7 @@ class TimedMediaHandlerHooks {
 		// Add the PopUpMediaTransform module ( specific to timedMedia handler ( no support in mwEmbed modules )
 		$wgResourceModules+= array(
 			'mw.PopUpMediaTransform' => $baseExtensionResource + array(
+				'position' => 'top',
 				'scripts' => 'resources/mw.PopUpThumbVideo.js',
 				'styles' => 'resources/PopUpThumbVideo.css',
 				'dependencies' => array( 'mw.MwEmbedSupport', 'mediawiki.Title' ),
