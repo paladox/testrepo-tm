@@ -64,6 +64,10 @@ class TimedMediaHandlerHooks {
 		$wgResourceModules+= array(
 			'mw.PopUpMediaTransform' => $baseExtensionResource + array(
 				'scripts' => 'resources/mw.PopUpThumbVideo.js',
+				'dependencies' => array( 'mw.MwEmbedSupport', 'mediawiki.Title' ),
+			),
+			'mw.PopUpMediaTransform.styles' => $baseExtensionResource + array(
+				'position' => 'top',
 				'styles' => 'resources/PopUpThumbVideo.css',
 				'dependencies' => array( 'mw.MwEmbedSupport', 'mediawiki.Title' ),
 			),
@@ -405,7 +409,7 @@ class TimedMediaHandlerHooks {
 
 		if ( $addModules ) {
 			$out->addModuleScripts( 'mw.PopUpMediaTransform' );
-			$out->addModuleStyles( 'mw.PopUpMediaTransform' );
+			$out->addModuleStyles( 'mw.PopUpMediaTransform.styles' );
 		}
 
 		return true;
