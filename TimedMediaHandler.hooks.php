@@ -8,8 +8,9 @@
  */
 
 class TimedMediaHandlerHooks {
+
 	// Register TimedMediaHandler Hooks
-	static function register(){
+	public static function register(){
 		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue,
 		$wgMediaHandlers, $wgResourceModules, $wgExcludeFromThumbnailPurge, $wgExtraNamespaces,
 		$wgParserOutputHooks, $wgTimedTextNS, $wgFileExtensions, $wgTmhEnableMp4Uploads,
@@ -56,8 +57,8 @@ class TimedMediaHandlerHooks {
 		$wgJobTypesExcludedFromDefaultQueue[] = 'webVideoTranscode';
 
 		$baseExtensionResource = array(
-			'localBasePath' => __DIR__,
-			'remoteExtPath' => 'TimedMediaHandler',
+			'localBasePath' => __DIR__ . '/../',
+			'remoteExtPath' => 'TimedMediaHandler/',
 		);
 
 		// Add the PopUpMediaTransform module ( specific to timedMedia handler ( no support in mwEmbed modules )
