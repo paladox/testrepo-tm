@@ -8,8 +8,39 @@
  */
 
 class TimedMediaHandlerHooks {
+
+	public static function registerExtension() {
+		global $wgGroupPermissions, $wgFFmpeg2theoraLocation, $wgOggThumbLocation, $wgFFmpegLocation,
+		$wgFileExtensions, $wgTmhFileExtensions;
+
+		// Which users can restart failed or expired transcode jobs:
+		$wgGroupPermissions['sysop']['transcode-reset'] = true;
+		$wgGroupPermissions['autoconfirmed']['transcode-reset'] = true;
+
+		// Which users can see Special:TimedMediaHandler
+		$wgGroupPermissions['sysop']['transcode-status'] = true;
+
+		// The location of ffmpeg2theora (transcoding)
+		// Set to false to use avconv/ffmpeg to produce Ogg Theora transcodes instead;
+		// beware this will disable Ogg skeleton metadata generation.
+		$wgFFmpeg2theoraLocation = '/usr/bin/ffmpeg2theora';
+
+		// Location of oggThumb binary ( used instead of ffmpeg )
+		$wgOggThumbLocation = '/usr/bin/oggThumb';
+
+		// Location of the avconv/ffmpeg binary (used to encode WebM and for thumbnails)
+		$wgFFmpegLocation = '/usr/bin/avconv';
+
+		// List of extensions handled by Timed Media Handler since its referenced in a few places.
+		// you should not modify this variable
+
+		$wgTmhFileExtensions = array( 'ogg', 'ogv', 'oga', 'flac', 'wav', 'webm', 'mp4' );
+
+		$wgFileExtensions = array_merge( $wgFileExtensions, $wgTmhFileExtensions );
+	}
+
 	// Register TimedMediaHandler Hooks
-	static function register(){
+	public static function register(){
 		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue,
 		$wgMediaHandlers, $wgResourceModules, $wgExcludeFromThumbnailPurge, $wgExtraNamespaces,
 		$wgParserOutputHooks, $wgTimedTextNS, $wgFileExtensions, $wgTmhEnableMp4Uploads,
