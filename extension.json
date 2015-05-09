@@ -1,0 +1,123 @@
+{
+	"name": "TimedMediaHandler",
+	"namemsg": "timedmediahandler-extensionname",
+	"version": "0.4.0",
+	"author": [
+		"Michael Dale",
+		"Tim Starling",
+		"James Heinrich",
+		"Jan Gerber",
+		"Brion Vibber"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:TimedMediaHandler",
+	"descriptionmsg": "'timedmediahandler-desc",
+	"type": "media",
+	"license-name": "GPL-2.0+",
+	"callback": "TimedMediaHandlerHooks::registerExtension",
+	"@doc": "Read README.md for all comments.",
+	"AvailableRights": [
+		"transcode-reset",
+		"transcode-status"
+	],
+	"ExtensionFunctions": [
+		"TimedMediaHandlerHooks::register"
+	],
+	"SpecialPages": {
+		"OrphanedTimedText": "SpecialOrphanedTimedText",
+		"TimedMediaHandler": "SpecialTimedMediaHandler"
+	},
+	"APIModules": {
+		"transcodereset": "ApiTranscodeReset"
+	},
+	"APIPropModules": {
+		"videoinfo": "ApiQueryVideoInfo",
+		"transcodestatus": "ApiTranscodeStatus"
+	},
+	"MessagesDirs": {
+		"TimedMediaHandler": [
+			"i18n"
+		],
+		"MwEmbed.EmbedPlayer": [
+			"MwEmbedModules/EmbedPlayer/i18n"
+		],
+		"MwEmbed.TimedText": [
+			"MwEmbedModules/TimedText/i18n"
+		]
+	},
+	"ExtensionMessagesFiles": {
+		"TimedMediaHandlerMagic": "TimedMediaHandler.i18n.magic.php",
+		"TimedMediaHandlerAliases": "TimedMediaHandler.i18n.alias.php"
+	},
+	"AutoloadClasses": {
+		"WebVideoTranscode": "WebVideoTranscode/WebVideoTranscode.php",
+		"TimedMediaHandler": "TimedMediaHandler_body.php",
+		"TimedMediaHandlerHooks": "TimedMediaHandler.hooks.php",
+		"TimedMediaTransformOutput": "TimedMediaTransformOutput.php",
+		"TimedMediaIframeOutput": "TimedMediaIframeOutput.php",
+		"TimedMediaThumbnail": "TimedMediaThumbnail.php",
+		"TranscodeStatusTable": "TranscodeStatusTable.php",
+		"ApiTestCaseVideoUpload": "tests/phpunit/ApiTestCaseVideoUpload.php",
+		"OggHandlerTMH": "handlers/OggHandler/OggHandler.php",
+		"OggException": "handlers/OggHandler/OggException.php",
+		"File_Ogg": "handlers/OggHandler/File_Ogg/File/Ogg.php",
+		"File_Ogg_Bitstream": "handlers/OggHandler/File_Ogg/File/Ogg/Bitstream.php",
+		"File_Ogg_Flac": "handlers/OggHandler/File_Ogg/File/Ogg/Flac.php",
+		"File_Ogg_Media": "handlers/OggHandler/File_Ogg/File/Ogg/Media.php",
+		"File_Ogg_Opus": "handlers/OggHandler/File_Ogg/File/Ogg/Opus.php",
+		"File_Ogg_Speex": "handlers/OggHandler/File_Ogg/File/Ogg/Speex.php",
+		"File_Ogg_Theora": "handlers/OggHandler/File_Ogg/File/Ogg/Theora.php",
+		"File_Ogg_Vorbis": "handlers/OggHandler/File_Ogg/File/Ogg/Vorbis.php",
+		"getID3": "libs/getid3/getid3.php",
+		"getid3_exception": "libs/getid3/getid3.php",
+		"getid3_handler": "libs/getid3/getid3.php",
+		"ID3Handler": "handlers/ID3Handler/ID3Handler.php",
+		"Mp4Handler": "handlers/Mp4Handler/Mp4Handler.php",
+		"WebMHandler": "handlers/WebMHandler/WebMHandler.php",
+		"FLACHandler": "handlers/FLACHandler/FLACHandler.php",
+		"WAVHandler": "handlers/WAVHandler/WAVHandler.php",
+		"ForeignApiQueryAllPages": "handlers/TextHandler/TextHandler.php",
+		"TextHandler": "handlers/TextHandler/TextHandler.php",
+		"TimedTextPage": "TimedTextPage.php",
+		"WebVideoTranscodeJob": "WebVideoTranscode/WebVideoTranscodeJob.php",
+		"ApiQueryVideoInfo": "ApiQueryVideoInfo.php",
+		"ApiTranscodeStatus": "ApiTranscodeStatus.php",
+		"ApiTranscodeReset": "ApiTranscodeReset.php",
+		"SpecialTimedMediaHandler": "SpecialTimedMediaHandler.php",
+		"SpecialOrphanedTimedText": "SpecialOrphanedTimedText.php"
+	},
+	"config": {
+		"MwEmbedModuleConfig": {
+			"EmbedPlayer.DirectFileLinkWarning": true,
+			"EmbedPlayer.EnableOptionsMenu": true,
+			"EmbedPlayer.DisableHTML5FlashFallback": true,
+			"TimedText.ShowInterface": "always",
+			"TimedText.ShowAddTextLink": true
+		},
+		"WaitTimeForTranscodeReset": 3600,
+		"MinimumVideoPlayerSize": 200,
+		"MediaVideoTypes": [
+			"Theora",
+			"VP8"
+		],
+		"MediaAudioTypes": [
+			"Vorbis",
+			"Speex",
+			"FLAC",
+			"Opus"
+		],
+		"VideoPlayerSkinModule": "mw.PlayerSkinKskin",
+		"EnableIframeEmbed": true,
+		"EnableTranscode": true,
+		"EnableNiceBackgroundTranscodeJobs": false,
+		"TranscodeBackgroundPriority": 19,
+		"TranscodeBackgroundTimeLimit": 28800,
+		"TranscodeBackgroundMemoryLimit": 2097152,
+		"TranscodeBackgroundSizeLimit": 3145728,
+		"FFmpegThreads": 1,
+		"TimedTextNS": 710,
+		"EnableLocalTimedText": true,
+		"TmhEnableMp4Uploads": false,
+		"TmhTheoraTwoPassEncoding": false
+	},
+	"manifest_version": 1
+}
