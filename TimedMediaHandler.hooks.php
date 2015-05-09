@@ -8,6 +8,54 @@
  */
 
 class TimedMediaHandlerHooks {
+
+	/**
+	 * Executed after processing extension.json
+	 */
+	public static function registerExtension() {
+		global $wgGroupPermissions, $wgFileExtensions, $wgTmhFileExtensions, $wgEnabledTranscodeSet,
+		$wgEnabledAudioTranscodeSet;
+
+		// Which users can restart failed or expired transcode jobs:
+		$wgGroupPermissions['sysop']['transcode-reset'] = true;
+		$wgGroupPermissions['autoconfirmed']['transcode-reset'] = true;
+
+		// Which users can see Special:TimedMediaHandler
+		$wgGroupPermissions['sysop']['transcode-status'] = true;
+
+		// List of file extensions handled by Timed Media Handler since its referenced in
+		// a few places. You should not modify this variable.
+		$wgTmhFileExtensions = array( 'ogg', 'ogv', 'oga', 'flac', 'wav', 'webm', 'mp4' );
+
+		$wgFileExtensions = array_merge( $wgFileExtensions, $wgTmhFileExtensions );
+
+		/**
+		 * Default enabled transcodes
+		 *
+		 * -If set to empty array, no derivatives will be created
+		 * -Derivative keys encode settings are defined in WebVideoTranscode.php
+		 *
+		 * -These transcodes are *in addition to* the source file.
+		 * -Only derivatives with smaller width than the source asset size will be created
+		 * -Regardless of source size at least one WebM and Ogg source will be created from the $wgEnabledTranscodeSet
+		 * -Derivative jobs are added to the MediaWiki JobQueue the first time the asset is displayed
+		 * -Derivative should be listed min to max
+		 */
+
+		$wgEnabledAudioTranscodeSet = array(
+			WebVideoTranscode::ENC_OGG_VORBIS,
+
+			//opus support must be available in avconv
+			//WebVideoTranscode::ENC_OGG_OPUS,
+
+			//avconv needs libmp3lame support
+			//WebVideoTranscode::ENC_MP3,
+
+			//avconv needs libvo_aacenc support
+			//WebVideoTranscode::ENC_AAC,
+		);
+	}
+
 	// Register TimedMediaHandler Hooks
 	public static function register(){
 		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue,
