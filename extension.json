@@ -1,0 +1,296 @@
+{
+	"name": "TimedMediaHandler",
+	"namemsg": "timedmediahandler-extensionname",
+	"version": "0.6.0",
+	"author": [
+		"Michael Dale",
+		"Tim Starling",
+		"James Heinrich",
+		"Jan Gerber",
+		"Brion Vibber",
+		"Derk-Jan Hartman"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:TimedMediaHandler",
+	"descriptionmsg": "timedmediahandler-desc",
+	"type": "media",
+	"license-name": "GPL-2.0+",
+	"callback": "TimedMediaHandlerHooks::registerExtension",
+	"@doc": "Read README.md for all comments.",
+	"GroupPermissions": {
+		"autoconfirmed": {
+			"transcode-reset": true
+		},
+		"sysop": {
+			"transcode-reset": true,
+			"transcode-status": true
+		}
+	},
+	"AvailableRights": [
+		"transcode-reset",
+		"transcode-status"
+	],
+	"ExtensionFunctions": [
+		"TimedMediaHandlerHooks::register"
+	],
+	"SpecialPages": {
+		"OrphanedTimedText": "SpecialOrphanedTimedText",
+		"TimedMediaHandler": "SpecialTimedMediaHandler"
+	},
+	"APIModules": {
+		"transcodereset": "ApiTranscodeReset"
+	},
+	"APIPropModules": {
+		"videoinfo": "ApiQueryVideoInfo",
+		"transcodestatus": "ApiTranscodeStatus"
+	},
+	"MessagesDirs": {
+		"TimedMediaHandler": [
+			"i18n"
+		],
+		"MwEmbed.EmbedPlayer": [
+			"MwEmbedModules/EmbedPlayer/i18n"
+		],
+		"MwEmbed.TimedText": [
+			"MwEmbedModules/TimedText/i18n"
+		]
+	},
+	"ExtensionMessagesFiles": {
+		"TimedMediaHandlerMagic": "TimedMediaHandler.i18n.magic.php",
+		"TimedMediaHandlerAliases": "TimedMediaHandler.i18n.alias.php"
+	},
+	"AutoloadClasses": {
+		"WebVideoTranscode": "WebVideoTranscode/WebVideoTranscode.php",
+		"TimedMediaHandler": "TimedMediaHandler_body.php",
+		"TimedMediaHandlerHooks": "TimedMediaHandler.hooks.php",
+		"TimedMediaTransformOutput": "TimedMediaTransformOutput.php",
+		"TimedMediaIframeOutput": "TimedMediaIframeOutput.php",
+		"TimedMediaThumbnail": "TimedMediaThumbnail.php",
+		"TranscodeStatusTable": "TranscodeStatusTable.php",
+		"ApiTestCaseVideoUpload": "tests/phpunit/ApiTestCaseVideoUpload.php",
+		"OggHandlerTMH": "handlers/OggHandler/OggHandler.php",
+		"OggException": "handlers/OggHandler/OggException.php",
+		"File_Ogg": "handlers/OggHandler/File_Ogg/File/Ogg.php",
+		"File_Ogg_Bitstream": "handlers/OggHandler/File_Ogg/File/Ogg/Bitstream.php",
+		"File_Ogg_Flac": "handlers/OggHandler/File_Ogg/File/Ogg/Flac.php",
+		"File_Ogg_Media": "handlers/OggHandler/File_Ogg/File/Ogg/Media.php",
+		"File_Ogg_Opus": "handlers/OggHandler/File_Ogg/File/Ogg/Opus.php",
+		"File_Ogg_Speex": "handlers/OggHandler/File_Ogg/File/Ogg/Speex.php",
+		"File_Ogg_Theora": "handlers/OggHandler/File_Ogg/File/Ogg/Theora.php",
+		"File_Ogg_Vorbis": "handlers/OggHandler/File_Ogg/File/Ogg/Vorbis.php",
+		"getID3": "libs/getid3/getid3.php",
+		"getid3_exception": "libs/getid3/getid3.php",
+		"getid3_handler": "libs/getid3/getid3.php",
+		"ID3Handler": "handlers/ID3Handler/ID3Handler.php",
+		"Mp4Handler": "handlers/Mp4Handler/Mp4Handler.php",
+		"WebMHandler": "handlers/WebMHandler/WebMHandler.php",
+		"FLACHandler": "handlers/FLACHandler/FLACHandler.php",
+		"WAVHandler": "handlers/WAVHandler/WAVHandler.php",
+		"ForeignApiQueryAllPages": "handlers/TextHandler/TextHandler.php",
+		"TextHandler": "handlers/TextHandler/TextHandler.php",
+		"TimedTextPage": "TimedTextPage.php",
+		"WebVideoTranscodeJob": "WebVideoTranscode/WebVideoTranscodeJob.php",
+		"ApiQueryVideoInfo": "ApiQueryVideoInfo.php",
+		"ApiTranscodeStatus": "ApiTranscodeStatus.php",
+		"ApiTranscodeReset": "ApiTranscodeReset.php",
+		"SpecialTimedMediaHandler": "SpecialTimedMediaHandler.php",
+		"SpecialOrphanedTimedText": "SpecialOrphanedTimedText.php"
+	},
+	"ParserTestFiles": [
+		"tests/parserTests.txt"
+	],
+	"Hooks": {
+		"CanonicalNamespaces": [
+			"TimedMediaHandlerHooks::addCanonicalNamespaces"
+		],
+		"ResourceLoaderRegisterModules": [
+			"TimedMediaHandlerHooks::resourceLoaderRegisterModules"
+		]
+	},
+	"config": {
+		"TmhWebPlayer": {
+			"value": "mwembed"
+		},
+		"MwEmbedModuleConfig": {
+			"value": {
+				"EmbedPlayer.DirectFileLinkWarning": true,
+				"EmbedPlayer.EnableOptionsMenu": true,
+				"EmbedPlayer.DisableHTML5FlashFallback": true,
+				"TimedText.ShowInterface": "always",
+				"TimedText.ShowAddTextLink": true
+			}
+		},
+		"WaitTimeForTranscodeReset": {
+			"value": 3600
+		},
+		"MinimumVideoPlayerSize": {
+			"value": 200
+		},
+		"EnabledTranscodeSet": [],
+		"EnabledAudioTranscodeSet": [],
+		"TMHVideoOGV160p": {
+			"value": true
+		},
+		"TMHVideoOGV240p": {
+			"value": true
+		},
+		"TMHVideoOGV360p": {
+			"value": true
+		},
+		"TMHVideoOGV480p": {
+			"value": true
+		},
+		"TMHVideoOGV720p": {
+			"value": true
+		},
+		"TMHVideoOGV1080p": {
+			"value": true
+		},
+		"TMHVideoWEBM160p": {
+			"value": true
+		},
+		"TMHVideoWEBM240p": {
+			"value": true
+		},
+		"TMHVideoWEBM360p": {
+			"value": true
+		},
+		"TMHVideoWEBM480p": {
+			"value": true
+		},
+		"TMHVideoWEBM720p": {
+			"value": true
+		},
+		"TMHVideoWEBM1080p": {
+			"value": true
+		},
+		"TMHVideoWEBM1440p": {
+			"value": false
+		},
+		"TMHVideoWEBM2160p": {
+			"value": false
+		},
+		"TMHVideoVP9160p": {
+			"value": false
+		},
+		"TMHVideoVP9240p": {
+			"value": false
+		},
+		"TMHVideoVP9360p": {
+			"value": false
+		},
+		"TMHVideoVP9480p": {
+			"value": false
+		},
+		"TMHVideoVP9720p": {
+			"value": false
+		},
+		"TMHVideoVP91080p": {
+			"value": false
+		},
+		"TMHVideoVP91440p": {
+			"value": false
+		},
+		"TMHVideoVP92160p": {
+			"value": false
+		},
+		"TMHVideoH264160p": {
+			"value": false
+		},
+		"TMHVideoH264240p": {
+			"value": false
+		},
+		"TMHVideoH264360p": {
+			"value": false
+		},
+		"TMHVideoH264480p": {
+			"value": false
+		},
+		"TMHVideoH264720p": {
+			"value": false
+		},
+		"TMHVideoH2641080p": {
+			"value": false
+		},
+		"TMHVideoH2641440p": {
+			"value": false
+		},
+		"TMHVideoH2642160p": {
+			"value": false
+		},
+		"TMHAudioOggVorbis": {
+			"value": true
+		},
+		"TMHAudioOggOpus": {
+			"value": false
+		},
+		"TMHAudioMp3": {
+			"value": false
+		},
+		"TMHAudioAcc": {
+			"value": false
+		},
+		"MediaVideoTypes": {
+			"value": [
+				"Theora",
+				"VP8"
+			]
+		},
+		"MediaAudioTypes": {
+			"value": [
+				"Vorbis",
+				"Speex",
+				"FLAC",
+				"Opus"
+			]
+		},
+		"VideoPlayerSkinModule": {
+			"value": "mw.PlayerSkinKskin"
+		},
+		"EnableIframeEmbed": {
+			"value": true
+		},
+		"EnableTranscode": {
+			"value": true
+		},
+		"EnableNiceBackgroundTranscodeJobs": {
+			"value": false
+		},
+		"TranscodeBackgroundPriority": {
+			"value": 19
+		},
+		"TranscodeBackgroundTimeLimit": {
+			"value": 28800
+		},
+		"TranscodeBackgroundMemoryLimit": {
+			"value": 2097152
+		},
+		"TranscodeBackgroundSizeLimit": {
+			"value": 3145728
+		},
+		"FFmpegThreads": {
+			"value": 1
+		},
+		"FFmpeg2theoraLocation": {
+			"value": "/usr/bin/ffmpeg2theora"
+		},
+		"OggThumbLocation": {
+			"value": "/usr/bin/oggThumb"
+		},
+		"FFmpegLocation": {
+			"value": "/usr/bin/avconv"
+		},
+		"TimedTextNS": {
+			"value": 710
+		},
+		"EnableLocalTimedText": {
+			"value": true
+		},
+		"TmhEnableMp4Uploads": {
+			"value": false
+		},
+		"TmhTheoraTwoPassEncoding": {
+			"value": false
+		}
+	},
+	"manifest_version": 2
+}
