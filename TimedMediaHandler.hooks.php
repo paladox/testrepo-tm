@@ -8,6 +8,14 @@
  */
 
 class TimedMediaHandlerHooks {
+
+	public static function registerExtension() {
+		ini_set( 'include_path',
+			__DIR__ . "/handlers/OggHandler/PEAR/File_Ogg" .
+			PATH_SEPARATOR .
+			ini_get( 'include_path' ) );
+	}
+
 	// Register TimedMediaHandler Hooks
 	static function register(){
 		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue,
