@@ -9,6 +9,193 @@
 
 class TimedMediaHandlerHooks {
 
+	/**
+	 * Executed after processing extension.json
+	 */
+	public static function registerExtension() {
+		global $wgFileExtensions, $wgTmhFileExtensions, $wgEnabledTranscodeSet,
+			$wgEnabledAudioTranscodeSet;
+
+		global $wgTMHVideoOGV160p, $wgTMHVideoOGV240p, $wgTMHVideoOGV360p,
+			$wgTMHVideoOGV480p, $wgTMHVideoOGV720p, $wgTMHVideoOGV1080p;
+
+		global $wgTMHVideoWEBM160p, $wgTMHVideoWEBM240p, $wgTMHVideoWEBM360p,
+			$wgTMHVideoWEBM480p, $wgTMHVideoWEBM720p, $wgTMHVideoWEBM1080p,
+			$wgTMHVideoWEBM1440p, $wgTMHVideoWEBM2160p;
+
+		global $wgTMHVideoVP9160p, $wgTMHVideoVP9240p, $wgTMHVideoVP9360p,
+			$wgTMHVideoVP9480p, $wgTMHVideoVP9720p, $wgTMHVideoVP91080p,
+			$wgTMHVideoVP91440p, $wgTMHVideoVP92160p;
+
+		global $wgTMHVideoH264160p, $wgTMHVideoH264240p, $wgTMHVideoH264360p,
+			$wgTMHVideoH264480p, $wgTMHVideoH264720p, $wgTMHVideoH2641080p,
+			$wgTMHVideoH2641440p, $wgTMHVideoH2642160p;
+
+		global $wgTMHAudioOggVorbis, $wgTMHAudioOggOpus, $wgTMHAudioMp3,
+			$wgTMHAudioAcc;
+
+		// List of file extensions handled by Timed Media Handler since its referenced in
+		// a few places. You should not modify this variable.
+		$wgTmhFileExtensions = [ 'ogg', 'ogv', 'oga', 'flac', 'opus', 'wav', 'webm', 'mp4' ];
+
+		$wgFileExtensions = array_merge( $wgFileExtensions, $wgTmhFileExtensions );
+
+		// OGV transcodes
+		if ( $wgTMHVideoOGV160p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_OGV_160P, ];
+		}
+
+		if ( $wgTMHVideoOGV240p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_OGV_240P, ];
+		}
+
+		if ( $wgTMHVideoOGV360p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_OGV_360P, ];
+		}
+
+		if ( $wgTMHVideoOGV480p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_OGV_480P, ];
+		}
+
+		if ( $wgTMHVideoOGV720p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_OGV_720P, ];
+		}
+
+		if ( $wgTMHVideoOGV1080p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_OGV_1080P, ];
+		}
+
+		// WEBM transcodes
+		if ( $wgTMHVideoWEBM160p == true ) {
+			// WebM VP8/Vorbis
+			// primary free/open video format
+			// supported by Chrome/Firefox/Opera but not Safari/IE/Edge
+
+			// Very low-bitrate web streamable WebM video
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_WEBM_160P, ];
+		}
+
+		if ( $wgTMHVideoWEBM240p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_WEBM_240P, ];
+		}
+
+		if ( $wgTMHVideoWEBM360p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_WEBM_360P, ];
+		}
+
+		if ( $wgTMHVideoWEBM480p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_WEBM_480P, ];
+		}
+
+		if ( $wgTMHVideoWEBM720p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_WEBM_720P, ];
+		}
+
+		if ( $wgTMHVideoWEBM1080p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_WEBM_1080P, ];
+		}
+
+		if ( $wgTMHVideoWEBM1440p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_WEBM_1440P, ];
+		}
+
+		if ( $wgTMHVideoWEBM2160p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_WEBM_2160P, ];
+		}
+
+		// VP9 transcodes
+		if ( $wgTMHVideoVP9160p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_VP9_160P, ];
+		}
+
+		if ( $wgTMHVideoVP9240p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_VP9_240P, ];
+		}
+
+		if ( $wgTMHVideoVP9360p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_VP9_360P, ];
+		}
+
+		if ( $wgTMHVideoVP9480p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_VP9_480P, ];
+		}
+
+		if ( $wgTMHVideoVP9720p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_VP9_720P, ];
+		}
+
+		if ( $wgTMHVideoVP91080p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_VP9_1080P, ];
+		}
+
+		if ( $wgTMHVideoVP91440p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_VP9_1440P, ];
+		}
+
+		if ( $wgTMHVideoVP92160p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_VP9_2160P, ];
+		}
+
+		// H264 transcodes
+		if ( $wgTMHVideoH264160p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_H264_160P, ];
+		}
+
+		if ( $wgTMHVideoH264240p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_H264_240P, ];
+		}
+
+		if ( $wgTMHVideoH264360p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_H264_320P, ];
+		}
+
+		if ( $wgTMHVideoH264480p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_H264_480P, ];
+		}
+
+		if ( $wgTMHVideoH264720p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_H264_720P, ];
+		}
+
+		if ( $wgTMHVideoH2641080p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_H264_1080P, ];
+		}
+
+		if ( $wgTMHVideoH2641440p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_H264_1440P, ];
+		}
+
+		if ( $wgTMHVideoH2642160p == true ) {
+			$wgTMHEnabledVideoTranscodeSet = [ WebVideoTranscode::ENC_H264_2160P, ];
+		}
+
+		if ( $wgTMHAudioOggVorbis == true ) {
+			$wgTMHEnabledAudioTranscodeSet = [ WebVideoTranscode::ENC_OGG_VORBIS, ];
+		}
+
+		if ( $wgTMHAudioOggOpus == true ) {
+			$wgTMHEnabledAudioTranscodeSet = [ WebVideoTranscode::ENC_OGG_OPUS, ];
+		}
+
+		if ( $wgTMHAudioMp3 == true ) {
+			$wgTMHEnabledAudioTranscodeSet = [ WebVideoTranscode::ENC_MP3, ];
+		}
+
+		if ( $wgTMHAudioAcc == true ) {
+			$wgTMHEnabledAudioTranscodeSet = [ WebVideoTranscode::ENC_AAC, ];
+		}
+
+		$wgEnabledTranscodeSet = array_merge(
+			$wgEnabledTranscodeSet,
+			$wgTMHEnabledVideoTranscodeSet
+		);
+
+		$wgEnabledAudioTranscodeSet = array_merge(
+			$wgEnabledAudioTranscodeSet,
+			$wgTMHEnabledAudioTranscodeSet
+		);
+	}
+
 	// Register TimedMediaHandler namespace IDs
 	// These are configurable due to Commons history: T123823
 	// These need to be before registerhooks due to: T123695
