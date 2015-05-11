@@ -39,12 +39,14 @@ class WebVideoTranscode {
 	const ENC_WEBM_480P = '480p.webm';
 	const ENC_WEBM_720P = '720p.webm';
 	const ENC_WEBM_1080P = '1080p.webm';
+	const ENC_WEBM_2160P = '2160p.webm';
 
 	// mp4 profiles:
 	const ENC_H264_320P = '320p.mp4';
 	const ENC_H264_480P = '480p.mp4';
 	const ENC_H264_720P = '720p.mp4';
 	const ENC_H264_1080P = '1080p.mp4';
+	const ENC_H264_2160P = '2160p.mp4';
 
 	const ENC_OGG_VORBIS = 'ogg';
 	const ENC_OGG_OPUS = 'opus';
@@ -203,6 +205,16 @@ class WebVideoTranscode {
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
 
+		WebVideoTranscode::ENC_WEBM_2160P =>
+			 array(
+				'maxSize'                    => '4096x2160',
+				'videoQuality'               => 7,
+				'audioQuality'               => 3,
+				'noUpscaling'                => 'true',
+				'videoCodec'                 => 'vp9',
+				'type'                       => 'video/webm; codecs="vp9, vorbis"',
+			),
+
 		// Losly defined per PCF guide to mp4 profiles:
 		// https://develop.participatoryculture.org/index.php/ConversionMatrix
 		// and apple HLS profile guide:
@@ -248,6 +260,18 @@ class WebVideoTranscode {
 			array(
 				'maxSize' => '1920x1080',
 				'videoCodec' => 'h264',
+				'videoBitrate' => '5000k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '128k',
+				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+			),
+
+		WebVideoTranscode::ENC_H264_2160P =>
+			array(
+				'maxSize' => '4096x2160',
+				'videoCodec' => 'h264',
+				'preset' => '2160p',
 				'videoBitrate' => '5000k',
 				'audioCodec' => 'aac',
 				'channels' => '2',
@@ -556,6 +580,9 @@ class WebVideoTranscode {
 			if( $codec == 'vp8' ){
 				$addWebMFlag = true;
 			}
+			if( $codec == 'vp9' ){
+				$addWebMFlag = true;
+			}
 			if( $codec == 'h264' ){
 				$addH264Flag = true;
 			}
@@ -571,6 +598,10 @@ class WebVideoTranscode {
 					$addOggFlag = true;
 				}
 				if( !$addWebMFlag && self::$derivativeSettings[$transcodeKey]['videoCodec'] == 'vp8' ){
+					self::addSourceIfReady( $file, $sources, $transcodeKey, $options );
+					$addWebMFlag = true;
+				}
+				if( !$addWebMFlag && self::$derivativeSettings[$transcodeKey]['videoCodec'] == 'vp9' ){
 					self::addSourceIfReady( $file, $sources, $transcodeKey, $options );
 					$addWebMFlag = true;
 				}
