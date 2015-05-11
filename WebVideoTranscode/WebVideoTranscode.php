@@ -39,12 +39,14 @@ class WebVideoTranscode {
 	const ENC_WEBM_480P = '480p.webm';
 	const ENC_WEBM_720P = '720p.webm';
 	const ENC_WEBM_1080P = '1080p.webm';
+	const ENC_WEBM_4320P = '4320p.webm';
 
 	// mp4 profiles:
 	const ENC_H264_320P = '320p.mp4';
 	const ENC_H264_480P = '480p.mp4';
 	const ENC_H264_720P = '720p.mp4';
 	const ENC_H264_1080P = '1080p.mp4';
+	const ENC_H264_4320P = '4320p.mp4';
 
 	const ENC_OGG_VORBIS = 'ogg';
 	const ENC_OGG_OPUS = 'opus';
@@ -203,6 +205,16 @@ class WebVideoTranscode {
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
 
+		WebVideoTranscode::ENC_WEBM_4320P =>
+			 array(
+				'maxSize'                    => '7680x4320',
+				'videoQuality'               => 7,
+				'audioQuality'               => 3,
+				'noUpscaling'                => 'true',
+				'videoCodec'                 => 'vp9',
+				'type'                       => 'video/webm; codecs="vp8, vorbis"',
+			),
+
 		// Losly defined per PCF guide to mp4 profiles:
 		// https://develop.participatoryculture.org/index.php/ConversionMatrix
 		// and apple HLS profile guide:
@@ -248,6 +260,18 @@ class WebVideoTranscode {
 			array(
 				'maxSize' => '1920x1080',
 				'videoCodec' => 'h264',
+				'videoBitrate' => '5000k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '128k',
+				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+			),
+
+		WebVideoTranscode::ENC_H264_4320P =>
+			array(
+				'maxSize' => '7680x4320',
+				'videoCodec' => 'h264',
+				'preset' => '4320p',
 				'videoBitrate' => '5000k',
 				'audioCodec' => 'aac',
 				'channels' => '2',
