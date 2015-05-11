@@ -142,6 +142,9 @@ $wgEnabledTranscodeSet = array(
 
 	// A full-HD high quality WebM stream
 	WebVideoTranscode::ENC_WEBM_1080P,
+
+	// A 4K full high quality WebM stream
+	WebVideoTranscode::ENC_WEBM_2160p,
 /*
 	// A least common denominator h.264 stream; first gen iPhone, iPods, early android etc.
 	WebVideoTranscode::ENC_H264_320P,
@@ -154,6 +157,9 @@ $wgEnabledTranscodeSet = array(
 
 	// A full-HD high quality stream; higher end phones, tablets, smart tvs
 	WebVideoTranscode::ENC_H264_1080P,
+
+	// A 4K high quality stream; higher end phones, tablets, smart tvs
+	WebVideoTranscode::ENC_H264_2160P,
 */
 );
 
