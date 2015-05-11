@@ -55,7 +55,7 @@ $wgWaitTimeForTranscodeReset = 3600;
 $wgMinimumVideoPlayerSize = 200;
 
 // Set the supported ogg codecs:
-$wgMediaVideoTypes = array( 'Theora', 'VP8' );
+$wgMediaVideoTypes = array( 'Theora', 'VP8', 'VP9' );
 $wgMediaAudioTypes = array( 'Vorbis', 'Speex', 'FLAC', 'Opus' );
 
 // Default skin for mwEmbed player
@@ -145,6 +145,9 @@ $wgEnabledTranscodeSet = array(
 	// A full-HD high quality WebM stream
 	WebVideoTranscode::ENC_WEBM_1080P,
 
+	// A 4K full high quality WebM stream
+	// WebVideoTranscode::ENC_WEBM_2160P,
+
 
 	// Ogg Theora/Vorbis
 	// Fallback for Safari/IE/Edge with ogv.js
@@ -182,6 +185,9 @@ $wgEnabledTranscodeSet = array(
 
 	// A full-HD high quality stream; higher end phones, tablets, smart tvs
 	WebVideoTranscode::ENC_H264_1080P,
+
+	// A 4K high quality stream; higher end phones, tablets, smart tvs
+	WebVideoTranscode::ENC_H264_2160P,
 */
 );
 
