@@ -140,8 +140,8 @@ class WebVideoTranscode {
 				'twopass'                    => 'true',
 				'keyframeInterval'           => '128',
 				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				'videoCodec'                 => array('vp8', 'vp9'),
+				'type'                       => 'video/webm; codecs="vp8, vp9, vorbis"',
 			),
 		WebVideoTranscode::ENC_WEBM_360P =>
 			array(
@@ -153,8 +153,8 @@ class WebVideoTranscode {
 				'twopass'                    => 'true',
 				'keyframeInterval'           => '128',
 				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				'videoCodec'                 => array('vp8', 'vp9'),
+				'type'                       => 'video/webm; codecs="vp8, vp9, vorbis"',
 			),
 		WebVideoTranscode::ENC_WEBM_480P =>
 			array(
@@ -166,8 +166,8 @@ class WebVideoTranscode {
 				'twopass'                    => 'true',
 				'keyframeInterval'           => '128',
 				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				'videoCodec'                 => array('vp8', 'vp9'),
+				'type'                       => 'video/webm; codecs="vp8, vp9, vorbis"',
 			),
 		WebVideoTranscode::ENC_WEBM_720P =>
 			array(
@@ -175,8 +175,8 @@ class WebVideoTranscode {
 				'videoQuality'               => 7,
 				'audioQuality'               => 3,
 				'noUpscaling'                => 'true',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				'videoCodec'                 => array('vp8', 'vp9'),
+				'type'                       => 'video/webm; codecs="vp8, vp9, vorbis"',
 			),
 		WebVideoTranscode::ENC_WEBM_1080P =>
 			 array(
@@ -184,8 +184,8 @@ class WebVideoTranscode {
 				'videoQuality'               => 7,
 				'audioQuality'               => 3,
 				'noUpscaling'                => 'true',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				'videoCodec'                 => array('vp8', 'vp9'),
+				'type'                       => 'video/webm; codecs="vp8, vp9, vorbis"',
 			),
 
 		// Losly defined per PCF guide to mp4 profiles:
