@@ -114,7 +114,7 @@ class WebVideoTranscode {
 				'noUpscaling'                => 'true',
 				'keyframeInterval'           => '128',
 				'videoCodec'                 => 'theora',
-				'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				'type'                       => 'video/ogg; codecs="theora, vorbis, opus"',
 			),
 
 		WebVideoTranscode::ENC_OGV_1080P =>
@@ -125,7 +125,7 @@ class WebVideoTranscode {
 				'noUpscaling'                => 'true',
 				'keyframeInterval'           => '128',
 				'videoCodec'                 => 'theora',
-				'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				'type'                       => 'video/ogg; codecs="theora, vorbis, opus"',
 			),
 
 		// WebM transcode:
