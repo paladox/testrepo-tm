@@ -542,6 +542,9 @@ class WebVideoTranscode {
 			if( $codec == 'vp8' ){
 				$addWebMFlag = true;
 			}
+			if( $codec == 'vp9' ){
+				$addWebMFlag = true;
+			}
 			if( $codec == 'h264' ){
 				$addH264Flag = true;
 			}
@@ -557,6 +560,10 @@ class WebVideoTranscode {
 					$addOggFlag = true;
 				}
 				if( !$addWebMFlag && self::$derivativeSettings[$transcodeKey]['videoCodec'] == 'vp8' ){
+					self::addSourceIfReady( $file, $sources, $transcodeKey, $options );
+					$addWebMFlag = true;
+				}
+				if( !$addWebMFlag && self::$derivativeSettings[$transcodeKey]['videoCodec'] == 'vp9' ){
 					self::addSourceIfReady( $file, $sources, $transcodeKey, $options );
 					$addWebMFlag = true;
 				}
