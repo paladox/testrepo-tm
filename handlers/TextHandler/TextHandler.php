@@ -260,10 +260,10 @@ class TextHandler {
 					'kind' => 'subtitles',
 					'data-mwtitle' => $namespacePrefix . $subTitle->getDBkey(),
 					'data-mwprovider' => $providerName,
-					'type' => $contentType,
+					'type' => $this->getContentType( $timedTextExtension ),
 					// @todo Should eventually add special entry point and output proper WebVTT format:
 					// http://www.whatwg.org/specs/web-apps/current-work/webvtt.html
-					'src' => $this->getFullURL( $page['title'], $contentType ),
+					'src' => $this->getFullURL( $page['title'], $timedTextExtension ),
 					'srclang' =>  $languageKey,
 					'data-dir' => Language::factory( $languageKey )->getDir(),
 					'label' => wfMessage('timedmedia-subtitle-language',
@@ -275,16 +275,17 @@ class TextHandler {
 		return $textTracks;
 	}
 
-	function getContentType( $timedTextExtension ) {
-		if ( $timedTextExtension === 'srt' ) {
+	function getContentType( $subtitleExtension ) {
+		if ( $subtitleExtension === 'srt' ) {
 			return 'text/x-srt';
-		} else if ( $timedTextExtension === 'vtt' ) {
+		} elseif ( $subtitleExtension = 'vtt' ) {
 			return 'text/vtt';
 		}
 		return '';
 	}
 
-	function getFullURL( $pageTitle, $contentType ){
+	function getFullURL( $pageTitle, $contentType, $subtitleExtension ) {
+		$contentType = $this->getContentType( $subtitleExtension );
 		if( $this->file->isLocal() ) {
 			$subTitle =  Title::newFromText( $pageTitle ) ;
 			return $subTitle->getFullURL( array(
