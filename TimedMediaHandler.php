@@ -15,29 +15,9 @@ $wgAvailableRights[] = 'transcode-reset';
 $wgAvailableRights[] = 'transcode-status';
 
 
-
-/*** MwEmbed module configuration: *********************************/
-
-// Path overdie for cortado ( by default its false and uses hard coded paths relative to TMH
+// Path override for cortado ( by default its false and uses hard coded paths relative to TMH
 // or the predefined path on upload server: http://upload.wikimedia.org/jars/cortado.jar
 $wgCortadoJarFile = false;
-
-// Show a warning to the user if they are not using an html5 browser with high quality ogg support
-$wgMwEmbedModuleConfig['EmbedPlayer.DirectFileLinkWarning'] = true;
-
-// Show the options menu:
-$wgMwEmbedModuleConfig['EmbedPlayer.EnableOptionsMenu'] = true;
-
-// TMH needs java ( no h.264 or mp3 derivatives )
-$wgMwEmbedModuleConfig['EmbedPlayer.DisableJava' ] = false;
-$wgMwEmbedModuleConfig['EmbedPlayer.DisableHTML5FlashFallback' ] = true;
-
-// The text interface should always be shown
-// ( even if there are no text tracks for that asset at render time )
-$wgMwEmbedModuleConfig['TimedText.ShowInterface'] = 'always';
-
-// Show the add text link:
-$wgMwEmbedModuleConfig['TimedText.ShowAddTextLink'] = true;
 
 /*** Timed Media Handler configuration ****************************/
 
@@ -57,9 +37,6 @@ $wgMinimumVideoPlayerSize = 200;
 // Set the supported ogg codecs:
 $wgMediaVideoTypes = array( 'Theora', 'VP8' );
 $wgMediaAudioTypes = array( 'Vorbis', 'Speex', 'FLAC', 'Opus' );
-
-// Default skin for mwEmbed player
-$wgVideoPlayerSkinModule = 'mw.PlayerSkinKskin';
 
 // Support iframe for remote embedding
 $wgEnableIframeEmbed = true;
@@ -240,9 +217,6 @@ $wgAPIModules['transcodereset'] = 'ApiTranscodeReset';
 $wgMessagesDirs['TimedMediaHandler'] = __DIR__ . '/i18n';
 $wgExtensionMessagesFiles['TimedMediaHandlerMagic'] = "$timedMediaDir/TimedMediaHandler.i18n.magic.php";
 $wgExtensionMessagesFiles['TimedMediaHandlerAliases'] = "$timedMediaDir/TimedMediaHandler.i18n.alias.php";
-// Inlcude module locationlizations
-$wgMessagesDirs['MwEmbed.EmbedPlayer'] = __DIR__ . '/MwEmbedModules/EmbedPlayer/i18n';
-$wgMessagesDirs['MwEmbed.TimedText'] = __DIR__ . '/MwEmbedModules/TimedText/i18n';
 
 // Special Pages
 $wgAutoloadClasses['SpecialTimedMediaHandler'] = "$timedMediaDir/SpecialTimedMediaHandler.php";
@@ -264,5 +238,5 @@ $wgExtensionCredits['media'][] = array(
 	'author'         => array( 'Michael Dale', 'Tim Starling', 'James Heinrich', 'Jan Gerber' ),
 	'url'            => 'https://www.mediawiki.org/wiki/Extension:TimedMediaHandler',
 	'descriptionmsg' => 'timedmedia-desc',
-	'version'        => '0.4.0',
+	'version'        => '0.5.0',
 );
