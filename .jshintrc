@@ -35,6 +35,7 @@
 	"predef": [
 		"mediaWiki",
 		"mw",
-		"jQuery"
+		"jQuery",
+		"videojs"
 	]
 }

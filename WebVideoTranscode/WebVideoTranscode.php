@@ -796,6 +796,7 @@ class WebVideoTranscode {
 			)->text(),
 			"width" => intval( $file->getWidth() ),
 			"height" => intval( $file->getHeight() ),
+			"res" => intval( $file->getHeight() ),
 		);
 
 		if( $bitrate ){
@@ -849,6 +850,7 @@ class WebVideoTranscode {
 				// eventually we will define a manifest xml entry point.
 				"width" => intval( $width ),
 				"height" => intval( $height ),
+				"res" => intval( $height ),
 			);
 
 		// a "ready" transcode should have a bitrate:
