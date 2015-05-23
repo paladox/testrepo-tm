@@ -6,7 +6,6 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 	// Video file sources object lazy init in getSources()
 	var $sources = null;
 	var $textTracks = null;
-	var $hashTime = null;
 	var $textHandler = null; // lazy init in getTextHandler
 	var $disablecontrols = null;
 
@@ -17,7 +16,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 
 	function __construct( $conf ){
 		$options = array( 'file', 'dstPath', 'sources', 'thumbUrl', 'start', 'end',
-			'width', 'height', 'length', 'offset', 'isVideo', 'path', 'fillwindow',
+			'width', 'height', 'length', 'isVideo', 'path', 'fillwindow',
 			'sources', 'disablecontrols' );
 		foreach ( $options as $key ) {
 			if( isset( $conf[ $key ]) ){
@@ -133,11 +132,11 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			$this->width = $options['override-width'];
 		}
 
-		if ( $this->useImagePopUp() ) {
-			$res = $this->getImagePopUp();
-		} else {
+//		if ( $this->useImagePopUp() ) {
+//			$res = $this->getImagePopUp();
+//		} else {
 			$res = $this->getHtmlMediaTagOutput();
-		}
+//		}
 		$this->width = $oldWidth;
 		$this->height = $oldHeight;
 		return $res;
@@ -368,7 +367,8 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 		global $wgVideoPlayerSkin ;
 		// Normalize values
 		$length = floatval( $this->length  );
-		$offset = floatval( $this->offset );
+		$start = floatval( $this->start );
+		$end = floatval( $this->end );
 
 		$width = $sizeOverride ? $sizeOverride[0] : $this->getPlayerWidth();
 		$height = $sizeOverride ? $sizeOverride[1]: $this->getPlayerHeight();
@@ -379,27 +379,27 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 		if( $this->fillwindow ){
 			$width = '100%';
 			$height = '100%';
-		} else{
-			$width .= 'px';
-			$height .= 'px';
+//		} else{
+//			$width .= 'px';
+//			$height .= 'px';
 		}
 
 		$mediaAttr = array(
 			'id' => self::PLAYER_ID_PREFIX . TimedMediaTransformOutput::$serial++,
-			'style' => "width:{$width}",
+			'width' => $width,
 			// Get the correct size:
 			'poster' => $posterUrl,
 
 			// Note we set controls to true ( for no-js players ) when mwEmbed rewrites the interface
 			// it updates the controls attribute of the embed video
-			'controls'=> 'true',
+			'controls'=> true,
 			// Since we will reload the item with javascript,
 			// tell browser to not load the video before
-			'preload'=>'none',
+			'preload'=>'none'
 		);
 
 		if ( $this->isVideo ) {
-			$mediaAttr['style'] .= ";height:{$height}";
+			$mediaAttr['height'] .= $height;
 		}
 
 		if( $autoPlay === true ){
@@ -407,13 +407,14 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 		}
 
 		// MediaWiki uses the kSkin class
-		$mediaAttr['class'] = 'kskin';
+		$mediaAttr['class'] = 'video-js ' . $wgVideoPlayerSkin;
 
 		if ( $this->file ) {
 			// Custom data-attributes
 			$mediaAttr += array(
 				'data-durationhint' => $length,
-				'data-startoffset' => $offset,
+				'data-start' => $start,
+				'data-end' => $end,
 				'data-mwtitle' => $this->file->getTitle()->getDBkey()
 			);
 
@@ -434,12 +435,9 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			if ( $length ) {
 				$mediaAttr[ 'data-durationhint' ] = $length;
 			}
-			if ( $offset ) {
-				$mediaAttr[ 'data-startoffset' ] = $offset;
-			}
 		}
 		if ( $this->disablecontrols ) {
-			$mediaAttr[ 'data-disablecontrols' ] = $this->disablecontrols;
+			$mediaAttr[ 'controls' ] = false;
 		}
 		return $mediaAttr;
 	}
@@ -452,35 +450,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			// Generate transcode jobs ( and get sources that are already transcoded)
 			// At a minimum this should return the source video file.
 			$this->sources = WebVideoTranscode::getSources( $this->file );
-			// Check if we have "start or end" times and append the temporal url fragment hash
-			foreach( $this->sources as &$source ){
-				$source['src'].= $this->getTemporalUrlHash();
-			}
 		}
 		return $this->sources;
-	}
-
-	function getTemporalUrlHash(){
-		if( $this->hashTime ){
-			return $this->hashTime;
-		}
-		$hash ='';
-		if( $this->start ){
-			$startSec = TimedMediaHandler::parseTimeString( $this->start );
-			if( $startSec !== false ){
-				$hash.= '#t=' . TimedMediaHandler::seconds2npt( $startSec );
-			}
-		}
-		if( $this->end ){
-			if( $hash == '' ){
-				$hash .= '#t=0';
-			}
-			$endSec = TimedMediaHandler::parseTimeString( $this->end );
-			if( $endSec !== false ){
-				$hash.= ',' . TimedMediaHandler::seconds2npt( $endSec );
-			}
-		}
-		$this->hashTime = $hash;
-		return $this->hashTime;
 	}
 }
