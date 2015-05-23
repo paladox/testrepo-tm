@@ -203,9 +203,6 @@ class TimedMediaHandler extends MediaHandler {
 	/**
 	 * Parser output hook only adds the PopUpMediaTransform
 	 *
-	 * The core embedPlayer module is part of a "loaderScript" so it does not need to
-	 * be registered here.
-	 *
 	 * TODO move core loader to on-page script as to not include it on all pages.
 	 *
 	 * @param $outputPage OutputPage
@@ -213,10 +210,8 @@ class TimedMediaHandler extends MediaHandler {
 	 * @param $data
 	 */
 	static function outputHook( $outputPage, $parserOutput, $data ) {
-		// Add the PopUpMediaTransform code
-		$outputPage->addModuleScripts( 'mw.PopUpMediaTransform' );
-		$outputPage->addModuleStyles( 'mw.PopUpMediaTransform' );
-		$outputPage->addModules( 'mw.TMHGalleryHook.js' );
+		// TODO add modules that pages with video need
+		$outputPage->addModules( 'ext.tmh.video-js' );
 	}
 
 	/**

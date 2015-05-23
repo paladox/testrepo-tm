@@ -13,7 +13,7 @@ class TimedMediaHandlerHooks {
 		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue,
 		$wgMediaHandlers, $wgResourceModules, $wgExcludeFromThumbnailPurge, $wgExtraNamespaces,
 		$wgParserOutputHooks, $wgTimedTextNS, $wgFileExtensions, $wgTmhEnableMp4Uploads,
-		$wgExtensionAssetsPath, $wgMwEmbedModuleConfig, $timedMediaDir, $wgCortadoJarFile,
+		$wgExtensionAssetsPath, $timedMediaDir, $wgCortadoJarFile,
 		$wgEnableLocalTimedText, $wgTmhFileExtensions;
 
 		// Remove mp4 if not enabled:
@@ -23,22 +23,6 @@ class TimedMediaHandlerHooks {
 				array_splice( $wgFileExtensions, $index, 1 );
 			}
 		}
-
-		if( !class_exists( 'MwEmbedResourceManager' ) ) {
-			echo "TimedMediaHandler requires the MwEmbedSupport extension.\n";
-			exit( 1 );
-		}
-
-		// Register the Timed Media Handler javascript resources ( MwEmbed modules )
-		MwEmbedResourceManager::register( 'extensions/TimedMediaHandler/MwEmbedModules/EmbedPlayer' );
-		MwEmbedResourceManager::register( 'extensions/TimedMediaHandler/MwEmbedModules/TimedText' );
-
-		// Set the default webPath for this embed player extension
-		$wgMwEmbedModuleConfig['EmbedPlayer.WebPath'] = $wgExtensionAssetsPath .
-			'/' . basename ( $timedMediaDir ) . '/MwEmbedModules/EmbedPlayer';
-
-		// Register java cortado path config:
-		$wgMwEmbedModuleConfig['wgCortadoJarFile'] = $wgCortadoJarFile;
 
 		// Setup media Handlers:
 		$wgMediaHandlers['application/ogg'] = 'OggHandlerTMH';
@@ -62,41 +46,27 @@ class TimedMediaHandlerHooks {
 
 		// Add the PopUpMediaTransform module ( specific to timedMedia handler ( no support in mwEmbed modules )
 		$wgResourceModules+= array(
-			'mw.PopUpMediaTransform' => $baseExtensionResource + array(
-				'scripts' => 'resources/mw.PopUpThumbVideo.js',
-				'styles' => 'resources/PopUpThumbVideo.css',
-				'dependencies' => array( 'mw.MwEmbedSupport', 'mediawiki.Title' ),
+			'ext.tmh.video-js' => $baseExtensionResource + array(
+				'scripts' => 'resources/video-js/video-dev.js',
+				'styles' => 'resources/video-js/video-js.css',
 			),
-			'mw.TMHGalleryHook.js' => $baseExtensionResource + array(
-				'scripts' => 'resources/mw.TMHGalleryHook.js',
-				// position top needed as it needs to load before mediawiki.page.gallery
-				'position' => 'top',
-			),
-			'embedPlayerIframeStyle'=> $baseExtensionResource + array(
-				'styles' => 'resources/embedPlayerIframe.css',
+			'ext.tmh.loader' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.player.js',
+				'dependencies' => array(
+					'ext.tmh.video-js',
+				),
 			),
 			'ext.tmh.transcodetable' => $baseExtensionResource + array(
 				'scripts' => 'resources/ext.tmh.transcodetable.js',
 				'styles' => 'resources/transcodeTable.css',
 				'dependencies' => array(
 					'mediawiki.api.edit',
-					'mw.MwEmbedSupport',
 				),
 				'messages'=> array(
-					'mwe-ok',
-					'mwe-cancel',
 					'timedmedia-reset-error',
 					'timedmedia-reset',
 					'timedmedia-reset-confirm'
 				)
-			),
-			"mw.MediaWikiPlayerSupport" =>  $baseExtensionResource + array(
-				'scripts' => 'resources/mw.MediaWikiPlayerSupport.js',
-				'dependencies'=> 'mw.Api',
-			),
-			// adds support MediaWikiPlayerSupport player bindings
-			"mw.MediaWikiPlayer.loader" =>  $baseExtensionResource + array(
-				'loaderScripts' => 'resources/mw.MediaWikiPlayer.loader.js',
 			),
 		);
 		// Setup a hook for iframe embed handling:
@@ -404,8 +374,8 @@ class TimedMediaHandlerHooks {
 		}
 
 		if ( $addModules ) {
-			$out->addModuleScripts( 'mw.PopUpMediaTransform' );
-			$out->addModuleStyles( 'mw.PopUpMediaTransform' );
+			// TODO
+			$out->addModules( 'ext.tmh.video-js' );
 		}
 
 		return true;
