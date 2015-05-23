@@ -133,11 +133,11 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			$this->width = $options['override-width'];
 		}
 
-		if ( $this->useImagePopUp() ) {
-			$res = $this->getImagePopUp();
-		} else {
+//		if ( $this->useImagePopUp() ) {
+//			$res = $this->getImagePopUp();
+//		} else {
 			$res = $this->getHtmlMediaTagOutput();
-		}
+//		}
 		$this->width = $oldWidth;
 		$this->height = $oldHeight;
 		return $res;
@@ -379,14 +379,14 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 		if( $this->fillwindow ){
 			$width = '100%';
 			$height = '100%';
-		} else{
-			$width .= 'px';
-			$height .= 'px';
+//		} else{
+//			$width .= 'px';
+//			$height .= 'px';
 		}
 
 		$mediaAttr = array(
 			'id' => self::PLAYER_ID_PREFIX . TimedMediaTransformOutput::$serial++,
-			'style' => "width:{$width}",
+			'width' => $width,
 			// Get the correct size:
 			'poster' => $posterUrl,
 
@@ -395,11 +395,11 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			'controls'=> 'true',
 			// Since we will reload the item with javascript,
 			// tell browser to not load the video before
-			'preload'=>'none',
+			'preload'=>'none'
 		);
 
 		if ( $this->isVideo ) {
-			$mediaAttr['style'] .= ";height:{$height}";
+			$mediaAttr['height'] .= $height;
 		}
 
 		if( $autoPlay === true ){
@@ -407,7 +407,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 		}
 
 		// MediaWiki uses the kSkin class
-		$mediaAttr['class'] = 'kskin';
+		$mediaAttr['class'] = 'video-js vjs-default-skin';
 
 		if ( $this->file ) {
 			// Custom data-attributes
