@@ -65,8 +65,10 @@ class TimedMediaIframeOutput {
 		$wgOut->allowClickjacking();
 		$wgOut->disallowUserJs();
 
+
 		$wgOut->addModuleStyles( 'embedPlayerIframeStyle' );
-		$wgOut->addModules( array( 'mw.MediaWikiPlayer.loader', 'ext.tmh.embedPlayerIframe' ) );
+		$wgOut->addModules( array( 'ext.tmh.player' ) );
+
 		$wgOut->sendCacheControl();
 	?>
 <!DOCTYPE html>

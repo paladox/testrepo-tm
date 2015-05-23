@@ -15,9 +15,6 @@ $wgAvailableRights[] = 'transcode-reset';
 $wgAvailableRights[] = 'transcode-status';
 
 
-
-/*** MwEmbed module configuration: *********************************/
-
 // Show a warning to the user if they are not using an html5 browser with high quality ogg support
 $wgMwEmbedModuleConfig['EmbedPlayer.DirectFileLinkWarning'] = true;
 
@@ -51,9 +48,6 @@ $wgMinimumVideoPlayerSize = 200;
 // Set the supported ogg codecs:
 $wgMediaVideoTypes = array( 'Theora', 'VP8' );
 $wgMediaAudioTypes = array( 'Vorbis', 'Speex', 'FLAC', 'Opus' );
-
-// Default skin for mwEmbed player
-$wgVideoPlayerSkinModule = 'mw.PlayerSkinKskin';
 
 // Support iframe for remote embedding
 $wgEnableIframeEmbed = true;
@@ -217,6 +211,8 @@ $wgTmhFileExtensions = array( 'ogg', 'ogv', 'oga', 'flac', 'wav', 'webm', 'mp4' 
 
 $wgFileExtensions = array_merge( $wgFileExtensions, $wgTmhFileExtensions );
 
+$wgVideoPlayerSkin = 'vjs-default-skin';
+
 // Timed Media Handler AutoLoad Classes:
 $wgAutoloadClasses['TimedMediaHandler'] = "$timedMediaDir/TimedMediaHandler_body.php";
 $wgAutoloadClasses['TimedMediaHandlerHooks'] = "$timedMediaDir/TimedMediaHandler.hooks.php";
@@ -279,9 +275,6 @@ $wgAPIModules['transcodereset'] = 'ApiTranscodeReset';
 $wgMessagesDirs['TimedMediaHandler'] = __DIR__ . '/i18n';
 $wgExtensionMessagesFiles['TimedMediaHandlerMagic'] = "$timedMediaDir/TimedMediaHandler.i18n.magic.php";
 $wgExtensionMessagesFiles['TimedMediaHandlerAliases'] = "$timedMediaDir/TimedMediaHandler.i18n.alias.php";
-// Inlcude module locationlizations
-$wgMessagesDirs['MwEmbed.EmbedPlayer'] = __DIR__ . '/MwEmbedModules/EmbedPlayer/i18n';
-$wgMessagesDirs['MwEmbed.TimedText'] = __DIR__ . '/MwEmbedModules/TimedText/i18n';
 
 // Special Pages
 $wgAutoloadClasses['SpecialTimedMediaHandler'] = "$timedMediaDir/SpecialTimedMediaHandler.php";
@@ -304,6 +297,6 @@ $wgExtensionCredits['media'][] = array(
 	'author'         => array( 'Michael Dale', 'Tim Starling', 'James Heinrich', 'Jan Gerber', 'Brion Vibber' ),
 	'url'            => 'https://www.mediawiki.org/wiki/Extension:TimedMediaHandler',
 	'descriptionmsg' => 'timedmediahandler-desc',
-	'version'        => '0.4.0',
+	'version'        => '0.5.0',
 	'license-name'   => 'GPL-2.0+',
 );

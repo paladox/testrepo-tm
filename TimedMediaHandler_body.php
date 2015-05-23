@@ -201,15 +201,16 @@ class TimedMediaHandler extends MediaHandler {
 			return ;
 		}
 		$parserOutput->hasTimedMediaTransform = true;
+
 		$parserOutput->addModules( array(
-			'mw.MediaWikiPlayer.loader',
-			'mw.PopUpMediaTransform',
-			'mw.TMHGalleryHook.js',
+			'ext.tmh.player',
 		) );
 		if ( $parserOutput ) {
 			// Not present when run from outputpage hooks, like File/Category etc...
 			$parserOutput->setExtensionData( 'mw_ext_TMH_hasTimedMediaTransform', true );
 		}
+
+		$parserOutput->addOutputHook( 'TimedMediaHandler' );
 	}
 
 	/**
