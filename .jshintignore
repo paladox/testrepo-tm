@@ -1,1 +1,5 @@
 MwEmbedModules
+
+resources/video-js/
+resources/videojs-offset/
+resources/videojs-resolution-selector/
