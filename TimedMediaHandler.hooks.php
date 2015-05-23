@@ -13,8 +13,7 @@ class TimedMediaHandlerHooks {
 		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue,
 		$wgMediaHandlers, $wgResourceModules, $wgExcludeFromThumbnailPurge, $wgExtraNamespaces,
 		$wgParserOutputHooks, $wgTimedTextNS, $wgFileExtensions, $wgTmhEnableMp4Uploads,
-		$wgExtensionAssetsPath, $wgMwEmbedModuleConfig, $timedMediaDir,
-		$wgEnableLocalTimedText, $wgTmhFileExtensions;
+		$wgExtensionAssetsPath, $baseExtensionResource, $wgEnableLocalTimedText, $wgTmhFileExtensions;
 
 		// Remove mp4 if not enabled:
 		if( $wgTmhEnableMp4Uploads === false ){
@@ -23,19 +22,6 @@ class TimedMediaHandlerHooks {
 				array_splice( $wgFileExtensions, $index, 1 );
 			}
 		}
-
-		if( !class_exists( 'MwEmbedResourceManager' ) ) {
-			echo "TimedMediaHandler requires the MwEmbedSupport extension.\n";
-			exit( 1 );
-		}
-
-		// Register the Timed Media Handler javascript resources ( MwEmbed modules )
-		MwEmbedResourceManager::register( 'extensions/TimedMediaHandler/MwEmbedModules/EmbedPlayer' );
-		MwEmbedResourceManager::register( 'extensions/TimedMediaHandler/MwEmbedModules/TimedText' );
-
-		// Set the default webPath for this embed player extension
-		$wgMwEmbedModuleConfig['EmbedPlayer.WebPath'] = $wgExtensionAssetsPath .
-			'/' . basename ( $timedMediaDir ) . '/MwEmbedModules/EmbedPlayer';
 
 		// Setup media Handlers:
 		$wgMediaHandlers['application/ogg'] = 'OggHandlerTMH';
@@ -59,32 +45,65 @@ class TimedMediaHandlerHooks {
 
 		// Add the PopUpMediaTransform module ( specific to timedMedia handler ( no support in mwEmbed modules )
 		$wgResourceModules+= array(
-			'mw.PopUpMediaTransform' => $baseExtensionResource + array(
-				'scripts' => 'resources/mw.PopUpThumbVideo.js',
-				'dependencies' => array( 'mw.MwEmbedSupport', 'mediawiki.Title' ),
+			'ext.tmh.video-js' => $baseExtensionResource + array(
+				'scripts' => 'resources/video-js/video.js',
+				'styles' => 'resources/video-js/video-js.css',
+				'languageScripts' => array(
+					'ar' => 'resources/video-js/lang/ar.js',
+					'ba' => 'resources/video-js/lang/ba.js',
+					'bg' => 'resources/video-js/lang/bg.js',
+					'ca' => 'resources/video-js/lang/ca.js',
+					'cs' => 'resources/video-js/lang/cs.js',
+					'da' => 'resources/video-js/lang/da.js',
+					'de' => 'resources/video-js/lang/de.js',
+					'es' => 'resources/video-js/lang/es.js',
+					'fi' => 'resources/video-js/lang/fi.js',
+					'fr' => 'resources/video-js/lang/fr.js',
+					'hr' => 'resources/video-js/lang/hr.js',
+					'hu' => 'resources/video-js/lang/hu.js',
+					'it' => 'resources/video-js/lang/it.js',
+					'ja' => 'resources/video-js/lang/ja.js',
+					'ko' => 'resources/video-js/lang/ko.js',
+					'nl' => 'resources/video-js/lang/nl.js',
+					'pt-BR' => 'resources/video-js/lang/pt-BR.js',
+					'ru' => 'resources/video-js/lang/ru.js',
+					'sr' => 'resources/video-js/lang/sr.js',
+					'sv' => 'resources/video-js/lang/sv.js',
+					'tr' => 'resources/video-js/lang/tr.js',
+					'uk' => 'resources/video-js/lang/uk.js',
+					'vi' => 'resources/video-js/lang/vi.js',
+					'zh-CN' => 'resources/video-js/lang/zh-CN.js',
+					'zh-TW' => 'resources/video-js/lang/zh-TW.js',
+				),
 			),
-			'mw.PopUpMediaTransform.styles' => $baseExtensionResource + array(
-				'position' => 'top',
-				'styles' => 'resources/PopUpThumbVideo.css',
+			'ext.tmh.videojs-offset' => $baseExtensionResource + array(
+				'scripts' => 'resources/videojs-offset/videojs-offset.js',
+				'dependencies' => array(
+					'ext.tmh.video-js',
+				),
 			),
-			'mw.TMHGalleryHook.js' => $baseExtensionResource + array(
-				'scripts' => 'resources/mw.TMHGalleryHook.js',
-				// position top needed as it needs to load before mediawiki.page.gallery
-				'position' => 'top',
+			'ext.tmh.videojs-quality-selector' => $baseExtensionResource + array(
+				'scripts' => 'resources/videojs-resolution-selector/video-quality-selector.js',
+				'styles' => 'resources/videojs-resolution-selector/video-quality-selector.css',
+				'dependencies' => array(
+					'ext.tmh.video-js',
+				),
 			),
-			'embedPlayerIframeStyle'=> $baseExtensionResource + array(
-				'styles' => 'resources/embedPlayerIframe.css',
+			'ext.tmh.player' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.player.js',
+				'dependencies' => array(
+					'ext.tmh.video-js',
+					'ext.tmh.videojs-quality-selector',
+					#'ext.tmh.videojs-offset',
+				),
 			),
 			'ext.tmh.transcodetable' => $baseExtensionResource + array(
 				'scripts' => 'resources/ext.tmh.transcodetable.js',
 				'styles' => 'resources/transcodeTable.css',
 				'dependencies' => array(
 					'mediawiki.api.edit',
-					'mw.MwEmbedSupport',
 				),
 				'messages'=> array(
-					'mwe-ok',
-					'mwe-cancel',
 					'timedmedia-reset-error',
 					'timedmedia-reset',
 					'timedmedia-reset-confirm'
@@ -92,14 +111,6 @@ class TimedMediaHandlerHooks {
 			),
 			'ext.tmh.TimedTextSelector' =>  $baseExtensionResource + array(
 				'scripts' => 'resources/ext.tmh.TimedTextSelector.js',
-			),
-			"mw.MediaWikiPlayerSupport" =>  $baseExtensionResource + array(
-				'scripts' => 'resources/mw.MediaWikiPlayerSupport.js',
-				'dependencies'=> 'mw.Api',
-			),
-			// adds support MediaWikiPlayerSupport player bindings
-			"mw.MediaWikiPlayer.loader" =>  $baseExtensionResource + array(
-				'loaderScripts' => 'resources/mw.MediaWikiPlayer.loader.js',
 			),
 		);
 
@@ -443,8 +454,8 @@ class TimedMediaHandlerHooks {
 		}
 
 		if ( $addModules ) {
-			$out->addModuleScripts( 'mw.PopUpMediaTransform' );
-			$out->addModuleStyles( 'mw.PopUpMediaTransform.styles' );
+			// TODO
+			$out->addModules( 'ext.tmh.player' );
 		}
 
 		return true;
