@@ -36,5 +36,6 @@
 		"mediaWiki",
 		"mw",
 		"jQuery"
+		"videojs"
 	]
 }

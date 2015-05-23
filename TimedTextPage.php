@@ -32,7 +32,7 @@ class TimedTextPage extends Article {
 	public function renderOutput( $out ){
 		// parse page title:
 		$titleParts = explode( '.', $this->getTitle()->getDBkey() );
-		$srt = array_pop( $titleParts );
+		$timedTextExtension = array_pop( $titleParts );
 		$languageKey = array_pop( $titleParts );
 
 		$oldid = $this->getOldID();
@@ -53,7 +53,7 @@ class TimedTextPage extends Article {
 		$fileTitle = Title::newFromText( $this->getTitle()->getDBkey(), NS_FILE );
 		$file = wfFindFile( $fileTitle );
 		// Check for a valid srt page, present redirect form for the full title match:
-		if( $srt !== '.srt' && $file && $file->exists() ){
+		if( ( $timedTextExtension !== '.srt' || $timedTextExtension !== '.vtt' ) && $file && $file->exists() ){
 			if( $file->isLocal() ){
 				$this->doRedirectToPageForm( $fileTitle );
 			} else {
@@ -101,7 +101,7 @@ class TimedTextPage extends Article {
 					xml::tags( 'td', array( 'valign' => 'top',  'width' => self::$videoWidth ),
 						$this->getVideoHTML( $videoTitle )
 					) .
-					xml::tags( 'td', array( 'valign' => 'top' ) , $this->getSrtHTML( $languageName ) )
+					xml::tags( 'td', array( 'valign' => 'top' ) , $this->getTimedTextHTML( $languageName ) )
 				)
 			)
 		);
@@ -143,8 +143,10 @@ class TimedTextPage extends Article {
 				)
 			)
 		);
+		// FIXME: this is broken for SRT now that we have VTT
+		$timedTextExtension = ".vtt";
 		$timedTextTile = Title::newFromText( $this->getTitle()->getDBkey() . '.'.
-			'LANG' . '.srt', NS_TIMEDTEXT )->getFullText();
+			'LANG' . $timedTextExtension, NS_TIMEDTEXT )->getFullText();
 		$out->addScript(
 			Html::InlineScript(
 				'$(function() {' .
@@ -181,13 +183,13 @@ class TimedTextPage extends Article {
 	}
 
 	/**
-	 * Gets the srt text
+	 * Gets the TimedText text
 	 *
-	 * XXX We should add srt parsing and links to seek to that time in the video
+	 * XXX We should add TimedText parsing and links to seek to that time in the video
 	 * @param $languageName string
 	 * @return Message|string
 	 */
-	private function getSrtHTML( $languageName ){
+	private function getTimedTextHTML( $languageName ){
 		if( !$this->exists() ){
 			return wfMessage( 'timedmedia-subtitle-no-subtitles',  $languageName );
 		}
