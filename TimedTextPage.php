@@ -54,7 +54,7 @@ class TimedTextPage extends Article {
 		$fileTitle = Title::newFromText( $this->getTitle()->getDBkey(), NS_FILE );
 		$file = wfFindFile( $fileTitle );
 		// Check for a valid srt page, present redirect form for the full title match:
-		if( !in_array( $timedTextExtension, self::$knownTimedTextExtensions ) && $file && $file->exists() ){
+		if( ( $timedTextExtension !== '.srt' || $timedTextExtension !== '.vtt' ) && $file && $file->exists() ) {
 			if( $file->isLocal() ){
 				$this->doRedirectToPageForm( $fileTitle );
 			} else {
@@ -144,6 +144,7 @@ class TimedTextPage extends Article {
 				)
 			)
 		);
+
 		$out->addModules( 'ext.tmh.TimedTextSelector' );
 	}
 
@@ -168,8 +169,9 @@ class TimedTextPage extends Article {
 	}
 
 	/**
-	 * Gets an HTML representation of the Timed Text
+	 * Gets the TimedText text
 	 *
+	 * XXX We should add TimedText parsing and links to seek to that time in the video
 	 * @param $languageName string
 	 * @return Message|string
 	 */
