@@ -64,7 +64,7 @@ class TimedMediaIframeOutput {
 		$wgBreakFrames = false;
 		$wgOut->allowClickjacking();
 
-		$wgOut->addModules( array( 'embedPlayerIframeStyle', 'mw.EmbedPlayer', 'mw.MwEmbedSupport' ) );
+		$wgOut->addModules( array( 'ext.tmh.player' ) );
 		$wgOut->sendCacheControl();
 	?>
 <!DOCTYPE html>
