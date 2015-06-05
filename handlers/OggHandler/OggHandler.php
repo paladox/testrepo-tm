@@ -38,7 +38,7 @@ class OggHandlerTMH extends TimedMediaHandler {
 			$metadata['length'] = $f->getLength();
 			// Get the offset of the file (in cases where the file is a segment copy)
 			$metadata['offset'] = $f->getStartOffset();
-		} catch ( PEAR_Exception $e ) {
+		} catch ( OggException $e ) {
 			// File not found, invalid stream, etc.
 			$metadata['error'] = array(
 				'message' => $e->getMessage(),

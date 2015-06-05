@@ -197,10 +197,7 @@ $wgAutoloadClasses['ApiTestCaseVideoUpload'] = "$timedMediaDir/tests/phpunit/Api
 
 // Ogg Handler
 $wgAutoloadClasses['OggHandlerTMH'] = "$timedMediaDir/handlers/OggHandler/OggHandler.php";
-ini_set( 'include_path',
-	"$timedMediaDir/handlers/OggHandler/PEAR/File_Ogg" .
-	PATH_SEPARATOR .
-	ini_get( 'include_path' ) );
+$wgAutoloadClasses['OggException'] = "$timedMediaDir/handlers/OggHandler/OggException.php";
 
 // getID3 provides metadata for mp4 and webm files:
 $wgAutoloadClasses['getID3'] = "$timedMediaDir/libs/getid3/getid3.php";
