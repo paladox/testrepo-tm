@@ -45,10 +45,15 @@ class WebVideoTranscode {
 	const ENC_H264_720P = '720p.mp4';
 	const ENC_H264_1080P = '1080p.mp4';
 
+	// mjpeg profile (for iOS last-ditch fallback):
+	const ENC_MJPEG_160P = '160p.mov';
+
+	// audio profiles
 	const ENC_OGG_VORBIS = 'ogg';
 	const ENC_OGG_OPUS = 'opus';
 	const ENC_MP3 = 'mp3';
 	const ENC_AAC = 'm4a';
+	const ENC_WAV_ULAW = 'wav';
 
 	// Static cache of transcode state per instantiation
 	public static $transcodeState = array() ;
@@ -241,6 +246,22 @@ class WebVideoTranscode {
 				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
 			),
 
+		// MJPEG profile for iOS last-ditch fallback
+		// Won't look good, but plays. :D
+		WebVideoTranscode::ENC_MJPEG_160P =>
+			array(
+				'maxSize'                    => '288x160',
+				'videoBitrate'               => '512',
+				'framerate'                  => '15',
+				'samplerate'                 => '22050',
+				'channels'                   => '1',
+				'noUpscaling'                => 'true',
+				'bufDelay'                   => '256',
+				'videoCodec'                 => 'mjpeg',
+				'audioCodec'                 => 'pcm_mulaw',
+				'type'                       => 'video/quicktime; codecs="jpeg, ulaw"',
+			),
+
 		//Audio profiles
 		WebVideoTranscode::ENC_OGG_VORBIS =>
 			array(
@@ -281,6 +302,16 @@ class WebVideoTranscode {
 				'noUpscaling'                => 'true',
 				'novideo'                    => 'true',
 				'type'                       => 'audio/mp4; codecs="mp4a.40.5"',
+			),
+		WebVideoTranscode::ENC_WAV_ULAW =>
+			array(
+				'audioCodec'                 => 'pcm_mulaw',
+				'audioQuality'               => '1',
+				'samplerate'                 => '22050',
+				'channels'                   => '1',
+				'noUpscaling'                => 'true',
+				'novideo'                    => 'true',
+				'type'                       => 'audio/wav; codecs="ulaw"',
 			),
 	);
 
@@ -514,6 +545,7 @@ class WebVideoTranscode {
 		$addOggFlag = false;
 		$addWebMFlag = false;
 		$addH264Flag = false;
+		$addMJPEGFlag = false;
 
 		$ext = pathinfo( "$fileName", PATHINFO_EXTENSION);
 
@@ -544,6 +576,9 @@ class WebVideoTranscode {
 			}
 			if( $codec == 'h264' ){
 				$addH264Flag = true;
+			}
+			if( $codec == 'mjpeg' ) {
+				$addMJPEGFlag = true;
 			}
 			// Try and add the source
 			self::addSourceIfReady( $file, $sources, $transcodeKey, $options );

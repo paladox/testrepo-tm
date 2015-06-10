@@ -191,7 +191,7 @@ class WebVideoTranscodeJob extends Job {
 			$status = $this->ffmpegEncode( $options );
 		} elseif( $options['videoCodec'] == 'theora' && $wgFFmpeg2theoraLocation !== false ){
 			$status = $this->ffmpeg2TheoraEncode( $options );
-		} elseif( $options['videoCodec'] == 'vp8' || $options['videoCodec'] == 'h264' || ( $options['videoCodec'] == 'theora' && $wgFFmpeg2theoraLocation === false ) ){
+		} elseif( $options['videoCodec'] == 'vp8' || $options['videoCodec'] == 'h264' || ( $options['videoCodec'] == 'theora' && $wgFFmpeg2theoraLocation === false ) || $options['videoCodec'] == 'mjpeg' ){
 			// Check for twopass:
 			if( isset( $options['twopass'] ) ){
 				// ffmpeg requires manual two pass
@@ -350,6 +350,8 @@ class WebVideoTranscodeJob extends Job {
 			$cmd.= $this->ffmpegAddH264VideoOptions( $options, $pass );
 		} elseif( $options['videoCodec'] == 'theora'){
 			$cmd.= $this->ffmpegAddTheoraVideoOptions( $options, $pass );
+		} elseif( $options['videoCodec'] == 'mjpeg' ) {
+			$cmd .= $this->ffmpegAddMJPEGVideoOptions( $options, $pass );
 		}
 		// Add size options:
 		$cmd .= $this->ffmpegAddVideoSizeOptions( $options ) ;
@@ -578,6 +580,43 @@ class WebVideoTranscodeJob extends Job {
 
 		// Output Ogg
 		$cmd.=" -f ogg";
+
+		return $cmd;
+	}
+	/**
+	 * Adds ffmpeg shell options for MJPEG MOV
+	 *
+	 * @param $options
+	 * @param $pass
+	 * @return string
+	 */
+	function ffmpegAddMJPEGVideoOptions( $options, $pass ){
+		global $wgFFmpegThreads;
+
+		// Get a local pointer to the file object
+		$file = $this->getFile();
+
+		$cmd =' -threads ' . intval( $wgFFmpegThreads );
+
+		// Check for video bitrate:
+		if ( isset( $options['videoBitrate'] ) ) {
+			$cmd.= " -qmin 2 -qmax 31";
+			$cmd.= " -vb " . wfEscapeShellArg( $options['videoBitrate'] * 1000 );
+		}
+		// Set the codec:
+		$cmd.= " -vcodec mjpeg";
+
+		if( isset( $options['deinterlace'] ) ){
+			$cmd.= ' -deinterlace';
+		}
+
+		if( isset( $options['framerate'] ) ) {
+			$cmd.= ' -r ' . wfEscapeShellArg( $options['framerate'] );
+		}
+
+		// Output QuickTime MOV container
+		//$cmd.=" -f mov -movflags faststart"; // no -movflags on avconv in Ubuntu 14.04
+		$cmd.=" -f mov";
 
 		return $cmd;
 	}
