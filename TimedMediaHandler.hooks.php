@@ -107,6 +107,7 @@ class TimedMediaHandlerHooks {
 		$wgResourceModules += array(
 			'ext.tmh.bogoslow' => $baseExtensionResource + array(
 				'scripts' => 'resources/ext.tmh.bogoslow.js',
+				'targets' => array( 'mobile', 'desktop' ),
 			),
 			'ext.tmh.OgvJsSupport' => $baseExtensionResource + array(
 				'scripts' => array(
@@ -116,7 +117,22 @@ class TimedMediaHandlerHooks {
 				'targets' => array( 'mobile', 'desktop' ),
 			),
 		);
-
+		// Add the MobileFrontend-specific lightweight player
+		$wgResourceModules += array(
+			'ext.tmh.mobile' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.mobile.js',
+				'styles' => array(
+					'resources/ext.tmh.mobile.css',
+					'resources/PopUpThumbVideo.css',
+				),
+				'dependencies' => array(
+					'mobile.startup',
+					'ext.tmh.OgvJsSupport',
+					'ext.tmh.bogoslow',
+				),
+				'targets' => array( 'mobile' ),
+			),
+		);
 		// Setup a hook for iframe embed handling:
 		$wgHooks['ArticleFromTitle'][] = 'TimedMediaIframeOutput::iframeHook';
 
