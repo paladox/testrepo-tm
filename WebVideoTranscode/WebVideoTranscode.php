@@ -717,6 +717,11 @@ class WebVideoTranscode {
 
 		// Remove from local WebVideoTranscode cache:
 		self::clearTranscodeCache( $titleObj->getDBkey() );
+
+		// Now requeue the transcode job so it doesn't get lost!
+		foreach ( $removeKeys as $tKey ) {
+			self::updateJobQueue( $file, $tKey );
+		}
 	}
 
 	/**
@@ -746,14 +751,14 @@ class WebVideoTranscode {
 
 	/**
 	 * Add a source to the sources list if the transcode job is ready
-	 * if the source is not found update the job queue
+	 *
+	 * If the source is not found, it will not be used yet...
+	 * Missing transcodes should be added by write tasks, not read tasks!
 	 */
 	public static function addSourceIfReady( &$file, &$sources, $transcodeKey, $dataPrefix = '' ){
 		// Check if the transcode is ready:
 		if( self::isTranscodeReady( $file, $transcodeKey ) ){
 			$sources[] = self::getDerivativeSourceAttributes( $file, $transcodeKey, $dataPrefix );
-		} else {
-			self::updateJobQueue( $file, $transcodeKey );
 		}
 	}
 
