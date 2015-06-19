@@ -656,7 +656,9 @@ class WebVideoTranscode {
 				);
 			}
 		}
-		return self::$transcodeState[ $fileName ];
+		$sorted = self::$transcodeState[ $fileName ];
+		uksort( $sorted, 'strnatcmp' );
+		return $sorted;
 	}
 
 	/**
