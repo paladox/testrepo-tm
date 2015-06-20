@@ -160,6 +160,7 @@ class TimedMediaHandlerHooks {
 		// Add transcode status to video asset pages:
 		$wgHooks[ 'ImagePageAfterImageLinks' ][] = 'TimedMediaHandlerHooks::checkForTranscodeStatus';
 		$wgHooks[ 'NewRevisionFromEditComplete' ][] = 'TimedMediaHandlerHooks::onNewRevisionFromEditComplete';
+		$wgHooks[ 'ArticlePurge' ][] = 'TimedMediaHandlerHooks::onArticlePurge';
 
 		$wgHooks['LoadExtensionSchemaUpdates'][] = 'TimedMediaHandlerHooks::checkSchemaUpdates';
 		$wgHooks['wgQueryPages'][] = 'TimedMediaHandlerHooks::onwgQueryPages';
@@ -340,6 +341,21 @@ class TimedMediaHandlerHooks {
 					WebVideoTranscode::removeTranscodes( $file );
 					WebVideoTranscode::startJobQueue( $file );
 				}
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * When a user asks for a purge, perhaps through our handy "update transcode status"
+	 * link, make sure we've got the updated set of transcodes. Fire off new transcodes
+	 * if necessary.
+	 */
+	public static function onArticlePurge( $article ) {
+		if( $article->getTitle()->getNamespace() == NS_FILE ) {
+			$file = wfFindFile( $article->getTitle() );
+			if( self::isTranscodableFile( $file ) ){
+				WebVideoTranscode::startJobQueue( $file );
 			}
 		}
 		return true;
