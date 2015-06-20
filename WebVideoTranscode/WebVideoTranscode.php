@@ -510,12 +510,8 @@ class WebVideoTranscode {
 		}
 
 		if( $file->getHandler()->isAudio( $file ) ){
-			$sourceCodec = $file->getHandler()->getStreamTypes( $file );
-			$sourceCodec = $sourceCodec ? strtolower( $sourceCodec[0] ) : '';
-			foreach( $wgEnabledAudioTranscodeSet as $transcodeKey ){
-				$codec = self::$derivativeSettings[$transcodeKey]['audioCodec'];
-				if ( $sourceCodec != $codec ) {
-					// Try and add the source
+			foreach( $wgEnabledAudioTranscodeSet as $transcodeKey ) {
+				if ( self::isTranscodeEnabled( $file, $transcodeKey ) ) {
 					self::addSourceIfReady( $file, $sources, $transcodeKey, $options );
 				}
 			}
@@ -896,6 +892,38 @@ class WebVideoTranscode {
 	}
 
 	/**
+	 * Check if the given transcode key is appropriate for the file.
+	 *
+	 * @param $file File object
+	 * @param $transcodeKey String transcode key
+	 * @return boolean
+	 */
+	public static function isTranscodeEnabled( File $file, $transcodeKey ) {
+		global $wgEnabledTranscodeSet, $wgEnabledAudioTranscodeSet;
+
+		$audio = $file->getHandler()->isAudio( $file );
+		if ( $audio ) {
+			$keys = $wgEnabledAudioTranscodeSet;
+		} else {
+			$keys = $wgEnabledTranscodeSet;
+		}
+
+		if ( in_array( $transcodeKey, $keys ) ) {
+			$settings = self::$derivativeSettings[$transcodeKey];
+			if ( $audio ) {
+				$sourceCodecs = $file->getHandler()->getStreamTypes( $file );
+				$sourceCodec = $sourceCodec ? strtolower( $sourceCodecs[0] ) : '';
+				return ( $sourceCodec !== $settings['audioCodec'] );
+			} else {
+				return !self::isTargetLargerThanFile( $file, $settings['maxSize'] );
+			}
+		} else {
+			// Transcode key is invalid or has been disabled.
+			return false;
+		}
+	}
+
+	/**
 	 * Update the job queue if the file is not already in the job queue:
 	 * @param $file File object
 	 * @param $transcodeKey String transcode key
@@ -905,6 +933,10 @@ class WebVideoTranscode {
 		$db = $file->repo->getMasterDB();
 
 		$transcodeState = self::getTranscodeState( $file, $db );
+
+		if ( !self::isTranscodeEnabled( $file, $transcodeKey ) ) {
+			return;
+		}
 
 		// If the job hasn't been added yet, attempt to do so
 		if ( !isset( $transcodeState[ $transcodeKey ] ) ) {
@@ -993,7 +1025,7 @@ class WebVideoTranscode {
 	 * Test if a given transcode target is larger than the source file
 	 *
 	 * @param $file File object
-	 * @param $targetMaxSize int
+	 * @param $targetMaxSize string
 	 * @return bool
 	 */
 	public static function isTargetLargerThanFile( &$file, $targetMaxSize ){
@@ -1011,7 +1043,7 @@ class WebVideoTranscode {
 	/**
 	 * Return maxSize array for given maxSize setting
 	 *
-	 * @param $targetMaxSize int
+	 * @param $targetMaxSize string
 	 * @return array
 	 */
 	public static function getMaxSize( $targetMaxSize ){
