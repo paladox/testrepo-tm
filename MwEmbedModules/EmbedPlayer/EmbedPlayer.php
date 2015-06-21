@@ -2,7 +2,9 @@
 	global $wgVideoPlayerSkinModule;
 	// Register all the EmbedPlayer modules
 	return array(
-			"jquery.embedPlayer" => array( 'scripts' => 'resources/jquery.embedPlayer.js' ),
+			"jquery.embedPlayer" => array(
+				'scripts' => 'resources/jquery.embedPlayer.js'
+			),
 			"mw.EmbedPlayer.loader" => array(
 				'scripts' => 'resources/mw.EmbedPlayer.loader.js',
 				'dependencies' => 'jquery.embedPlayer',
@@ -14,7 +16,9 @@
 					'ext.tmh.OgvJsSupport',
 				),
 			),
-			"mw.MediaPlayer" => array( 'scripts' => 'resources/mw.MediaPlayer.js' ),
+			"mw.MediaPlayer" => array(
+				'scripts' => 'resources/mw.MediaPlayer.js'
+			),
 			"mw.MediaPlayers" => array(
 				'scripts' => 'resources/mw.MediaPlayers.js',
 				'dependencies' => 'mw.MediaPlayer'
@@ -53,6 +57,8 @@
 
 					// We always end up loading native player
 					'mw.EmbedPlayerNative',
+					// Always load imageOverlay for capturing user gestures in source switches
+					'mw.EmbedPlayerImageOverlay',
 
 					// Sub classes:
 					'mw.MediaElement',
@@ -77,12 +83,20 @@
 				'messageDir' => 'i18n',
 			),
 
-			"mw.EmbedPlayerKplayer"	=> array( 'scripts'=> "resources/mw.EmbedPlayerKplayer.js" ),
-			"mw.EmbedPlayerGeneric"	=> array( 'scripts'=> "resources/mw.EmbedPlayerGeneric.js" ),
-			"mw.EmbedPlayerNative"	=> array( 'scripts'=> "resources/mw.EmbedPlayerNative.js" ),
+			"mw.EmbedPlayerKplayer"	=> array(
+				'scripts'=> "resources/mw.EmbedPlayerKplayer.js"
+			),
+			"mw.EmbedPlayerGeneric"	=> array(
+				'scripts'=> "resources/mw.EmbedPlayerGeneric.js"
+			),
+			"mw.EmbedPlayerNative"	=> array(
+				'scripts'=> "resources/mw.EmbedPlayerNative.js"
+			),
 			"mw.EmbedPlayerVLCApp"	=> array(
 				'scripts'=> "resources/mw.EmbedPlayerVLCApp.js",
-				'dependencies' => array( 'mediawiki.Uri' )
+				'dependencies' => array(
+					'mediawiki.Uri'
+				)
 			),
 			"mw.EmbedPlayerIEWebMPrompt" => array(
 				'scripts' => 'resources/mw.EmbedPlayerIEWebMPrompt.js',
@@ -95,9 +109,13 @@
 					'ext.tmh.OgvJsSupport',
 				),
 			),
-			"mw.EmbedPlayerImageOverlay" => array( 'scripts'=> "resources/mw.EmbedPlayerImageOverlay.js" ),
+			"mw.EmbedPlayerImageOverlay" => array(
+				'scripts'=> "resources/mw.EmbedPlayerImageOverlay.js"
+			),
 
-			"mw.EmbedPlayerVlc" => array( 'scripts'=> "resources/mw.EmbedPlayerVlc.js" ),
+			"mw.EmbedPlayerVlc" => array(
+				'scripts'=> "resources/mw.EmbedPlayerVlc.js"
+			),
 
 			"mw.PlayerSkinKskin" => array(
 				'scripts' => "resources/skins/kskin/mw.PlayerSkinKskin.js",

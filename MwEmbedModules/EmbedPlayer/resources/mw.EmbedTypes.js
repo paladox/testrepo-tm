@@ -200,7 +200,13 @@ mw.EmbedTypes = {
 				var dummyvid = document.createElement( "video" );
 				if( dummyvid.canPlayType ) {
 					// Add the webm player
-					if( dummyvid.canPlayType('video/webm; codecs="vp8, vorbis"') ){
+					if( dummyvid.canPlayType('video/webm; codecs="vp8, vorbis"')
+						//	&&
+						// ! mw.isMobileChrome() // current versions of mobile chrome should support webm
+												 // left as a comment in cases we need to re disable
+							&&
+						! mw.isAndroid40() // android 4 'Internet browser' lies as well.
+					){
 						this.mediaPlayers.addPlayer( webmNativePlayer );
 					}
 					if( dummyvid.canPlayType('video/webm; codecs="vp9, opus"') ){
@@ -208,26 +214,25 @@ mw.EmbedTypes = {
 					}
 
 					// Test for MP3:
-					if ( this.supportedMimeType('audio/mpeg') ) {
-							this.mediaPlayers.addPlayer( mp3NativePlayer );
+					if ( this.supportedMimeType('audio/mpeg') || dummyvid.canPlayType('audio/mpeg; codecs="mp3"') ) {
+						this.mediaPlayers.addPlayer( mp3NativePlayer );
 					}
-
+					
 					// Test for AAC:
 					if ( dummyvid.canPlayType( 'audio/mp4; codecs="mp4a.40.5"' ) ) {
-							this.mediaPlayers.addPlayer( aacNativePlayer );
+						this.mediaPlayers.addPlayer( aacNativePlayer );
 					}
 
 					// Test for h264:
 					if ( dummyvid.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"' ) ) {
 						this.mediaPlayers.addPlayer( h264NativePlayer );
-						// Check for iOS for vdn player support ( apple adaptive ) or vdn canPlayType != '' ( ie maybe/probably )
-						if( mw.isIOS() || dummyvid.canPlayType('application/vnd.apple.mpegurl; codecs="avc1.42E01E"' ) ){
+						// Check for vdn player support ( apple adaptive ) or vdn canPlayType != '' ( ie maybe/probably )
+						if( dummyvid.canPlayType('application/vnd.apple.mpegurl; codecs="avc1.42E01E"' ) ){
 							// Android 3x lies about HLS support ( only add if not Android 3.x )
 							if( navigator.userAgent.indexOf( 'Android 3.') == -1 ){
 								this.mediaPlayers.addPlayer( appleVdnPlayer );
 							}
 						}
-
 					}
 					// For now if Android assume we support h264Native (FIXME
 					// test on real devices )
@@ -236,12 +241,11 @@ mw.EmbedTypes = {
 					}
 
 					// Test for ogg
-					if ( dummyvid.canPlayType( 'video/ogg; codecs="theora, vorbis"' ) || 
+					if ( dummyvid.canPlayType( 'video/ogg; codecs="theora, vorbis"' ) ||
 						dummyvid.canPlayType( 'audio/ogg; codecs="vorbis"' )
 					) {
 						this.mediaPlayers.addPlayer( oggNativePlayer );
 					}
-
 					// Test for opus
 					if ( dummyvid.canPlayType( 'audio/ogg; codecs="opus"' ).replace(/maybe/, '') ) {
 						this.mediaPlayers.addPlayer( opusNativePlayer );
@@ -297,10 +301,6 @@ mw.EmbedTypes = {
 			}
 		}
 
-		if ( mw.isIOS() ) {
-			this.mediaPlayers.addPlayer( vlcAppPlayer );
-		}
-
 		// Note IE 11 doesn't identify itself as 'MSIE'.
 		// For simplicity just check for the rendering engine codename 'Trident'.
 		if ( navigator.userAgent.indexOf( 'Trident' ) != -1 ) {
@@ -332,8 +332,8 @@ mw.EmbedTypes = {
 		}
 
 		// Allow extensions to detect and add their own "players"
-		mw.log("EmbedPlayer::trigger:embedPlayerUpdateMediaPlayersEvent");
-		$( mw ).trigger( 'embedPlayerUpdateMediaPlayersEvent' , this.mediaPlayers );
+		mw.log("EmbedPlayer::trigger:EmbedPlayerUpdateMediaPlayers");
+		$( mw ).trigger( 'EmbedPlayerUpdateMediaPlayers' , this.mediaPlayers );
 
 	},
 
@@ -355,6 +355,5 @@ mw.EmbedTypes = {
 		return hasObj;
 	}
 };
-
 
 } )( mediaWiki, jQuery );

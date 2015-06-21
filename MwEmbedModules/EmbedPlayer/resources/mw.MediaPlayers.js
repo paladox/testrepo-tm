@@ -20,7 +20,7 @@ mw.MediaPlayers.prototype = {
 	defaultPlayers : { },
 
 	/**
-	 * Initializartion function sets the default order for players for a given
+	 * Initialization function sets the default order for players for a given
 	 * mime type
 	 */
 	init: function() {
@@ -94,6 +94,7 @@ mw.MediaPlayers.prototype = {
 		var _this = this;
 		var baseMimeType = mimeType.split( ';' )[0];
 		if ( this.defaultPlayers[ baseMimeType ] ) {
+			
 			$.each( this.defaultPlayers[ baseMimeType ], function( d, lib ) {
 				var library = _this.defaultPlayers[ baseMimeType ][ d ];
 				for ( var i = 0; i < _this.players.length; i++ ) {
@@ -118,7 +119,7 @@ mw.MediaPlayers.prototype = {
 		var mimePlayers = this.getMIMETypePlayers( mimeType );
 		if ( mimePlayers.length > 0 )
 		{
-			// Select the default player:
+			// Check for prior preference for this mime type
 			for ( var i = 0; i < mimePlayers.length; i++ ) {
 				// Check for native:
 				if(  mimePlayers[i].librayr == 'Native' ){

@@ -13,7 +13,7 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 	mw.log( 'processEmbedPlayers:: playerSet: ', playerSet);
 	// The player id list container
 	var playerIdList = [];
-	
+
 	// Check if the selected player set is ready if ready issue the parent callback
 	var areSelectedPlayersReady = function(){
 		var playersLoaded = true;
@@ -95,6 +95,15 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 
 			// Allow plugins to add bindings to the inDomPlayer
 			$( mw ).trigger ( 'EmbedPlayerNewPlayer', inDomPlayer );
+			
+			// Retain support for legacy new embed player trigger name:
+			$( mw ).trigger ( 'newEmbedPlayerEvent', inDomPlayer );
+
+			// Also trigger legacy newEmbedPlayerEvent event
+			if( $( mw ).data('events') && $( mw ).data('events')['newEmbedPlayerEvent'] ){
+				mw.log("processEmbedPlayers:: Warning, newEmbedPlayerEvent is deprecated, please use EmbedPlayerNewPlayer");
+				$( mw ).trigger( 'newEmbedPlayerEvent', inDomPlayer );
+			}
 
 			// Add a player ready binding:
 			$( inDomPlayer ).bind( 'playerReady.swap', function(event, id){
@@ -237,8 +246,15 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 				swapPlayerElement[ method ] = playerInterface[ method ];
 			}
 		}
+		// set width and height attr:
+		if( $( targetElement ).attr('width') ){
+			$( swapPlayerElement ).css('width',  $( targetElement ).attr('width') );
+		}
+		if( $( targetElement ).attr('height') ){
+			$( swapPlayerElement ).css('height',  $( targetElement ).attr('height') );
+		}
 		// copy over css text:
-		swapPlayerElement.style.cssText = targetElement.style.cssText;
+		swapPlayerElement.style.cssText += targetElement.style.cssText;
 		// player element must always be relative to host video and image layout
 		swapPlayerElement.style.position = 'relative';
 
@@ -252,7 +268,7 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 			});
 		}
 		// Check for Persistent native player ( should keep the video embed around )
-		if(  playerInterface.isPersistentNativePlayer()
+		if(  ( playerInterface.isPersistentNativePlayer() && !mw.config.get( 'EmbedPlayer.DisableVideoTagSupport' ) )
 				||
 			// Also check for native controls on a video or audio tag
 			( playerInterface.useNativePlayerControls()
@@ -289,10 +305,6 @@ mw.processEmbedPlayers = function( playerSet, callback ) {
 	// Add a loader for <div /> embed player rewrites:
 	$( playerSet ).each( function( index, playerElement) {
 
-		// Make sure the playerElement has an id:
-		if( !$( playerElement ).attr('id') ){
-			$( playerElement ).attr( "id", 'mwe_vid' + ( index ) );
-		}
 		// Add the player Id to the playerIdList
 		playerIdList.push( $( playerElement ).attr( "id") );
 
