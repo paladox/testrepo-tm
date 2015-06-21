@@ -79,7 +79,7 @@ mw.EmbedPlayerJava = {
 		var appletLoc = false;
 		// Check for wgCortadoJarFile override
 		if( mw.config.get( 'wgCortadoJarFile' ) !== false ){
-			return mw.config.get('wgCortadoJarFile' );
+			return mw.config.get('wgCortadoJarFile' ); 
 		}
 		if (
 			(
@@ -88,10 +88,10 @@ mw.EmbedPlayerJava = {
 			!mw.isLocalDomain( mw.getMwEmbedPath() )
 			||
 			mw.config.get( 'relativeCortadoAppletPath' ) === false
-            ) &&
+		) &&
 			window.cortadoDomainLocations[ new mw.Uri( mediaSrc ).host ]
 		){
-		    return window.cortadoDomainLocations[ new mw.Uri( mediaSrc ).host ];
+			return window.cortadoDomainLocations[ new mw.Uri( mediaSrc ).host ];
 		} else {
 			// Get the local relative cortado applet location:
 			return mw.config.get( 'relativeCortadoAppletPath' );

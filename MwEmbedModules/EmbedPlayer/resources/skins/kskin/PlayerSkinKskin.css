@@ -82,10 +82,10 @@
 	height: 21px;
 	padding: 2px 0 0 6px;
 	margin-top: 0px;
-	background: url(images/ksprite.png) repeat-x 0 -81px;
+	background-color: black;
 	font: normal 11px arial, sans-serif;
 	color: #555;
-
+	
 	position:absolute;
 	bottom:0px;
 	left:0px;
@@ -124,7 +124,6 @@
 	border-radius:5px 5px 5px 5px;
 	-webkit-border-radius:5px 5px 5px 5px;
 }
-
 .k-player .ui-corner-all {
 	border-radius:5px 5px 5px 5px !important;
 	-webkit-border-radius:5px 5px 5px 5px !important;
@@ -479,4 +478,16 @@
 	width : 51px;
 	height : 12px;
 	cursor: pointer;
+}
+
+/* Custom */
+
+.fullscreen-btn {
+	right: -4px;
+}
+
+/* Add scroll bar to list */
+
+.fg-menu-container {
+	overflow: auto;
 }
