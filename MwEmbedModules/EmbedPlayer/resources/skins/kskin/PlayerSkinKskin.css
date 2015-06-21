@@ -58,7 +58,9 @@
 .k-player .ui-state-default .ui-icon-comment {
 	background-position: 0px -65px;
 }
-
+.k-player .ui-state-hover .ui-icon-comment {
+	background-position: -17px -65px;
+}
 .k-player .ui-state-default .ui-icon-play {
 	background: url(images/ksprite.png) no-repeat 0 0;
 }
@@ -82,10 +84,10 @@
 	height: 21px;
 	padding: 2px 0 0 6px;
 	margin-top: 0px;
-	background: url(images/ksprite.png) repeat-x 0 -81px;
+	background-color: black;
 	font: normal 11px arial, sans-serif;
 	color: #555;
-
+	
 	position:absolute;
 	bottom:0px;
 	left:0px;
@@ -98,20 +100,17 @@
 	background: url("images/ksprite.png") repeat-x scroll 0 -350px
 		transparent;
 	display: inline;
-	/* @noflip */
 	float: left;
 	margin-left: 10px;
 	border: 1px solid #EEEEEE;
 	height: 8px;
 	margin: 5px 2px 0 0px;
 	position: relative;
-	/* @noflip */
-	direction: ltr;
 }
 
 .k-player .play_head .ui-slider-handle {
 	background: url("images/ksprite.png") no-repeat scroll -67px -341px
-		transparent !important;
+		transparent;
 	border: 1px solid #888888;
 	display: block;
 	height: 8px;
@@ -124,11 +123,8 @@
 	border-radius:5px 5px 5px 5px;
 	-webkit-border-radius:5px 5px 5px 5px;
 }
-
 .k-player .ui-corner-all {
-	border-radius:5px 5px 5px 5px !important;
-	-webkit-border-radius:5px 5px 5px 5px !important;
-	-moz-border-radius:5px 5px 5px 5px !important;
+	-moz-border-radius:5px 5px 5px 5px;
 }
 .k-player ul.fg-menu{
 	margin: 0.3em 0 0 .3em;
@@ -137,8 +133,6 @@
 }
 .k-player .fg-menu-container{
 	padding: 0px;
-	/* @noflip */
-	right: 16px;
 }
 
 .ui-dialog-content .k-player ul.fg-menu{
@@ -152,8 +146,7 @@
 	font: 11px arial, sans-serif;
 	line-height: 20px;
 	overflow: hidden;
-	width: 39px;
-	/* @noflip */
+	width: 55px;
 	float: right;
 }
 
@@ -166,19 +159,17 @@
 	overflow: hidden;
 	width: 70px;
 	cursor: pointer;
-	/* @noflip */
 	float: right;
 	text-align: center;
 }
 
 .k-player .lButton {
 	cursor: pointer;
-	/* @noflip */
 	float: left;
 	list-style: none outside none;
 	margin: 2px;
 	padding: 0px 0;
-	width: 19px;
+	width: 24px;
 	height: 16px;
 	position: relative;
 	background: none repeat scroll 0 0 transparent !important;
@@ -187,12 +178,11 @@
 
 .k-player .rButton {
 	cursor: pointer;
-	/* @noflip */
 	float: right;
 	list-style: none outside none;
 	margin-top: 2px;
 	padding: 0px 0;
-	width: 22px;
+	width: 23px;
 	height: 16px;
 	position: relative;
 	background: none repeat scroll 0 0 transparent !important;
@@ -202,12 +192,12 @@
 .k-player .k-options {
 	border: 1px solid #AAAAAA !important;
 	color: #555555 !important;
-	/* @noflip */
 	float: right;
 	height: 21px;
 	margin-top: -2px;
 	margin-right: 0px;
 	width: 50px;
+	float: right;
 	background: none repeat scroll 0 0 transparent !important;
 	font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
 	font-size: 11px;
@@ -221,9 +211,8 @@
 }
 
 .k-player .k-menu-screens {
-	/* @noflip */
 	float: left;
-	font-size: 14px;
+	font-size: 11px;
 	text-align: left;
 	padding: 5px 5px 10px 5px;
 }
@@ -236,9 +225,7 @@
 	list-style: none outside none;
 	padding: 0 0 5px;
 	position: absolute;
-	/* @noflip */
 	right: 0;
-	margin-left: 0;
 }
 
 .k-player .k-menu {
@@ -248,6 +235,7 @@
 	left: 0;
 	position: absolute;
 	top: 0;
+	z-index: 3;
 }
 
 .k-player .k-menu-bar li a {
@@ -355,18 +343,17 @@
 
 .k-menu-screens li a {
 	padding-left: 22px;
-	padding-right: 22px;
 	background: url(images/ksprite.png) no-repeat -85px -274px;
 	text-decoration: none;
 	color: #BBB;
 }
 
 .k-menu-screens li a.active,.k-menu-screens li a:hover .active {
-	background-position: -85px -245px;
+	background-position: -85px -247px;
 }
 
 .k-menu-screens li a:hover {
-	background-position: -85px -259px;
+	background-position: -85px -260px;
 }
 
 .k-menu textarea {
@@ -388,6 +375,7 @@
 	float: right;
 	height: 34px;
 	padding: 0 5px 3px;
+	width: 84px;
 	font-size: 1em;
 }
 
@@ -412,7 +400,6 @@
 }
 
 .k-player .volume_control {
-	/* @noflip */
 	margin-right: 2px;
 	width: 16px;
 }
@@ -423,8 +410,6 @@
 
 .k-player .volume-slider {
 	width: 20px;
-	/* @noflip */
-	direction: ltr;
 }
 
 .k-player .volume-slider .ui-slider-range {
@@ -444,21 +429,16 @@
 	width: 8px;
 }
 
-.k-player .ui-slider-horizontal .ui-slider-range-min {
-	/* @noflip */
-	left: 0;
-}
-
 .k-player .credits_box {
 	background-attachment:scroll;
 	background-color:white;
 	background-image:none;
 	background-position:0 0;
-	bottom: 20px;
-	left: 20px;
+	bottom:30px;
+	left:15px;
 	position:absolute;
-	right: 20px;
-	top: 30px;
+	right:30px;
+	top:48px;
 	overflow:hidden;
 }
 .k-player .credits_box a{
@@ -479,4 +459,16 @@
 	width : 51px;
 	height : 12px;
 	cursor: pointer;
+}
+
+/* Custom */
+
+.fullscreen-btn {
+	right: -4px;
+}
+
+/* Add scroll bar to list */
+
+.fg-menu-container {
+overflow: auto;
 }
