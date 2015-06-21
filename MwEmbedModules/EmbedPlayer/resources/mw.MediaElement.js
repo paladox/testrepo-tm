@@ -285,9 +285,28 @@ mw.MediaElement.prototype = {
 				namedSourceSet[ shortName ].push( source );
 			}
 		});
+		
+		// Check if is mobile ( and we don't have a flavor id based selection )
+		// get the most compatible h.264 file
+		if ( mw.isMobileDevice() && namedSourceSet[ 'h264' ] && namedSourceSet[ 'h264' ].length ){
+			var minSize = 99999999;
+			$.each( namedSourceSet[ 'h264' ], function( inx, source ){
+				// Don't select sources of type audio, 
+				// ( if an actual audio file don't use "width" as a source selection metric )
+				if( source.width < minSize && source.width != 0 ){
+					minSize = source.width;
+					setSelectedSource( source );
+				}
+			})
+		}
+		
+		if ( this.selectedSource ) {
+			mw.log('MediaElement::autoSelectSource: mobileDevice; most compatible h.264 because of resolution:' + this.selectedSource.width );
+			return this.selectedSource;
+		}
 
 		var codecPref = mw.config.get( 'EmbedPlayer.CodecPreference');
-
+		
 		// if on android 4 use mp4 over webm
 		if( mw.isAndroid40() ){
 			if( codecPref && codecPref[0] == 'webm' ){
@@ -312,9 +331,9 @@ mw.MediaElement.prototype = {
 					if( this.parentEmbedId ){
 						var displayWidth = $('#' + this.parentEmbedId).width();
 						$.each( namedSourceSet[ codec ], function(inx, source ){
-							if( source.width && displayWidth ){
+							if( parseInt( source.width ) && displayWidth ){
 								var sizeDelta =  Math.abs( source.width - displayWidth );
-								mw.log('MediaElement::autoSelectSource: size delta : ' + sizeDelta + ' for s:' + source.width );
+								//mw.log('MediaElement::autoSelectSource: size delta : ' + sizeDelta + ' for s:' + source.width );
 								if( minSizeDelta == null ||  sizeDelta < minSizeDelta){
 									minSizeDelta = sizeDelta;
 									setSelectedSource( source );
@@ -329,6 +348,7 @@ mw.MediaElement.prototype = {
 					}
 					// if no size info is set just select the first source:
 					if( namedSourceSet[ codec ][0] ){
+						mw.log('MediaElement::autoSelectSource: first codec prefrence source');
 						return setSelectedSource( namedSourceSet[ codec ][0] );
 					}
 				}
@@ -359,6 +379,7 @@ mw.MediaElement.prototype = {
 			mw.log( 'MediaElement::autoSelectSource: Set via first source: ' + playableSources[0].getTitle() + ' mime: ' + playableSources[0].getMIMEType() );
 			return setSelectedSource( playableSources[0] );
 		}
+		mw.log( 'MediaElement::autoSelectSource: no match found');
 		// No Source found so no source selected
 		return false;
 	},
