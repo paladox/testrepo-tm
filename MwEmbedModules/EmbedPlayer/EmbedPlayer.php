@@ -2,13 +2,20 @@
 	global $wgVideoPlayerSkinModule;
 	// Register all the EmbedPlayer modules
 	return array(
-			"mw.MediaElement" => array( 'scripts' => 'resources/mw.MediaElement.js' ),
-			"mw.MediaPlayer" => array( 'scripts' => 'resources/mw.MediaPlayer.js' ),
+			"mw.MediaElement" => array(
+				'scripts' => 'resources/mw.MediaElement.js'
+			),
+			"mw.MediaPlayer" => array(
+				'scripts' => 'resources/mw.MediaPlayer.js'
+			),
 			"mw.MediaPlayers" => array(
 				'scripts' => 'resources/mw.MediaPlayers.js',
 				'dependencies' => 'mw.MediaPlayer'
 			),
-			"mw.MediaSource" => array( 'scripts' => 'resources/mw.MediaSource.js' ),
+			"mw.MediaSource" => array(
+				'scripts' => 'resources/mw.MediaSource.js',
+				'dependencies' => 'mw.MwEmbedSupport'
+			),
 			"mw.EmbedTypes" => array(
 				'scripts' => 'resources/mw.EmbedTypes.js',
 				'dependencies' =>  array(
@@ -36,6 +43,8 @@
 
 					// We always end up loading native player
 					'mw.EmbedPlayerNative',
+					// Always load imageOverlay for capturing user gestures in source switches
+					'mw.EmbedPlayerImageOverlay',
 
 					// Sub classes:
 					'mw.MediaElement',
@@ -60,21 +69,35 @@
 				'messageDir' => 'i18n',
 			),
 
-			"mw.EmbedPlayerKplayer"	=> array( 'scripts'=> "resources/mw.EmbedPlayerKplayer.js" ),
-			"mw.EmbedPlayerGeneric"	=> array( 'scripts'=> "resources/mw.EmbedPlayerGeneric.js" ),
-			"mw.EmbedPlayerJava" => array( 'scripts'=> "resources/mw.EmbedPlayerJava.js"),
-			"mw.EmbedPlayerNative"	=> array( 'scripts'=> "resources/mw.EmbedPlayerNative.js" ),
+			"mw.EmbedPlayerKplayer"	=> array(
+				'scripts'=> "resources/mw.EmbedPlayerKplayer.js"
+			),
+			"mw.EmbedPlayerGeneric"	=> array(
+				'scripts'=> "resources/mw.EmbedPlayerGeneric.js"
+			),
+			"mw.EmbedPlayerJava" => array(
+				'scripts'=> "resources/mw.EmbedPlayerJava.js"
+			),
+			"mw.EmbedPlayerNative"	=> array(
+				'scripts'=> "resources/mw.EmbedPlayerNative.js"
+			),
 			"mw.EmbedPlayerVLCApp"	=> array(
 				'scripts'=> "resources/mw.EmbedPlayerVLCApp.js",
-				'dependencies' => array( 'mediawiki.Uri' )
+				'dependencies' => array(
+					'mediawiki.Uri'
+				)
 			),
 			"mw.EmbedPlayerIEWebMPrompt" => array(
 				'scripts' => 'resources/mw.EmbedPlayerIEWebMPrompt.js',
 				'styles' => 'resources/mw.EmbedPlayerIEWebMPrompt.css',
 			),
-			"mw.EmbedPlayerImageOverlay" => array( 'scripts'=> "resources/mw.EmbedPlayerImageOverlay.js" ),
+			"mw.EmbedPlayerImageOverlay" => array(
+				'scripts'=> "resources/mw.EmbedPlayerImageOverlay.js"
+			),
 
-			"mw.EmbedPlayerVlc" => array( 'scripts'=> "resources/mw.EmbedPlayerVlc.js" ),
+			"mw.EmbedPlayerVlc" => array(
+				'scripts'=> "resources/mw.EmbedPlayerVlc.js"
+			),
 
 			"mw.PlayerSkinKskin" => array(
 				'scripts' => "resources/skins/kskin/mw.PlayerSkinKskin.js",
