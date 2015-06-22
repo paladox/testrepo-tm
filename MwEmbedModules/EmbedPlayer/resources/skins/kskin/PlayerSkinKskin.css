@@ -480,3 +480,9 @@
 	height : 12px;
 	cursor: pointer;
 }
+
+/* Add scroll bar to list */
+
+.fg-menu-container {
+	overflow: auto;
+}
