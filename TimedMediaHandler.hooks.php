@@ -86,6 +86,17 @@ class TimedMediaHandlerHooks {
 						),
 						'position' => 'top',
 					),
+				'ext.tmh.mobile' => $baseExtensionResource + array(
+						'scripts' => 'resources/ext.tmh.mobile.js',
+						'styles' => array(
+							'resources/ext.tmh.mobile.css',
+							'resources/PopUpThumbVideo.css',
+						),
+						'dependencies' => array(
+							'ext.tmh.OgvJsSupport',
+						),
+						'targets' => array( 'mobile' ),
+					),
 			);
 			// Add OgvJs-related modules for Safari/IE/Edge Ogg playback
 			$resourceModules += array(
@@ -637,6 +648,7 @@ class TimedMediaHandlerHooks {
 			$out->addModules( array(
 				'mw.MediaWikiPlayer.loader',
 				'mw.PopUpMediaTransform',
+				'ext.tmh.mobile',
 			) );
 		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
 			$out->addModuleStyles( 'ext.tmh.player.styles' );
