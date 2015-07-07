@@ -205,7 +205,9 @@ class TimedMediaHandler extends MediaHandler {
 			'mw.MediaWikiPlayer.loader',
 			'mw.PopUpMediaTransform',
 			'mw.TMHGalleryHook.js',
+			'ext.tmh.mobile',
 		) );
+
 		if ( $parserOutput ) {
 			// Not present when run from outputpage hooks, like File/Category etc...
 			$parserOutput->setExtensionData( 'mw_ext_TMH_hasTimedMediaTransform', true );
