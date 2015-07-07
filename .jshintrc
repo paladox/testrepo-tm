@@ -39,6 +39,7 @@
 		"OGVVersion",
 		"OGVSupport",
 		"OGVPlayer",
-		"OGVLoader"
+		"OGVLoader",
+		"OGVCompat"
 	]
 }
