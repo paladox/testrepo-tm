@@ -158,7 +158,20 @@ class TimedMediaHandlerHooks {
 				'targets' => array( 'mobile', 'desktop' ),
 			),
 		);
-
+		// Add the MobileFrontend-specific lightweight player
+		$wgResourceModules += array(
+			'ext.tmh.mobile' => $baseExtensionResource + array(
+				'scripts' => 'resources/ext.tmh.mobile.js',
+				'styles' => array(
+					'resources/ext.tmh.mobile.css',
+					'resources/PopUpThumbVideo.css',
+				),
+				'dependencies' => array(
+					'ext.tmh.OgvJsSupport',
+				),
+				'targets' => array( 'mobile' ),
+			),
+		);
 		// Setup a hook for iframe embed handling:
 		$wgHooks['ArticleFromTitle'][] = 'TimedMediaIframeOutput::iframeHook';
 
@@ -520,6 +533,7 @@ class TimedMediaHandlerHooks {
 				'mw.MediaWikiPlayer.loader',
 				'mw.PopUpMediaTransform',
 			) );
+			$out->addModuleScripts( 'ext.tmh.mobile' );
 		}
 
 		return true;
