@@ -39,6 +39,7 @@
 		"OGVSupport": false,
 		"OGVPlayer": false,
 		"OGVLoader": false,
+		"OGVCompat": false,
 		"videojs": false
 	}
 }
