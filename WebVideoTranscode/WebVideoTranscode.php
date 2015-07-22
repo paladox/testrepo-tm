@@ -27,6 +27,7 @@ class WebVideoTranscode {
 
 	// Ogg Profiles
 	const ENC_OGV_160P = '160p.ogv';
+	const ENC_OGV_240P = '240p.ogv';
 	const ENC_OGV_360P = '360p.ogv';
 	const ENC_OGV_480P = '480p.ogv';
 	const ENC_OGV_720P = '720p.ogv';
@@ -34,12 +35,14 @@ class WebVideoTranscode {
 
 	// WebM profiles:
 	const ENC_WEBM_160P = '160p.webm';
+	const ENC_WEBM_240P = '240p.webm';
 	const ENC_WEBM_360P = '360p.webm';
 	const ENC_WEBM_480P = '480p.webm';
 	const ENC_WEBM_720P = '720p.webm';
 	const ENC_WEBM_1080P = '1080p.webm';
 
 	// mp4 profiles:
+	const ENC_H264_240P = '240p.mp4';
 	const ENC_H264_320P = '320p.mp4';
 	const ENC_H264_480P = '480p.mp4';
 	const ENC_H264_720P = '720p.mp4';
@@ -68,6 +71,20 @@ class WebVideoTranscode {
 				'videoBitrate'               => '160',
 				'framerate'                  => '15',
 				'audioQuality'               => '-1',
+				'samplerate'                 => '44100',
+				'channels'                   => '2',
+				'noUpscaling'                => 'true',
+				//'twopass'                    => 'true',
+				'keyframeInterval'           => '128',
+				'bufDelay'                   => '256',
+				'videoCodec'                 => 'theora',
+				'type'                       => 'video/ogg; codecs="theora, vorbis"',
+			),
+		WebVideoTranscode::ENC_OGV_240P =>
+			array(
+				'maxSize'                    => '426x240',
+				'videoBitrate'               => '320',
+				'audioQuality'               => '0',
 				'samplerate'                 => '44100',
 				'channels'                   => '2',
 				'noUpscaling'                => 'true',
@@ -143,6 +160,19 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp8',
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
+		WebVideoTranscode::ENC_WEBM_240P =>
+			array(
+				'maxSize'                    => '426x240',
+				'videoBitrate'               => '320',
+				'audioQuality'               => '0',
+				'samplerate'                 => '44100',
+				'noUpscaling'                => 'true',
+				'twopass'                    => 'true',
+				'keyframeInterval'           => '128',
+				'bufDelay'                   => '256',
+				'videoCodec'                 => 'vp8',
+				'type'                       => 'video/webm; codecs="vp8, vorbis"',
+			),
 		WebVideoTranscode::ENC_WEBM_360P =>
 			array(
 				'maxSize'                    => '640x360',
@@ -192,6 +222,17 @@ class WebVideoTranscode {
 		// https://develop.participatoryculture.org/index.php/ConversionMatrix
 		// and apple HLS profile guide:
 		// https://developer.apple.com/library/ios/#documentation/networkinginternet/conceptual/streamingmediaguide/UsingHTTPLiveStreaming/UsingHTTPLiveStreaming.html#//apple_ref/doc/uid/TP40008332-CH102-DontLinkElementID_24
+
+		WebVideoTranscode::ENC_H264_240P =>
+			array(
+				'maxSize' => '426x240',
+				'videoCodec' => 'h264',
+				'videoBitrate' => '320k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '40k',
+				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+			),
 
 		WebVideoTranscode::ENC_H264_320P =>
 			array(
