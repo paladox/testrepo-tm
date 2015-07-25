@@ -19,6 +19,9 @@ mw.EmbedPlayerOgvJs = {
 		'overlays': true
 	},
 
+	_loadedMetadata: false,
+	_initialPlaybackTime: 0,
+
 	/**
 	 * Perform setup in response to a play start command.
 	 * This means loading the code asynchronously if needed,
@@ -90,13 +93,104 @@ mw.EmbedPlayerOgvJs = {
 				_this.onClipDone();
 			});
 			$( _this ).empty().append( player );
-			player.play();
+
+			_this._loadedMetadata = false;
+			player.addEventListener('loadedmetadata', function() {
+				_this._loadedMetadata = true;
+				player.play();
+				if ( _this._initialPlaybackTime ) {
+					player.currentTime = _this._initialPlaybackTime;
+					_this._initialPlaybackTime = 0;
+				}
+			});
+			player.load();
 
 			// Start the monitor:
 			_this.monitor();
 
+			// Make an attempt to monitor playback quality...
+			_this.cpuTime = 0;
+			_this.clockTime = 0;
+			_this.framesPlayed = 0;
+			_this.frameTime = 0;
+			player.addEventListener('framecallback', function(event) {
+				_this.framesPlayed++;
+				_this.cpuTime += event.cpuTime;
+				_this.clockTime += event.clockTime;
+				_this.frameTime += (1000 / player.ogvjsVideoFrameRate);
+				
+				if (_this.framesPlayed >= 150 && (_this.clockTime / _this.frameTime) > 1.1) {
+					_this.ogvjsDowngradeSource();
+				}
+			});
+
 			if ( optionalCallback ) {
 				optionalCallback();
+			}
+		});
+	},
+
+	ogvjsDowngradeSource: function() {
+		var _this = this,
+			source = this.ogvjsFindDowngradedSource();
+
+		if ( source.src !== this.mediaElement.selectedSource.src ) {
+			var oldPlayer = this.getPlayerElement(),
+				now = oldPlayer.currentTime;
+
+			oldPlayer.pause();
+			this.mediaElement.setSource( source );
+			this.switchPlaySource( source, function(){}, function( vid ) {
+				var player = _this.getPlayerElement();
+				if ( now > 0 ) {
+					var listener = function() {
+						player.removeEventListener( 'framecallback', listener );
+						player.pause();
+						setTimeout(function() {
+							player.currentTime = now;
+							player.play();
+						}, 0);
+					};
+					player.addEventListener( 'framecallback', listener );
+				}
+			});
+		}
+	},
+	
+	ogvjsFindDowngradedSource: function() {
+		var sources = this.ogvjsSources();
+		for ( var i = 0; i < sources.length; i++ ) {
+			if ( sources[i].src == this.mediaElement.selectedSource.src) {
+				if ( i == 0 ) {
+					// already at the smallest source
+					return this.mediaElement.selectedSource;
+				} else {
+					return sources[i - 1];
+				}
+			}
+		}
+		return this.selectedSource;
+	},
+
+	ogvjsSources: function() {
+		var _this = this,
+			sources = [];
+		$.each( _this.mediaElement.getPlayableSources(), function( sourceIndex, source ) {
+			// Output the player select code:
+			var supportingPlayers = mw.EmbedTypes.getMediaPlayers().getMIMETypePlayers( source.getMIMEType() );
+			for ( var i = 0; i < supportingPlayers.length; i++ ) {
+				if( supportingPlayers[i].library === 'OgvJs' ){
+					sources.push( source );
+				}
+			}
+		});
+		return sources.sort(function(a, b) {
+			if ( parseInt( a.height, 10 ) < parseInt( b.height, 10 ) ) {
+				return -1;
+			} else if ( parseInt( a.height, 10 ) > parseInt( b.height, 10 ) ) {
+				return 1;
+			} else {
+				return 0;
 			}
 		});
 	},

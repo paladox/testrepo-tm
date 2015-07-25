@@ -316,7 +316,7 @@ mw.MediaElement.prototype = {
 					var minSizeDelta = null;
 
 					// unless we're really slow...
-					var isBogoSlow = OGVCompat.isSlow();
+					var isBogoSlow = useBogoSlow && OGVCompat.isSlow();
 
 					if( this.parentEmbedId ){
 						var displayWidth = $('#' + this.parentEmbedId).width();
