@@ -588,7 +588,7 @@ var AudioFeeder;
 			console.log("No W3C Web Audio API available");
 			var flashOptions = {};
 			if (typeof options.base === 'string') {
-				flashOptions.swf = options.base + '/dynamicaudio.swf';
+				flashOptions.swf = options.base + '/dynamicaudio.swf?version=' + OGVVersion;
 			}
 			this.flashaudio = new DynamicAudio( flashOptions );
 		}
@@ -616,8 +616,8 @@ var AudioFeeder;
 			pendingBuffer = freshBuffer(),
 			pendingPos = 0,
 			muted = false,
-			bufferHead = 0,
-			playbackTimeAtBufferHead = -1,
+			queuedTime = 0,
+			playbackTimeAtBufferTail = -1,
 			targetRate,
 			dropped = 0,
 			delayedTime = 0,
@@ -655,21 +655,20 @@ var AudioFeeder;
 		}
 
 		function audioProcess(event) {
-			var playbackTime;
-			if (typeof event.playbackTime === "number") {
-				playbackTime = event.playbackTime;
-			} else if (typeof event.timeStamp === "number") {
-				playbackTime = (event.timeStamp - Date.now()) / 1000 + context.currentTime;
+			var channel, input, output, i;
+			if (typeof event.playbackTime === 'number') {
+				var playbackTime = event.playbackTime;
 			} else {
-				console.log("Unrecognized AudioProgressEvent format, no playbackTime or timestamp");
+				// Safari 6.1 hack
+				playbackTime = context.currentTime + (bufferSize / targetRate);
 			}
-			queuedTime += (bufferSize / context.sampleRate);
-			var expectedTime = playbackTimeAtBufferHead + (bufferSize / context.sampleRate);
+
+			var expectedTime = playbackTimeAtBufferTail;
 			if (expectedTime < playbackTime) {
-				// we may have lost some time while something ran too slow
-				delayedTime += (playbackTime - expectedTime);
+                // we may have lost some time while something ran too slow
+                delayedTime += (playbackTime - expectedTime);
 			}
-			playbackTimeAtBufferHead = playbackTime;
+
 			var inputBuffer = popNextBuffer(bufferSize);
 			if (!inputBuffer) {
 				// We might be in a throttled background tab; go ping the decoder
@@ -679,32 +678,30 @@ var AudioFeeder;
 					inputBuffer = popNextBuffer(bufferSize);
 				}
 			}
-			var channel, input, output, i;
-			if (!muted && inputBuffer) {
-				bufferHead += (bufferSize / context.sampleRate);
-				playbackTimeAtBufferHead += (bufferSize / context.sampleRate);
-				for (channel = 0; channel < outputChannels; channel++) {
-					input = inputBuffer[channel];
-					output = event.outputBuffer.getChannelData(channel);
-					for (i = 0; i < Math.min(bufferSize, input.length); i++) {
-						output[i] = input[i];
-					}
-				}
-			} else {
-				if (inputBuffer) {
-					// Pretend we played this audio
-					bufferHead += (bufferSize / context.sampleRate);
-					playbackTimeAtBufferHead += (bufferSize / context.sampleRate);
-				} else {
-					dropped++;
-				}
+
+            // If we haven't got enough data, write a buffer of of silence to
+            // both channels
+			if (!inputBuffer) {
 				for (channel = 0; channel < outputChannels; channel++) {
 					output = event.outputBuffer.getChannelData(channel);
 					for (i = 0; i < bufferSize; i++) {
 						output[i] = 0;
 					}
 				}
+				dropped++;
+				return;
 			}
+
+			var volume = (muted ? 0 : 1);
+			for (channel = 0; channel < outputChannels; channel++) {
+				input = inputBuffer[channel];
+				output = event.outputBuffer.getChannelData(channel);
+				for (i = 0; i < Math.min(bufferSize, input.length); i++) {
+					output[i] = input[i] * volume;
+				}
+			}
+			queuedTime += (bufferSize / context.sampleRate);
+			playbackTimeAtBufferTail = playbackTime + (bufferSize / context.sampleRate);
 		}
 	
 		/**
@@ -802,21 +799,32 @@ var AudioFeeder;
 			}
 			return digits;
 		}
-	
+
+		var flashBuffer = '',
+			flushTimeout = null;
+		function flushFlashBuffer() {
+			var chunk = flashBuffer;
+			if (self.flashaudio.flashElement.write) {
+				self.flashaudio.flashElement.write(chunk);
+			} else {
+				self.waitUntilReady(function() {
+					self.flashaudio.flashElement.write(chunk);
+				});
+			}
+			flashBuffer = '';
+			flushTimeout = null;
+		}
 		this.bufferData = function(samplesPerChannel) {
 			if(this.flashaudio) {
 				var resamples = !muted ? resampleFlash(samplesPerChannel) : resampleFlashMuted(samplesPerChannel);
 				var flashElement = this.flashaudio.flashElement;
 				if(resamples.length > 0) {
 					var str = hexString(resamples.buffer);
-					//console.log(str.length + ' bytes sent to Flash');
-					if (flashElement.write) {
-						flashElement.write(str);
-					} else {
-						//console.log('NOT YET READY');
-						self.waitUntilReady(function() {
-							flashElement.write(str);
-						});
+					flashBuffer += str;
+					if (!flushTimeout) {
+						// consolidate multiple consecutive tiny buffers in one pass;
+						// pushing data to Flash is relatively expensive on slow machines
+						flushTimeout = setTimeout(flushFlashBuffer, 0);
 					}
 				}
 			} else if (buffers) {
@@ -836,7 +844,7 @@ var AudioFeeder;
 				});
 			
 				var bufferedSamples = numSamplesQueued;
-				var remainingSamples = Math.floor(Math.max(0, (playbackTimeAtBufferHead - context.currentTime)) * context.sampleRate);
+				var remainingSamples = Math.floor(Math.max(0, (playbackTimeAtBufferTail - context.currentTime)) * context.sampleRate);
 			
 				return bufferedSamples + remainingSamples;
 			} else {
@@ -855,7 +863,9 @@ var AudioFeeder;
 			if (this.flashaudio) {
 				var flashElement = this.flashaudio.flashElement;
 				if (flashElement.write) {
-					return flashElement.getPlaybackState();
+					var state = flashElement.getPlaybackState();
+					state.samplesQueued += flashBuffer.length / 2;
+					return state;
 				} else {
 					//console.log('getPlaybackState USED TOO EARLY');
 					return {
@@ -867,7 +877,7 @@ var AudioFeeder;
 				}
 			} else {
 				return {
-					playbackPosition: queuedTime - Math.max(0, playbackTimeAtBufferHead - context.currentTime),
+					playbackPosition: queuedTime - Math.max(0, playbackTimeAtBufferTail - context.currentTime),
 					samplesQueued: samplesQueued(),
 					dropped: dropped,
 					delayed: delayedTime
@@ -926,7 +936,7 @@ var AudioFeeder;
 			} else {
 				node.onaudioprocess = audioProcess;
 				node.connect(context.destination);
-				playbackTimeAtBufferHead = context.currentTime;
+				playbackTimeAtBufferTail = context.currentTime;
 			}
 		};
 		
@@ -1068,7 +1078,9 @@ var AudioFeeder;
 function FrameSink(canvas, videoInfo) {
 	var self = this,
 		ctx = canvas.getContext('2d'),
-		imageData = null;
+		imageData = null,
+		resampleCanvas = null,
+		resampleContext = null;
 
 	
 /**
@@ -1193,6 +1205,13 @@ function convertYCbCr(ybcbr, output) {
 		}
 	}
 
+	function initResampleCanvas() {
+		resampleCanvas = document.createElement('canvas');
+		resampleCanvas.width = videoInfo.picWidth;
+		resampleCanvas.height = videoInfo.picHeight;
+		resampleContext = resampleCanvas.getContext('2d');
+	}
+
 	/**
 	 * Actually draw a frame into the canvas.
 	 */
@@ -1204,11 +1223,26 @@ function convertYCbCr(ybcbr, output) {
 		}
 		convertYCbCr(yCbCrBuffer, imageData.data);
 
-		ctx.putImageData(imageData,
-						 0, 0,
-						 videoInfo.picX, videoInfo.picY,
-						 videoInfo.picWidth, videoInfo.picHeight);
+		var resample = (videoInfo.picWidth != videoInfo.displayWidth || videoInfo.picHeight != videoInfo.displayHeight);
+		if (resample) {
+			// hack for non-square aspect-ratio
+			// putImageData doesn't resample, so we have to draw in two steps.
+			if (!resampleCanvas) {
+				initResampleCanvas();
+			}
+			drawContext = resampleContext;
+		} else {
+			drawContext = ctx;
+		}
 
+		drawContext.putImageData(imageData,
+						         0, 0,
+						         videoInfo.picX, videoInfo.picY,
+						         videoInfo.picWidth, videoInfo.picHeight);
+
+		if (resample) {
+			ctx.drawImage(resampleCanvas, 0, 0, videoInfo.displayWidth, videoInfo.displayHeight);
+		}
 	};
 
 	return self;
@@ -1229,7 +1263,7 @@ function WebGLFrameSink(canvas, videoInfo) {
 	var self = this,
 		gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl'),
 		debug = false; // swap this to enable more error checks, which can slow down rendering
-	
+
 	if (gl === null) {
 		throw new Error('WebGL unavailable');
 	}
@@ -1282,14 +1316,21 @@ function WebGLFrameSink(canvas, videoInfo) {
 
 	var textures = {};
 	function attachTexture(name, register, index, width, height, data) {
-		var texture;
+		var texture,
+			texWidth = WebGLFrameSink.stripe ? (width / 4) : width,
+			format = WebGLFrameSink.stripe ? gl.RGBA : gl.LUMINANCE,
+			filter = WebGLFrameSink.stripe ? gl.NEAREST : gl.LINEAR;
+
 		if (textures[name]) {
 			// Reuse & update the existing texture
 			texture = textures[name];
 		} else {
 			textures[name] = texture = gl.createTexture();
+			checkError();
+
+			gl.uniform1i(gl.getUniformLocation(program, name), index);
+			checkError();
 		}
-		checkError();
 		gl.activeTexture(register);
 		checkError();
 		gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -1298,33 +1339,35 @@ function WebGLFrameSink(canvas, videoInfo) {
 		checkError();
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 		checkError();
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
 		checkError();
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
 		checkError();
 		
 		gl.texImage2D(
 			gl.TEXTURE_2D,
 			0, // mip level
-			gl.LUMINANCE, // internal format
-			width, height,
+			format, // internal format
+			texWidth,
+			height,
 			0, // border
-			gl.LUMINANCE, // format
+			format, // format
 			gl.UNSIGNED_BYTE, //type
 			data // data!
 		);
 		checkError();
 	
-		gl.uniform1i(gl.getUniformLocation(program, name), index);
-		checkError();
-		
 		return texture;
 	}
 
 	function init(yCbCrBuffer) {
 		vertexShader = compileShader(gl.VERTEX_SHADER, "attribute vec2 aPosition;\nattribute vec2 aLumaPosition;\nattribute vec2 aChromaPosition;\nvarying vec2 vLumaPosition;\nvarying vec2 vChromaPosition;\nvoid main() {\n    gl_Position = vec4(aPosition, 0, 1);\n    vLumaPosition = aLumaPosition;\n    vChromaPosition = aChromaPosition;\n}\n");
-		fragmentShader = compileShader(gl.FRAGMENT_SHADER, "// inspired by https://github.com/mbebenita/Broadway/blob/master/Player/canvas.js\n// extra 'stripe' texture fiddling to work around IE 11's lack of gl.LUMINANCE or gl.ALPHA textures\n\nprecision mediump float;\nuniform sampler2D uTextureY;\nuniform sampler2D uTextureCb;\nuniform sampler2D uTextureCr;\nvarying vec2 vLumaPosition;\nvarying vec2 vChromaPosition;\nvoid main() {\n   // Y, Cb, and Cr planes are uploaded as LUMINANCE textures.\n   float fY = texture2D(uTextureY, vLumaPosition).x;\n   float fCb = texture2D(uTextureCb, vChromaPosition).x;\n   float fCr = texture2D(uTextureCr, vChromaPosition).x;\n\n   // Premultipy the Y...\n   float fYmul = fY * 1.1643828125;\n\n   // And convert that to RGB!\n   gl_FragColor = vec4(\n     fYmul + 1.59602734375 * fCr - 0.87078515625,\n     fYmul - 0.39176171875 * fCb - 0.81296875 * fCr + 0.52959375,\n     fYmul + 2.017234375   * fCb - 1.081390625,\n     1\n   );\n}\n");
-	
+		if (WebGLFrameSink.stripe) {
+			fragmentShader = compileShader(gl.FRAGMENT_SHADER, "// inspired by https://github.com/mbebenita/Broadway/blob/master/Player/canvas.js\n// extra 'stripe' texture fiddling to work around IE 11's poor performance on gl.LUMINANCE and gl.ALPHA textures\n\nprecision mediump float;\nuniform sampler2D uStripeLuma;\nuniform sampler2D uStripeChroma;\nuniform sampler2D uTextureY;\nuniform sampler2D uTextureCb;\nuniform sampler2D uTextureCr;\nvarying vec2 vLumaPosition;\nvarying vec2 vChromaPosition;\nvoid main() {\n   // Y, Cb, and Cr planes are mapped into a pseudo-RGBA texture\n   // so we can upload them without expanding the bytes on IE 11\n   // which doesn\\'t allow LUMINANCE or ALPHA textures.\n   // The stripe textures mark which channel to keep for each pixel.\n   vec4 vStripeLuma = texture2D(uStripeLuma, vLumaPosition);\n   vec4 vStripeChroma = texture2D(uStripeChroma, vChromaPosition);\n\n   // Each texture extraction will contain the relevant value in one\n   // channel only.\n   vec4 vY = texture2D(uTextureY, vLumaPosition) * vStripeLuma;\n   vec4 vCb = texture2D(uTextureCb, vChromaPosition) * vStripeChroma;\n   vec4 vCr = texture2D(uTextureCr, vChromaPosition) * vStripeChroma;\n\n   // Now assemble that into a YUV vector, and premultipy the Y...\n   vec3 YUV = vec3(\n     (vY.x  + vY.y  + vY.z  + vY.w) * 1.1643828125,\n     (vCb.x + vCb.y + vCb.z + vCb.w),\n     (vCr.x + vCr.y + vCr.z + vCr.w)\n   );\n   // And convert that to RGB!\n   gl_FragColor = vec4(\n     YUV.x + 1.59602734375 * YUV.z - 0.87078515625,\n     YUV.x - 0.39176171875 * YUV.y - 0.81296875 * YUV.z + 0.52959375,\n     YUV.x + 2.017234375   * YUV.y - 1.081390625,\n     1\n   );\n}\n");
+		} else {
+			fragmentShader = compileShader(gl.FRAGMENT_SHADER, "// inspired by https://github.com/mbebenita/Broadway/blob/master/Player/canvas.js\n\nprecision mediump float;\nuniform sampler2D uTextureY;\nuniform sampler2D uTextureCb;\nuniform sampler2D uTextureCr;\nvarying vec2 vLumaPosition;\nvarying vec2 vChromaPosition;\nvoid main() {\n   // Y, Cb, and Cr planes are uploaded as LUMINANCE textures.\n   float fY = texture2D(uTextureY, vLumaPosition).x;\n   float fCb = texture2D(uTextureCb, vChromaPosition).x;\n   float fCr = texture2D(uTextureCr, vChromaPosition).x;\n\n   // Premultipy the Y...\n   float fYmul = fY * 1.1643828125;\n\n   // And convert that to RGB!\n   gl_FragColor = vec4(\n     fYmul + 1.59602734375 * fCr - 0.87078515625,\n     fYmul - 0.39176171875 * fCb - 0.81296875 * fCr + 0.52959375,\n     fYmul + 2.017234375   * fCb - 1.081390625,\n     1\n   );\n}\n");
+		}
+
 		program = gl.createProgram();
 		gl.attachShader(program, vertexShader);
 		checkError();
@@ -1341,6 +1384,40 @@ function WebGLFrameSink(canvas, videoInfo) {
 
 		gl.useProgram(program);
 		checkError();
+
+		if (WebGLFrameSink.stripe) {
+			function buildStripe(width, height) {
+				var len = width * height,
+					out = new Uint32Array(len);
+				for (var i = 0; i < len; i += 4) {
+					out[i    ] = 0x000000ff;
+					out[i + 1] = 0x0000ff00;
+					out[i + 2] = 0x00ff0000;
+					out[i + 3] = 0xff000000;
+				}
+				return new Uint8Array(out.buffer);
+			}
+
+			attachTexture(
+				'uStripeLuma',
+				gl.TEXTURE3,
+				3,
+				yCbCrBuffer.strideY * 4,
+				yCbCrBuffer.height,
+				buildStripe(yCbCrBuffer.strideY, yCbCrBuffer.height)
+			);
+			checkError();
+
+			attachTexture(
+				'uStripeChroma',
+				gl.TEXTURE4,
+				4,
+				yCbCrBuffer.strideCb * 4,
+				yCbCrBuffer.height >> yCbCrBuffer.vdec,
+				buildStripe(yCbCrBuffer.strideCb, yCbCrBuffer.height >> yCbCrBuffer.vdec)
+			);
+			checkError();
+		}
 	}
 	
 	self.drawFrame = function(yCbCrBuffer) {
@@ -1442,6 +1519,18 @@ function WebGLFrameSink(canvas, videoInfo) {
 	return self;
 }
 
+// For IE and Edge; luminance and alpha textures are ssllooww to upload,
+// so we pack into RGBA and unpack in the shaders.
+WebGLFrameSink.stripe = (function() {
+	if (navigator.userAgent.indexOf('Trident') !== -1) {
+		return true;
+	}
+	if (navigator.userAgent.indexOf('Edge') !== -1) {
+		return true;
+	}
+	return false;
+})();
+
 /**
  * Static function to check if WebGL will be available with appropriate features.
  *
@@ -1462,21 +1551,25 @@ WebGLFrameSink.isAvailable = function() {
 			width = 4,
 			height = 4,
 			texture = gl.createTexture(),
-			data = new Uint8Array(width * height);
+			data = new Uint8Array(width * height),
+			texWidth = WebGLFrameSink.stripe ? (width / 4) : width,
+			format = WebGLFrameSink.stripe ? gl.RGBA : gl.LUMINANCE,
+			filter = WebGLFrameSink.stripe ? gl.NEAREST : gl.LINEAR;
 
 		gl.activeTexture(register);
 		gl.bindTexture(gl.TEXTURE_2D, texture);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
 		gl.texImage2D(
 			gl.TEXTURE_2D,
 			0, // mip level
-			gl.LUMINANCE, // internal format
-			width, height,
+			format, // internal format
+			texWidth,
+			height,
 			0, // border
-			gl.LUMINANCE, // format
+			format, // format
 			gl.UNSIGNED_BYTE, //type
 			data // data!
 		);
@@ -1620,6 +1713,8 @@ OGVTimeRanges = window.OGVTimeRanges = function(ranges) {
 OGVPlayer = window.OGVPlayer = function(options) {
 	options = options || {};
 
+	var instanceId = 'ogvjs' + (++OGVPlayer.instanceCount);
+
 	var codecClassName = null,
 		codecClassFile = null,
 		codecClass = null;
@@ -1642,7 +1737,6 @@ OGVPlayer = window.OGVPlayer = function(options) {
 		LOADED: 'LOADED',
 		READY: 'READY',
 		PLAYING: 'PLAYING',
-		PAUSED: 'PAUSED',
 		SEEKING: 'SEEKING',
 		ENDED: 'ENDED'
 	}, state = State.INITIAL;
@@ -1670,16 +1764,14 @@ OGVPlayer = window.OGVPlayer = function(options) {
 	
 	// Return a magical custom element!
 	var self = document.createElement('ogvjs');
-	self.style.display = 'inline-block';
-	self.style.position = 'relative';
-	self.style.width = '0px'; // size will be expanded later
-	self.style.height = '0px';
+	self.className = instanceId;
 
 	canvas.style.position = 'absolute';
 	canvas.style.top = '0';
 	canvas.style.left = '0';
 	canvas.style.width = '100%';
 	canvas.style.height = '100%';
+	canvas.style.objectFit = 'contain';
 	self.appendChild(canvas);
 
 	var getTimestamp;
@@ -1721,8 +1813,8 @@ OGVPlayer = window.OGVPlayer = function(options) {
 
 	var codec, audioFeeder;
 	var muted = false,
-		initialAudioPosition = 0.0,
-		initialAudioOffset = 0.0;
+		initialPlaybackPosition = 0.0,
+		initialPlaybackOffset = 0.0;
 	function initAudioFeeder() {
 		audioFeeder = new AudioFeeder( audioOptions );
 		if (muted) {
@@ -1736,18 +1828,24 @@ OGVPlayer = window.OGVPlayer = function(options) {
 		audioFeeder.init(audioInfo.channels, audioInfo.rate);
 	}
 	
-	function startAudio(offset) {
-		audioFeeder.start();
-		var state = audioFeeder.getPlaybackState();
-		initialAudioPosition = state.playbackPosition;
+	function startPlayback(offset) {
+		if (audioFeeder) {
+			audioFeeder.start();
+			var state = audioFeeder.getPlaybackState();
+			initialPlaybackPosition = state.playbackPosition;
+		} else {
+			initialPlaybackPosition = getTimestamp() / 1000;
+		}
 		if (offset !== undefined) {
-			initialAudioOffset = offset;
+			initialPlaybackOffset = offset;
 		}
 	}
 	
-	function stopAudio() {
-		initialAudioOffset = getAudioTime();
-		audioFeeder.stop();
+	function stopPlayback() {
+		if (audioFeeder) {
+			audioFeeder.stop();
+		}
+		initialPlaybackOffset = getPlaybackTime();
 	}
 	
 	/**
@@ -1755,9 +1853,15 @@ OGVPlayer = window.OGVPlayer = function(options) {
 	 *
 	 * @return {number} seconds since file start
 	 */
-	function getAudioTime(state) {
-		state = state || audioFeeder.getPlaybackState();
-		return (state.playbackPosition - initialAudioPosition) + initialAudioOffset;
+	function getPlaybackTime(state) {
+		var position;
+		if (audioFeeder) {
+			state = state || audioFeeder.getPlaybackState();
+			position = state.playbackPosition;
+		} else {
+			position = getTimestamp() / 1000;
+		}
+		return (position - initialPlaybackPosition) + initialPlaybackOffset;
 	}
 
 	var stream,
@@ -1784,6 +1888,7 @@ OGVPlayer = window.OGVPlayer = function(options) {
 	// Benchmark data that doesn't clear
 	var droppedAudio = 0, // number of times we were starved for audio
 		delayedAudio = 0; // seconds audio processing was delayed by blocked CPU
+	var poster = '', thumbnail;
 
 	function stopVideo() {
 		// kill the previous video if any
@@ -1915,9 +2020,7 @@ OGVPlayer = window.OGVPlayer = function(options) {
 		lastSeekPosition = -1;
 		codec.flush();
 		
-		if (codec.hasAudio && audioFeeder) {
-			stopAudio();
-		}
+		stopPlayback();
 		
 		var offset = codec.getKeypointOffset(toTime);
 		if (offset > 0) {
@@ -1946,9 +2049,12 @@ OGVPlayer = window.OGVPlayer = function(options) {
 		frameEndTimestamp = codec.frameTimestamp;
 		if (codec.hasAudio) {
 			seekTargetTime = codec.audioTimestamp;
-			startAudio(seekTargetTime);
 		} else {
 			seekTargetTime = codec.frameTimestamp;
+		}
+		startPlayback(seekTargetTime);
+		if (paused) {
+			stopPlayback(); // :P
 		}
 	}
 	
@@ -2076,9 +2182,8 @@ OGVPlayer = window.OGVPlayer = function(options) {
 		nextProcessingTimer = null;
 		
 		var audioBufferedDuration = 0,
-			decodedSamples = 0,
 			audioState = null,
-			audioPlaybackPosition = 0;
+			playbackPosition = 0;
 
 		var n = 0;
 		while (true) {
@@ -2186,10 +2291,11 @@ OGVPlayer = window.OGVPlayer = function(options) {
 				if (codec.hasAudio) {
 					initAudioFeeder();
 					audioFeeder.waitUntilReady(function() {
-						startAudio(0.0);
+						startPlayback(0.0);
 						pingProcessing(0);
 					});
 				} else {
+					startPlayback(0.0);
 					pingProcessing(0);
 				}
 
@@ -2253,19 +2359,21 @@ OGVPlayer = window.OGVPlayer = function(options) {
 			if (codec.hasAudio && audioFeeder) {
 				if (!audioState) {
 					audioState = audioFeeder.getPlaybackState();
-					audioPlaybackPosition = getAudioTime(audioState);
+					playbackPosition = getPlaybackTime(audioState);
 					audioBufferedDuration = (audioState.samplesQueued / audioFeeder.targetRate) * 1000;
 					droppedAudio = audioState.dropped;
 					delayedAudio = audioState.delayed;
 				}
+			} else {
+				playbackPosition = getPlaybackTime();
+			}
 
+			var startTimeSpent = getTimestamp();
+
+			if (codec.hasAudio && audioFeeder) {
 				// Drive on the audio clock!
-				var fudgeDelta = 0.1,
-					readyForAudio = audioState.samplesQueued <= (audioFeeder.bufferSize * 2),
-					frameDelay = (frameEndTimestamp - audioPlaybackPosition) * 1000,
-					readyForFrame = (frameDelay <= fudgeDelta);
+				var readyForAudio = audioState.samplesQueued <= (audioFeeder.bufferSize * 2);
 
-				var startTimeSpent = getTimestamp();
 				if (codec.audioReady && readyForAudio) {
 					var ok;
 					audioDecodingTime += time(function() {
@@ -2281,10 +2389,15 @@ OGVPlayer = window.OGVPlayer = function(options) {
 								audioFeeder.bufferData(buffer);
 							});
 							audioBufferedDuration += (buffer[0].length / audioInfo.rate) * 1000;
-							decodedSamples += buffer[0].length;
 						}
 					}
 				}
+			}
+
+			if (codec.hasVideo) {
+				var fudgeDelta = 0.1,
+					frameDelay = (frameEndTimestamp - playbackPosition) * 1000,
+					readyForFrame = (frameDelay <= fudgeDelta);
 				if (codec.frameReady && readyForFrame) {
 					var ok;
 					videoDecodingTime += time(function() {
@@ -2297,59 +2410,35 @@ OGVPlayer = window.OGVPlayer = function(options) {
 						// Bad packet or something.
 						console.log('Bad video packet or something');
 					}
-					targetFrameTime = currentTime + 1000.0 / fps;
 				}
-			
-				// Check in when all audio runs out
+			}
+
+			// Check in when all audio runs out
+			var nextDelays = [];
+			if (codec.hasAudio && audioFeeder) {
 				var bufferDuration = (audioFeeder.bufferSize / audioFeeder.targetRate) * 1000;
-				var nextDelays = [];
 				if (audioBufferedDuration <= bufferDuration * 2) {
 					// NEED MOAR BUFFERS
+					continue;
 				} else {
 					// Check in when the audio buffer runs low again...
 					nextDelays.push(bufferDuration / 2);
-					
-					if (codec.hasVideo) {
-						// Check in when the next frame is due
-						// Subtract time we already spent decoding
-						var deltaTimeSpent = getTimestamp() - startTimeSpent;
-						nextDelays.push(frameDelay - deltaTimeSpent);
-					}
 				}
-				
-				var nextDelay = Math.min.apply(Math, nextDelays);
-				if (nextDelays.length > 0) {
-					if (!codec.hasVideo) {
-						framesProcessed++; // pretend!
-						doFrameComplete();
-					}
-					pingProcessing(Math.max(0, nextDelay));
-					return;
+			}
+			if (codec.hasVideo) {
+				// Check in when the next frame is due
+				// Subtract time we already spent decoding
+				var deltaTimeSpent = getTimestamp() - startTimeSpent;
+				nextDelays.push(frameDelay - deltaTimeSpent);
+			}
+			var nextDelay = Math.min.apply(Math, nextDelays);
+			if (nextDelays.length > 0) {
+				if (!codec.hasVideo) {
+					framesProcessed++; // pretend!
+					doFrameComplete();
 				}
-			} else if (codec.hasVideo) {
-				// Video-only: drive on the video clock
-				if (codec.frameReady && getTimestamp() >= targetFrameTime) {
-					// it's time to draw
-					var ok;
-					videoDecodingTime += time(function() {
-						ok = codec.decodeFrame();
-					});
-					if (ok) {
-						processFrame();
-						drawFrame();
-						targetFrameTime += 1000.0 / fps;
-						pingProcessing(0);
-					} else {
-						console.log('Bad video packet or something');
-						pingProcessing(Math.max(0, targetFrameTime - getTimestamp()));
-					}
-				} else {
-					// check in again soon!
-					pingProcessing(Math.max(0, targetFrameTime - getTimestamp()));
-				}
+				pingProcessing(Math.max(0, nextDelay));
 				return;
-			} else {
-				// Ok we're just waiting for more input.
 			}
 		}
 	}
@@ -2410,16 +2499,15 @@ OGVPlayer = window.OGVPlayer = function(options) {
 			videoInfo = info;
 			fps = info.fps;
 			targetPerFrameTime = 1000 / fps;
-			
-			if (width === 0) {
-				self.style.width = self.videoWidth + 'px';
-			}
-			if (height === 0) {
-				self.style.height = self.videoHeight + 'px';
-			}
-			
-			canvas.width = info.picWidth;
-			canvas.height = info.picHeight;
+
+			canvas.width = info.displayWidth;
+			canvas.height = info.displayHeight;
+			OGVPlayer.styleManager.appendRule('.' + instanceId, {
+				width: info.displayWidth + 'px',
+				height: info.displayHeight + 'px'
+			});
+			OGVPlayer.updatePositionOnResize();
+
 			if (useWebGL) {
 				frameSink = new WebGLFrameSink(canvas, videoInfo);
 			} else {
@@ -2519,7 +2607,9 @@ OGVPlayer = window.OGVPlayer = function(options) {
 			},
 			onread: function(data) {
 				// Pass chunk into the codec's buffer
-				codec.receiveInput(data);
+				demuxingTime += time(function() {
+					codec.receiveInput(data);
+				});
 
 				// Continue the read/decode/draw loop...
 				pingProcessing();
@@ -2595,9 +2685,7 @@ OGVPlayer = window.OGVPlayer = function(options) {
 				continueVideo();
 			} else {
 				continueVideo = function() {
-					if (audioFeeder) {
-						startAudio();
-					}
+					startPlayback();
 					pingProcessing(0);
 				};
 				if (!started) {
@@ -2647,9 +2735,7 @@ OGVPlayer = window.OGVPlayer = function(options) {
 		} else if (!paused) {
 			clearTimeout(nextProcessingTimer);
 			nextProcessingTimer = null;
-			if (audioFeeder) {
-				stopAudio();
-			}
+			stopPlayback();
 			paused = true;
 			fireEvent('pause');
 		}
@@ -2703,14 +2789,12 @@ OGVPlayer = window.OGVPlayer = function(options) {
 			if (state == State.SEEKING) {
 				return seekTargetTime;
 			} else {
-				if (codec && codec.hasAudio && audioFeeder) {
+				if (codec) {
 					if (paused) {
-						return initialAudioOffset;
+						return initialPlaybackOffset;
 					} else {
-						return getAudioTime();
+						return getPlaybackTime();
 					}
-				} else if (codec && codec.hasVideo) {
-					return frameEndTimestamp;
 				} else {
 					return 0;
 				}
@@ -2786,7 +2870,6 @@ OGVPlayer = window.OGVPlayer = function(options) {
 		}
 	});
 	
-	var poster = '', thumbnail;
 	Object.defineProperty(self, "poster", {
 		get: function getPoster() {
 			return poster;
@@ -2805,15 +2888,15 @@ OGVPlayer = window.OGVPlayer = function(options) {
 				thumbnail.style.left = '0';
 				thumbnail.style.width = '100%';
 				thumbnail.style.height = '100%';
+				thumbnail.style.objectFit = 'contain';
 				thumbnail.addEventListener('load', function() {
-					if (width === 0) {
-						self.style.width = thumbnail.naturalWidth + 'px';
-					}
-					if (height === 0) {
-						self.style.height = thumbnail.naturalHeight + 'px';
-					}
+					OGVPlayer.styleManager.appendRule('.' + instanceId, {
+						width: thumbnail.naturalWidth + 'px',
+						height: thumbnail.naturalHeight + 'px'
+					});
+					self.appendChild(thumbnail);
+					OGVPlayer.updatePositionOnResize();
 				});
-				self.appendChild(thumbnail);
 			}
 		}
 	});
@@ -2822,11 +2905,7 @@ OGVPlayer = window.OGVPlayer = function(options) {
 	Object.defineProperty(self, "videoWidth", {
 		get: function getVideoWidth() {
 			if (videoInfo) {
-				if (videoInfo.aspectNumerator > 0 && videoInfo.aspectDenominator > 0) {
-					return Math.round(videoInfo.picWidth * videoInfo.aspectNumerator / videoInfo.aspectDenominator);
-				} else {
-					return videoInfo.picWidth;
-				}
+				return videoInfo.displayWidth;
 			} else {
 				return 0;
 			}
@@ -2835,7 +2914,7 @@ OGVPlayer = window.OGVPlayer = function(options) {
 	Object.defineProperty(self, "videoHeight", {
 		get: function getVideoHeight() {
 			if (videoInfo) {
-				return videoInfo.picHeight;
+				return videoInfo.displayHeight;
 			} else {
 				return 0;
 			}
@@ -2931,6 +3010,93 @@ OGVPlayer.initSharedAudioContext = function() {
 OGVPlayer.loadingNode = null;
 OGVPlayer.loadingCallbacks = [];
 
+OGVPlayer.instanceCount = 0;
+
+function StyleManager() {
+	var self = this;
+	var el = document.createElement('style');
+	el.type = 'text/css';
+	el.textContent = 'ogvjs { display: inline-block; position: relative; }';
+	document.head.appendChild(el);
+
+	var sheet = el.sheet;
+
+	self.appendRule = function(selector, defs) {
+		var bits = [];
+		for (prop in defs) {
+			if (defs.hasOwnProperty(prop)) {
+				bits.push(prop + ':' + defs[prop]);
+			}
+		}
+		var rule = selector + '{' + bits.join(';') + '}';
+		sheet.insertRule(rule, sheet.length - 1);
+	}
+}
+OGVPlayer.styleManager = new StyleManager();
+
+// IE 10/11 and Edge 12 don't support object-fit.
+// Chrome 43 supports it but it doesn't work on <canvas>!
+// Safari for iOS 8/9 supports it but positions our <canvas> incorrectly >:(
+// Also just for fun, IE 10 doesn't support 'auto' sizing on canvas. o_O
+//OGVPlayer.supportsObjectFit = (typeof document.createElement('div').style.objectFit === 'string');
+OGVPlayer.supportsObjectFit = false;
+if (OGVPlayer.supportsObjectFit) {
+	OGVPlayer.updatePositionOnResize = function() {
+		// no-op
+	};
+} else {
+	OGVPlayer.updatePositionOnResize = function() {
+		function fixup(el, width, height) {
+			var container = el.offsetParent || el.parentNode,
+				containerAspect = container.offsetWidth / container.offsetHeight,
+				intrinsicAspect = width / height;
+			if (intrinsicAspect > containerAspect) {
+				var vsize = container.offsetWidth / intrinsicAspect,
+					vpad = (container.offsetHeight - vsize) / 2;
+				el.style.width = '100%';
+				el.style.height = vsize + 'px';
+				el.style.marginLeft = 0;
+				el.style.marginRight = 0;
+				el.style.marginTop = vpad + 'px';
+				el.style.marginBottom = vpad + 'px';
+			} else {
+				var hsize = container.offsetHeight * intrinsicAspect,
+					hpad = (container.offsetWidth - hsize) / 2;
+				el.style.width = hsize + 'px';
+				el.style.height = '100%';
+				el.style.marginLeft = hpad + 'px';
+				el.style.marginRight = hpad + 'px';
+				el.style.marginTop = 0;
+				el.style.marginBottom = 0;
+			}
+		}
+		function queryOver(selector, callback) {
+			var nodeList = document.querySelectorAll(selector),
+				nodeArray = Array.prototype.slice.call(nodeList);
+			nodeArray.forEach(callback);
+		}
+
+		queryOver('ogvjs > canvas', function(canvas) {
+			fixup(canvas, canvas.width, canvas.height);
+		});
+		queryOver('ogvjs > img', function(poster) {
+			fixup(poster, poster.naturalWidth, poster.naturalHeight);
+		});
+	};
+	function fullResizeVideo() {
+		// fullscreens may ping us before the resize happens
+		setTimeout(OGVPlayer.updatePositionOnResize, 0);
+	}
+
+	window.addEventListener('resize', OGVPlayer.updatePositionOnResize);
+	window.addEventListener('orientationchange', OGVPlayer.updatePositionOnResize)
+
+	document.addEventListener('fullscreenchange', fullResizeVideo);
+	document.addEventListener('mozfullscreenchange', fullResizeVideo);
+	document.addEventListener('webkitfullscreenchange', fullResizeVideo);
+	document.addEventListener('MSFullscreenChange', fullResizeVideo);
+}
+
 
 // exports
 this.OGVMediaType = OGVMediaType;
@@ -2938,4 +3104,4 @@ this.OGVTimeRanges = OGVTimeRanges;
 this.OGVPlayer = OGVPlayer;
 
 })();
-window.OGVVersion = "0.9-20150707015605-1d409d9";
+window.OGVVersion = "0.9.1-20150725034235-8e2a000";
