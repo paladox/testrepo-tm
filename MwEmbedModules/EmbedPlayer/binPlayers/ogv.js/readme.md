@@ -7,6 +7,9 @@ Based around libogg, libvorbis, libtheora, libopus, libvpx, and libnestegg compi
 
 ## Updates
 
+* 0.9.1
+ * more sound sync fixes
+ * IE 11/Edge WebGL perf improvements
 * 0.9 - almost there!
  * controls attribute not yet supported
  * WebM is still experimental
@@ -41,16 +44,17 @@ The API isn't quite complete, but works pretty well.
 ogv.js requires a fast JS engine with typed arrays, and either Web Audio or Flash for audio playback.
 
 The primary target browsers are (testing 360p/30fps):
-* Safari 7/8 on Mac OS X 10.8/10.9
+* Safari 6.1/7/8 on Mac OS X 10.7/10.8/10.9
 * Safari on iOS 8 64-bit
-* Edge on Windows 10 (desktop/tablet and mobile)
+* Edge on Windows 10 desktop/tablet
 * Internet Explorer 10/11 on Windows 7/8/8.1 (desktop/tablet)
 
 And for lower-resolution files (testing 160p/15fps):
 * Safari on iOS 8 32-bit
+* Edge on Windows 10 Mobile
 * Internet Explorer 10/11 on Windows RT
 
-Older versions of iOS Safari have flaky JIT compilers. IE 9 and below lack typed arrays.
+Older versions of Safari have flaky JIT compilers. IE 9 and below lack typed arrays.
 
 (Note that Windows and Mac OS X can support Ogg and WebM by installing codecs or alternate browsers with built-in support, but this is not possible on iOS, Windows RT, or Windows 10 Mobile.)
 
@@ -71,8 +75,8 @@ The `OGVPlayer` class implements a player, and supports a subset of the events, 
   });
 
   // Now treat it just like a video or audio element
-  containerElement.addChild(player);
-  player.source = 'path/to/media.ogv';
+  containerElement.appendChild(player);
+  player.src = 'path/to/media.ogv';
   player.play();
 ```
 
@@ -90,7 +94,7 @@ If you need a URL versioning/cache-buster parameter for `ogv.js`, you can use th
 
 ```
   var script = document.createElement('script');
-  script.src = 'ogv.js?' + encodeURIComponent(OGVVersion);
+  script.src = 'ogv.js?version=' + encodeURIComponent(OGVVersion);
 ```
 
 
@@ -104,7 +108,7 @@ WebM is much slower, and remains experimental.
 
 See [device notes](https://github.com/brion/ogv.js/wiki/Device-notes) for testing status.
 
-On iOS 7, Safari performs significantly better than Chrome or other alternative browsers that are unable to enable the JIT due to iOS limitations on third-party developers. As of March 2014, I've gotten barely acceptable performance for 160p/15fps files on iPod Touch 5th-gen and iPad 3. Files at 360p and up play acceptably only on the latest 64-bit iPhones and iPads.
+On iOS 8, Safari performs significantly better than Chrome or other alternative browsers that are unable to enable the JIT due to iOS limitations on third-party developers. As of March 2014, I've gotten acceptable performance for 160p/15fps files on iPod Touch 5th-gen and iPad 3. Files at 360p and often 480p play acceptably on newer 64-bit iPhones and iPads.
 
 IE 11 on Windows RT 8.1 on an original Surface RT tablet performs barely acceptably with 160p/15fps files, but sound sync is poor (due to Flash overhead?). Larger files play unacceptably slowly.
 
@@ -113,11 +117,11 @@ In both cases, a native application looms as a possibly better alternative. If i
 
 *WebGL drawing acceleration*
 
-Accelerated YCbCr->RGB conversion and drawing can be done in WebGL on supporting browsers (Firefox, Chrome, IE 11 update 1, Edge, and Safari for iOS 8 & OS X 10.9), and is enabled by default if available.
+Accelerated YCbCr->RGB conversion and drawing can be done in WebGL on supporting browsers (Firefox, Chrome, IE 11, Edge, and Safari for iOS 8 & OS X 10.9), and is enabled by default if available.
 
 WebGL noticeably improves playback performance at HD and SD resolutions.
 
-IE 10 and early versions of IE 11 do not support luminance textures; there used to be some code to work around by packing RGBA textures that but it's been removed to simplify things. See [GPU acceleration page](https://github.com/brion/ogv.js/wiki/GPU-acceleration) for more info.
+Early versions of IE 11 do not support luminance or alpha textures, and in IE 11 update 1 and Edge they are still unexpectedly slow. As a workaround, on IE and Edge the data is packed into RGBA textures for faster texture upload and unpacked in the shader. See [GPU acceleration page](https://github.com/brion/ogv.js/wiki/GPU-acceleration) for more info.
 
 
 ## Difficulties
@@ -143,6 +147,7 @@ The Firefox and Safari/Chrome cases have been hacked up to do streaming bufferin
 
 [Safari has a bug with Range headers](https://bugs.webkit.org/show_bug.cgi?id=82672) which is worked around as necessary with a 'cache-busting' URL string parameter. Hopefully this will be fixed in future versions of Mac OS X and iOS.
 
+
 *Seeking*
 
 Seeking is implemented via the HTTP Range: header.
@@ -158,12 +163,12 @@ As with chunked streaming, cross-site playback requires CORS support for the Ran
 
 Firefox, Safari, Chrome, and Edge support the W3C Web Audio API.
 
-IE doesn't support Web Audio, but does bundle the Flash player. A small Flash shim is included here and used as a fallback -- thanks to Maik Merten for hacking some pieces together and getting this working!
+IE doesn't support Web Audio, but does bundle the Flash player in Windows 8/8.1/RT. A small Flash shim is included here and used as a fallback -- thanks to Maik Merten for hacking some pieces together and getting this working!
 
 A/V synchronization is performed on files with both audio and video, and seems to
 actually work. Yay!
 
-Note that autoplay doesn't work on iOS Safari due to limitations with starting audio playback.
+Note that autoplay doesn't work on iOS Safari due to limitations with starting audio playback from event handlers.
 
 
 *WebM*
