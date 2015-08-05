@@ -5,6 +5,16 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	exit( 1 );
 }
 
+// Extension Credits
+$wgExtensionCredits['media'][] = array(
+	'path'           => __FILE__,
+	'name'           => 'TimedMediaHandler',
+	'author'         => array( 'Michael Dale', 'Tim Starling', 'James Heinrich', 'Jan Gerber', 'Brion Vibber' ),
+	'url'            => 'https://www.mediawiki.org/wiki/Extension:TimedMediaHandler',
+	'descriptionmsg' => 'timedmedia-desc',
+	'version'        => '0.4.0',
+);
+
 // Set up the timed media handler dir:
 $timedMediaDir = __DIR__;
 // Include WebVideoTranscode (prior to config so that its defined transcode keys can be used in configuration)
@@ -286,17 +296,36 @@ $wgAutoloadClasses['SpecialOrphanedTimedText'] = "$timedMediaDir/SpecialOrphaned
 // we can still read the variable values
 $wgExtensionFunctions[] = 'TimedMediaHandlerHooks::register';
 
+// Setup a hook for iframe embed handling:
+$wgHooks['ArticleFromTitle'][] = 'TimedMediaIframeOutput::iframeHook';
+
+// When an upload completes ( check clear any existing transcodes )
+$wgHooks['UploadComplete'][] = 'TimedMediaHandlerHooks::checkUploadComplete';
+
+// When an image page is moved:
+$wgHooks['TitleMove'][] = 'TimedMediaHandlerHooks::checkTitleMove';
+
+// When image page is deleted so that we remove transcode settings / files.
+$wgHooks['FileDeleteComplete'][] = 'TimedMediaHandlerHooks::onFileDeleteComplete';
+
+// Use a BeforePageDisplay hook to load the styles in pages that pull in media dynamically.
+// (Special:Upload, for example, when there is an "existing file" warning.)
+$wgHooks['BeforePageDisplay'][] = 'TimedMediaHandlerHooks::pageOutputHook';
+
+// Make sure modules are loaded on image pages that don't have a media file in the wikitext.
+$wgHooks['ImageOpenShowImageInlineBefore'][] = 'TimedMediaHandlerHooks::onImageOpenShowImageInlineBefore';
+
+$wgHooks['LoadExtensionSchemaUpdates'][] = 'TimedMediaHandlerHooks::loadExtensionSchemaUpdates';
+$wgHooks['wgQueryPages'][] = 'TimedMediaHandlerHooks::onwgQueryPages';
+
+// Add unit tests
+$wgHooks['UnitTestsList'][] = 'TimedMediaHandlerHooks::registerUnitTests';
+
+// Add transcode status to video asset pages:
+$wgHooks[ 'ImagePageAfterImageLinks' ][] = 'TimedMediaHandlerHooks::checkForTranscodeStatus';
+$wgHooks[ 'NewRevisionFromEditComplete' ][] = 'TimedMediaHandlerHooks::onNewRevisionFromEditComplete';
+$wgHooks[ 'ArticlePurge' ][] = 'TimedMediaHandlerHooks::onArticlePurge';
+
 # add Special pages
 $wgSpecialPages['OrphanedTimedText'] = 'SpecialOrphanedTimedText';
 $wgSpecialPages['TimedMediaHandler'] = 'SpecialTimedMediaHandler';
-
-// Extension Credits
-$wgExtensionCredits['media'][] = array(
-	'path'           => __FILE__,
-	'name'           => 'TimedMediaHandler',
-	'namemsg'        => 'extensionname-timedmedia',
-	'author'         => array( 'Michael Dale', 'Tim Starling', 'James Heinrich', 'Jan Gerber', 'Brion Vibber' ),
-	'url'            => 'https://www.mediawiki.org/wiki/Extension:TimedMediaHandler',
-	'descriptionmsg' => 'timedmedia-desc',
-	'version'        => '0.4.0',
-);
