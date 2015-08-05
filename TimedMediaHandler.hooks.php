@@ -242,30 +242,6 @@ class TimedMediaHandlerHooks {
 			);
 		}
 
-		// Setup a hook for iframe embed handling:
-		$wgHooks['ArticleFromTitle'][] = 'TimedMediaIframeOutput::iframeHook';
-
-		// When an upload completes ( check clear any existing transcodes )
-		$wgHooks['UploadComplete'][] = 'TimedMediaHandlerHooks::checkUploadComplete';
-
-		// When an image page is moved:
-		$wgHooks['TitleMove'][] = 'TimedMediaHandlerHooks::checkTitleMove';
-
-		// When image page is deleted so that we remove transcode settings / files.
-		$wgHooks['FileDeleteComplete'][] = 'TimedMediaHandlerHooks::onFileDeleteComplete';
-
-		// Use a BeforePageDisplay hook to load the styles in pages that pull in media dynamically.
-		// (Special:Upload, for example, when there is an "existing file" warning.)
-		$wgHooks['BeforePageDisplay'][] = 'TimedMediaHandlerHooks::pageOutputHook';
-
-		// Make sure modules are loaded on image pages that don't have a media file in the wikitext.
-		$wgHooks['ImageOpenShowImageInlineBefore'][] =
-			'TimedMediaHandlerHooks::onImageOpenShowImageInlineBefore';
-
-		// Bug T63923: Make sure modules are loaded for the image history of image pages.
-		// This is needed when ImageOpenShowImageInlineBefore is not triggered (diff previews).
-		$wgHooks['ImagePageFileHistoryLine'][] = 'TimedMediaHandlerHooks::onImagePageFileHistoryLine';
-
 		// Exclude transcoded assets from normal thumbnail purging
 		// ( a maintenance script could handle transcode asset purging)
 		if ( isset( $wgExcludeFromThumbnailPurge ) ) {
@@ -274,11 +250,6 @@ class TimedMediaHandlerHooks {
 			// ( probably should move in-progress encodes out of web accessible directory )
 			$wgExcludeFromThumbnailPurge[] = 'log';
 		}
-
-		$wgHooks['LoadExtensionSchemaUpdates'][] = 'TimedMediaHandlerHooks::loadExtensionSchemaUpdates';
-
-		// Add unit tests
-		$wgHooks['UnitTestsList'][] = 'TimedMediaHandlerHooks::registerUnitTests';
 
 		/**
 		 * Add support for the "TimedText" NameSpace
@@ -292,15 +263,6 @@ class TimedMediaHandlerHooks {
 			$wgMwEmbedModuleConfig['TimedText.ShowInterface.local'] = 'off';
 		}
 
-		// Add transcode status to video asset pages:
-		$wgHooks['ImagePageAfterImageLinks'][] = 'TimedMediaHandlerHooks::checkForTranscodeStatus';
-		$wgHooks['NewRevisionFromEditComplete'][] =
-			'TimedMediaHandlerHooks::onNewRevisionFromEditComplete';
-		$wgHooks['ArticlePurge'][] = 'TimedMediaHandlerHooks::onArticlePurge';
-
-		$wgHooks['LoadExtensionSchemaUpdates'][] = 'TimedMediaHandlerHooks::checkSchemaUpdates';
-		$wgHooks['wgQueryPages'][] = 'TimedMediaHandlerHooks::onwgQueryPages';
-		$wgHooks['RejectParserCacheValue'][] = 'TimedMediaHandlerHooks::rejectParserCacheValue';
 		return true;
 	}
 
@@ -539,8 +501,15 @@ class TimedMediaHandlerHooks {
 	 * @param $updater DatabaseUpdater
 	 * @return bool
 	 */
-	public static function loadExtensionSchemaUpdates( $updater ) {
-		$updater->addExtensionTable( 'transcode', __DIR__ . '/TimedMediaHandler.sql' );
+	public static function loadExtensionSchemaUpdates( DatabaseUpdater $updater ) {
+		if ( $updater->getDB()->getType() == 'mysql' || $updater->getDB()->getType() == 'sqlite' ) {
+			$updater->addExtensionTable( 'transcode', __DIR__ . '/TimedMediaHandler.sql' );
+		}
+
+		if ( $updater->getDB()->getType() == 'sqlite' ) {
+			$updater->addExtensionUpdate( array( 'addIndex', 'transcode', 'transcode_name_key',
+				__DIR__ . "/archives/transcode_name_key.sql", true ) );
+		}
 		return true;
 	}
 
@@ -608,24 +577,6 @@ class TimedMediaHandlerHooks {
 			$out->addModules( 'ext.tmh.player' );
 		}
 
-		return true;
-	}
-
-	public static function checkSchemaUpdates( DatabaseUpdater $updater ) {
-		$base = __DIR__;
-
-		switch ( $updater->getDB()->getType() ) {
-		case 'mysql':
-		case 'sqlite':
-			 // Initial install tables
-			$updater->addExtensionTable( 'transcode', "$base/TimedMediaHandler.sql" );
-			$updater->addExtensionUpdate( array( 'addIndex', 'transcode', 'transcode_name_key',
-				"$base/archives/transcode_name_key.sql", true ) );
-			break;
-		case 'postgres':
-			// TODO
-			break;
-		}
 		return true;
 	}
 
