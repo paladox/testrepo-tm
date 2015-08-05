@@ -308,6 +308,39 @@ $wgAutoloadClasses['SpecialOrphanedTimedText'] = "$timedMediaDir/SpecialOrphaned
 // after you include TimedMediaHandler we can still read the variable values
 $wgExtensionFunctions[] = 'TimedMediaHandlerHooks::register';
 
+// Setup a hook for iframe embed handling:
+$wgHooks['ArticleFromTitle'][] = 'TimedMediaIframeOutput::iframeHook';
+
+// When an upload completes ( check clear any existing transcodes )
+$wgHooks['UploadComplete'][] = 'TimedMediaHandlerHooks::checkUploadComplete';
+
+// When an image page is moved:
+$wgHooks['TitleMove'][] = 'TimedMediaHandlerHooks::checkTitleMove';
+
+// When image page is deleted so that we remove transcode settings / files.
+$wgHooks['FileDeleteComplete'][] = 'TimedMediaHandlerHooks::onFileDeleteComplete';
+
+// Use a BeforePageDisplay hook to load the styles in pages that pull in media dynamically.
+// (Special:Upload, for example, when there is an "existing file" warning.)
+$wgHooks['BeforePageDisplay'][] = 'TimedMediaHandlerHooks::pageOutputHook';
+
+// Make sure modules are loaded on image pages that don't have a media file in the wikitext.
+$wgHooks['ImageOpenShowImageInlineBefore'][] =
+	'TimedMediaHandlerHooks::onImageOpenShowImageInlineBefore';
+
+$wgHooks['LoadExtensionSchemaUpdates'][] = 'TimedMediaHandlerHooks::loadExtensionSchemaUpdates';
+
+// Add unit tests
+$wgHooks['UnitTestsList'][] = 'TimedMediaHandlerHooks::registerUnitTests';
+
+// Add transcode status to video asset pages:
+$wgHooks['ImagePageAfterImageLinks'][] = 'TimedMediaHandlerHooks::checkForTranscodeStatus';
+$wgHooks['NewRevisionFromEditComplete'][] = 'TimedMediaHandlerHooks::onNewRevisionFromEditComplete';
+$wgHooks['ArticlePurge'][] = 'TimedMediaHandlerHooks::onArticlePurge';
+$wgHooks['wgQueryPages'][] = 'TimedMediaHandlerHooks::onwgQueryPages';
+
+$wgHooks['RejectParserCacheValue'][] = 'TimedMediaHandlerHooks::rejectParserCacheValue';
+
 # add Special pages
 $wgSpecialPages['OrphanedTimedText'] = 'SpecialOrphanedTimedText';
 $wgSpecialPages['TimedMediaHandler'] = 'SpecialTimedMediaHandler';
