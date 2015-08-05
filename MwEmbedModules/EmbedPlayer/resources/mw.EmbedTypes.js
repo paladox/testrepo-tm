@@ -67,6 +67,11 @@ var webmNativePlayer = new mw.MediaPlayer( 'webmNative', [
 	'audio/webm',
 	'audio/webm; codecs="vorbis"'
 ], 'Native' );
+var vp9NativePlayer = new mw.MediaPlayer( 'vp9Native', [
+	'video/webm; codecs="vp9"',
+	'video/webm; codecs="vp9, opus"',
+	'audio/webm; codecs="opus"'
+], 'Native' );
 
 // Image Overlay player ( extends native )
 var imageOverlayPlayer = new mw.MediaPlayer( 'imageOverlay', [
@@ -231,6 +236,9 @@ mw.EmbedTypes = {
 					// Add the webm player
 					if( dummyvid.canPlayType('video/webm; codecs="vp8, vorbis"') ){
 						this.mediaPlayers.addPlayer( webmNativePlayer );
+					}
+					if( dummyvid.canPlayType('video/webm; codecs="vp9, opus"') ){
+						this.mediaPlayers.addPlayer( vp9NativePlayer );
 					}
 
 					// Test for MP3:
