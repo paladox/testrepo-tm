@@ -46,11 +46,17 @@ class WebVideoTranscode {
 	const ENC_VP9_720P = '720p.vp9.webm';
 	const ENC_VP9_1080P = '1080p.vp9.webm';
 
-	// mp4 profiles:
+	// H264 mp4 profiles:
 	const ENC_H264_320P = '320p.mp4';
 	const ENC_H264_480P = '480p.mp4';
 	const ENC_H264_720P = '720p.mp4';
 	const ENC_H264_1080P = '1080p.mp4';
+
+	// H265 mp4 profiles:
+	const ENC_H265_320P = '320p.h265.mp4';
+	const ENC_H265_480P = '480p.h265.mp4';
+	const ENC_H265_720P = '720p.h265.mp4';
+	const ENC_H265_1080P = '1080p.h265.mp4';
 
 	const ENC_OGG_VORBIS = 'ogg';
 	const ENC_OGG_OPUS = 'opus';
@@ -270,6 +276,7 @@ class WebVideoTranscode {
 		// and apple HLS profile guide:
 		// https://developer.apple.com/library/ios/#documentation/networkinginternet/conceptual/streamingmediaguide/UsingHTTPLiveStreaming/UsingHTTPLiveStreaming.html#//apple_ref/doc/uid/TP40008332-CH102-DontLinkElementID_24
 
+		// mp4 H264 transcode:
 		WebVideoTranscode::ENC_H264_320P =>
 			array(
 				'maxSize' => '480x320',
@@ -310,6 +317,54 @@ class WebVideoTranscode {
 			array(
 				'maxSize' => '1920x1080',
 				'videoCodec' => 'h264',
+				'videoBitrate' => '5000k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '128k',
+				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+			),
+
+		// mp4 H265 transcode:
+		WebVideoTranscode::ENC_H265_320P =>
+			array(
+				'maxSize' => '480x320',
+				'videoCodec' => 'h265',
+				'preset' => 'ipod320',
+				'videoBitrate' => '400k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '40k',
+				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+			),
+
+		WebVideoTranscode::ENC_H265_480P =>
+			array(
+				'maxSize' => '640x480',
+				'videoCodec' => 'h265',
+				'preset' => 'ipod640',
+				'videoBitrate' => '1200k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '64k',
+				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+			),
+
+		WebVideoTranscode::ENC_H265_720P =>
+			array(
+				'maxSize' => '1280x720',
+				'videoCodec' => 'h265',
+				'preset' => '720p',
+				'videoBitrate' => '2500k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '128k',
+				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+			),
+
+		WebVideoTranscode::ENC_H265_1080P =>
+			array(
+				'maxSize' => '1920x1080',
+				'videoCodec' => 'h265',
 				'videoBitrate' => '5000k',
 				'audioCodec' => 'aac',
 				'channels' => '2',

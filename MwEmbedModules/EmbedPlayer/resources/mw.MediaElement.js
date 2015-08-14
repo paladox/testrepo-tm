@@ -283,6 +283,9 @@ mw.MediaElement.prototype = {
 					case 'h264Native':
 						var shortName = 'h264';
 						break;
+					case 'h265Native':
+						var shortName = 'h265';
+						break;
 					case 'appleVdn':
 						var shortName = 'appleVdn';
 						break;
