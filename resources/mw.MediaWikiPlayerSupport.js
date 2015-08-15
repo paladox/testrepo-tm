@@ -336,16 +336,19 @@
 			var apiUrl = mw.getApiProviderURL( source.mwprovider ),
 			// Get the image page ( cache for 1 hour )
 			request = {
-				'action': 'parse',
-				'page': source.mwtitle,
+				'action': 'query',
+				'prop': 'revisions',
+				'rvprop': 'content',
+				'titles': source.mwtitle,
+				'formatversion': 2,
 				'smaxage': 3600,
 				'maxage': 3600
 			};
 			mw.getJSON( apiUrl, request, function ( data ) {
-				if ( data && data.parse && data.parse.text &&  data.parse.text['*'] ) {
+				if ( data && data.query && data.query.pages.length > 0 && data.query.pages[0].revisions.length > 0 ) {
 					source.loaded = true;
-					source.mimeType = 'text/mw-srt';
-					source.captions = source.getCaptions(  data.parse.text['*'] );
+					source.mimeType = 'text/x-srt';
+					source.captions = source.getCaptions(  data.query.pages[0].revisions[0].content );
 					callback();
 				} else {
 					mw.log( 'Error: MediaWiki api error in getting timed text:', data );
