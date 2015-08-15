@@ -38,6 +38,9 @@ var h264NativePlayer = new mw.MediaPlayer( 'h264Native', [
 	'video/h264',
 	'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'
 ], 'Native' );
+var h265NativePlayer = new mw.MediaPlayer( 'h265Native', [
+	'video/mp4; codecs="hvc1.1.6.L93.90, mp4a.40.2"'
+], 'Native' );
 var appleVdnPlayer = new mw.MediaPlayer( 'appleVdn', [
 	'application/vnd.apple.mpegurl',
 	'application/vnd.apple.mpegurl; codecs="avc1.42E01E"'
@@ -229,10 +232,24 @@ mw.EmbedTypes = {
 						}
 
 					}
+					// Test for h265:
+					if ( dummyvid.canPlayType('video/mp4; codecs="hvc1.1.6.L93.90, mp4a.40.2"' ) ) {
+						this.mediaPlayers.addPlayer( h265NativePlayer );
+						// Check for iOS for vdn player support ( apple adaptive ) or vdn canPlayType != '' ( ie maybe/probably )
+						if( mw.isIOS() || dummyvid.canPlayType('application/vnd.apple.mpegurl; codecs="hvc1.1.6.L93.90"' ) ){
+							// Android 3x lies about HLS support ( only add if not Android 3.x )
+							if( navigator.userAgent.indexOf( 'Android 3.') == -1 ){
+								this.mediaPlayers.addPlayer( appleVdnPlayer );
+							}
+						}
+
+					}
+
 					// For now if Android assume we support h264Native (FIXME
 					// test on real devices )
 					if ( mw.isAndroid2() ){
 						this.mediaPlayers.addPlayer( h264NativePlayer );
+						this.mediaPlayers.addPlayer( h265NativePlayer );
 					}
 
 					// Test for ogg
