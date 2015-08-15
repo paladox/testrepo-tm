@@ -482,12 +482,18 @@ class WebVideoTranscodeJob extends Job {
 
 		// check for presets:
 		if( isset($options['preset']) ){
-			if ($options['preset'] == "360p") {
+			if ($options['preset'] == "160p") {
+				$cmd.= " -vpre libvpx-160p";
+			} elseif ($options['preset'] == "360p") {
 				$cmd.= " -vpre libvpx-360p";
+			} elseif ($options['preset'] == "480p") {
+				$cmd.= " -vpre libvpx-480p";
 			} elseif ( $options['preset'] == "720p" ) {
 				$cmd.= " -vpre libvpx-720p";
 			} elseif ( $options['preset'] == "1080p" ) {
 				$cmd.= " -vpre libvpx-1080p";
+			} elseif ( $options['preset'] == "2160p" ) {
+				$cmd.= " -vpre libvpx-2160p";
 			}
 		}
 
