@@ -188,6 +188,29 @@ $wgEnabledTranscodeSet = array(
 
 	// A 4K high quality stream; higher end phones, tablets, smart tvs
 	WebVideoTranscode::ENC_H264_2160P,
+
+	// MP4 H.265/AAC
+	// Primary format for the Apple/Microsoft world
+	//
+	// Check patent licensing issues in your country before use!
+	// Similar to VP9 in quality/bitrate
+	//
+	// This is a newer version of h264 format
+
+	// A least common denominator h.265 stream; first gen iPhone, iPods, early android etc.
+	WebVideoTranscode::ENC_H265_320P,
+
+	// A mid range h.265 stream; mid range phones and low end tables
+	WebVideoTranscode::ENC_H265_480P,
+
+	// An high quality HD stream; higher end phones, tablets, smart tvs
+	WebVideoTranscode::ENC_H265_720P,
+
+	// A full-HD high quality stream; higher end phones, tablets, smart tvs
+	WebVideoTranscode::ENC_H265_1080P,
+
+	// A 4K high quality stream; higher end phones, tablets, smart tvs
+	WebVideoTranscode::ENC_H265_2160P,
 */
 );
 
@@ -263,6 +286,8 @@ $wgAutoloadClasses['getid3_handler'] = "$timedMediaDir/libs/getid3/getid3.php";
 $wgAutoloadClasses['ID3Handler'] = "$timedMediaDir/handlers/ID3Handler/ID3Handler.php";
 // Mp4 / h264 Handler
 $wgAutoloadClasses['Mp4Handler'] = "$timedMediaDir/handlers/Mp4Handler/Mp4Handler.php";
+// Mp4 / h265 Handler
+$wgAutoloadClasses['Mp4Handlerh265'] = "$timedMediaDir/handlers/Mp4Handler/Mp4Handler.h265.php";
 // WebM Handler
 $wgAutoloadClasses['WebMHandler'] = "$timedMediaDir/handlers/WebMHandler/WebMHandler.php";
 // FLAC Handler
