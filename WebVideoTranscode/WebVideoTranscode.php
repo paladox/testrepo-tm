@@ -48,12 +48,19 @@ class WebVideoTranscode {
 	const ENC_VP9_1080P = '1080p.vp9.webm';
 	const ENC_VP9_2160P = '2160p.vp9.webm';
 
-	// mp4 profiles:
+	// H264 mp4 profiles:
 	const ENC_H264_320P = '320p.mp4';
 	const ENC_H264_480P = '480p.mp4';
 	const ENC_H264_720P = '720p.mp4';
 	const ENC_H264_1080P = '1080p.mp4';
 	const ENC_H264_2160P = '2160p.mp4';
+
+	// H265 mp4 profiles:
+	const ENC_H265_360P = '360p.h265.mp4';
+	const ENC_H265_480P = '480p.h265.mp4';
+	const ENC_H265_720P = '720p.h265.mp4';
+	const ENC_H265_1080P = '1080p.h265.mp4';
+	const ENC_H265_2160P = '2160p.h265.mp4';
 
 	const ENC_OGG_VORBIS = 'ogg';
 	const ENC_OGG_OPUS = 'opus';
@@ -359,6 +366,61 @@ class WebVideoTranscode {
 				'channels' => '2',
 				'audioBitrate' => '128k',
 				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+			),
+
+		// mp4 H265 transcode:
+		WebVideoTranscode::ENC_H265_360P =>
+			array(
+				'maxSize' => '640x360',
+				'videoCodec' => 'h265',
+				'videoBitrate' => '256',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '40k',
+				'type' => 'video/mp4; codecs="hvc1.1.6.L93.90, mp4a.40.2"',
+			),
+
+		WebVideoTranscode::ENC_H265_480P =>
+			array(
+				'maxSize' => '854x480',
+				'videoCodec' => 'h265',
+				'videoBitrate' => '512k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '64k',
+				'type' => 'video/mp4; codecs="hvc1.1.6.L93.90, mp4a.40.2"',
+			),
+
+		WebVideoTranscode::ENC_H265_720P =>
+			array(
+				'maxSize' => '1280x720',
+				'videoCodec' => 'h265',
+				'videoBitrate' => '1024k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '128k',
+				'type' => 'video/mp4; codecs="hvc1.1.6.L93.90, mp4a.40.2"',
+			),
+
+		WebVideoTranscode::ENC_H265_1080P =>
+			array(
+				'maxSize' => '1920x1080',
+				'videoCodec' => 'h265',
+				'videoBitrate' => '2048k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '128k',
+				'type' => 'video/mp4; codecs="hvc1.1.6.L93.90, mp4a.40.2"',
+			),
+		WebVideoTranscode::ENC_H265_2160P =>
+			array(
+				'maxSize' => '4096x2160',
+				'videoCodec' => 'h265',
+				'videoBitrate' => '8192k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '128k',
+				'type' => 'video/mp4; codecs="hvc1.1.6.L93.90, mp4a.40.2"',
 			),
 
 		//Audio profiles
