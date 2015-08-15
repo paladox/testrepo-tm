@@ -283,6 +283,9 @@ mw.MediaElement.prototype = {
 					case 'h264Native':
 						var shortName = 'h264';
 						break;
+					case 'h265Native':
+						var shortName = 'h265';
+						break;
 					case 'appleVdn':
 						var shortName = 'appleVdn';
 						break;
@@ -299,6 +302,7 @@ mw.MediaElement.prototype = {
 		// if on android 4 use mp4 over webm
 		if( mw.isAndroid40() ){
 			if( codecPref && codecPref[0] == 'webm' ){
+				codecPref[0] = 'h265';
 				codecPref[0] = 'h264';
 				codecPref[1] = 'webm';
 			}
