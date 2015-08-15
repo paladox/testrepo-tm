@@ -188,7 +188,7 @@ class WebVideoTranscodeJob extends Job {
 		} elseif( $options['videoCodec'] == 'theora' && $wgFFmpeg2theoraLocation !== false ) {
 			$status = $this->ffmpeg2TheoraEncode( $options );
 		} elseif( $options['videoCodec'] == 'vp8' || $options['videoCodec'] == 'vp9' ||
-			$options['videoCodec'] == 'h264' ||
+			$options['videoCodec'] == 'h264' || $options['videoCodec'] == 'h265' ||
 				( $options['videoCodec'] == 'theora' && $wgFFmpeg2theoraLocation === false )
 		) {
 			// Check for twopass:
@@ -360,6 +360,8 @@ class WebVideoTranscodeJob extends Job {
 			$cmd .= $this->ffmpegAddWebmVideoOptions( $options, $pass );
 		} elseif( $options['videoCodec'] == 'h264' ) {
 			$cmd .= $this->ffmpegAddH264VideoOptions( $options, $pass );
+		} elseif( $options['videoCodec'] == 'h265' ) {
+			$cmd .= $this->ffmpegAddH265VideoOptions( $options, $pass );
 		} elseif( $options['videoCodec'] == 'theora' ) {
 			$cmd .= $this->ffmpegAddTheoraVideoOptions( $options, $pass );
 		}
@@ -445,6 +447,35 @@ class WebVideoTranscodeJob extends Job {
 		}
 		// Output mp4
 		$cmd .=" -f mp4";
+		return $cmd;
+	}
+
+	/**
+	 * Adds ffmpeg shell options for h265
+	 *
+	 * @param $options
+	 * @param $pass
+	 * @return string
+	 */
+	function ffmpegAddH265VideoOptions( $options, $pass ) {
+		global $wgFFmpegThreads;
+		// Set the codec:
+		$cmd = " -threads " . intval( $wgFFmpegThreads ) . " -vcodec libx265";
+		// Check for presets:
+		if ( isset( $options['preset'] ) ) {
+			// Add the two vpre types:
+			switch ( $options['preset'] ) {
+				default:
+					// in the default case just pass along the preset to ffmpeg
+					$cmd .= " -vpre " . wfEscapeShellArg( $options['preset'] );
+				break;
+			}
+		}
+		if ( isset( $options['videoBitrate'] ) ) {
+			$cmd .= " -b " . wfEscapeShellArg( $options['videoBitrate'] );
+		}
+		// Output mp4
+		$cmd .= " -f mp4";
 		return $cmd;
 	}
 
