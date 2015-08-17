@@ -3,4 +3,5 @@
 .*.swp
 .project
 node_modules/
-vendor/
+/vendor
+/composer.lock

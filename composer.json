@@ -1,4 +1,7 @@
 {
+	"require": {
+		"captioning/captioning": "2.*"
+	},
 	"require-dev": {
 		"jakub-onderka/php-parallel-lint": "0.9.2",
 		"mediawiki/mediawiki-codesniffer": "0.5.1"
