@@ -189,5 +189,12 @@
 	"apierror-timedmedia-disabledtranscode": "Transcode is disabled on this wiki.",
 	"apierror-timedmedia-invalidtranscodetitle": "$1 is not transcodable.",
 	"apierror-timedmedia-badtranscodekey": "Invalid or disabled transcode key: $1",
-	"apierror-timedmedia-notenoughtimereset": "Not enough time has passed since the last reset of this transcode. $1 until this transcode can be reset."
+	"apierror-timedmedia-notenoughtimereset": "Not enough time has passed since the last reset of this transcode. $1 until this transcode can be reset.",
+	"apihelp-timedtext-description": "Provides timed text content for usage by <track> elements",
+	"apihelp-timedtext-param-title": "The media file title for which to retrieve timed text",
+	"apihelp-timedtext-param-pageid": "The pageid of the media file for which to retrieve timed text",
+	"apihelp-timedtext-param-trackformat": "The file format in which to return timed text",
+	"apihelp-timedtext-param-tracktype": "The type of text content to retrieve",
+	"apihelp-timedtext-param-lang": "The language of the timed text to retrieve",
+	"apihelp-timedtext-example-1": "Fetch an SRT subtitle file in German for the file Example.ogv"
 }

@@ -207,5 +207,12 @@
 	"apierror-timedmedia-disabledtranscode": "{{doc-apierror}}",
 	"apierror-timedmedia-invalidtranscodetitle": "{{doc-apierror}}\n\nParameters:\n* $1 - Title supplied",
 	"apierror-timedmedia-badtranscodekey": "{{doc-apierror}}\n\nParameters:\n* $1 - Key supplied",
-	"apierror-timedmedia-notenoughtimereset": "{{doc-apierror}}\n\nParameters:\n* $1 - Time until reset (e.g. \"{{int:timedmedia-minutes|1}}{{int:comma-separator}}{{int:timedmedia-seconds|42}}\"), uses the following messages:\n** {{msg-mw|Timedmedia-days}}\n** {{msg-mw|Timedmedia-hours}}\n** {{msg-mw|Timedmedia-minutes}}\n** {{msg-mw|Timedmedia-seconds}}\n** {{msg-mw|Comma-separator}}"
+	"apierror-timedmedia-notenoughtimereset": "{{doc-apierror}}\n\nParameters:\n* $1 - Time until reset (e.g. \"{{int:timedmedia-minutes|1}}{{int:comma-separator}}{{int:timedmedia-seconds|42}}\"), uses the following messages:\n** {{msg-mw|Timedmedia-days}}\n** {{msg-mw|Timedmedia-hours}}\n** {{msg-mw|Timedmedia-minutes}}\n** {{msg-mw|Timedmedia-seconds}}\n** {{msg-mw|Comma-separator}}",
+	"apihelp-timedtext-description": "{{doc-apihelp-description|timedtext}}",
+	"apihelp-timedtext-param-title": "{{doc-apihelp-param|title}}",
+	"apihelp-timedtext-param-pageid": "{{doc-apihelp-param|pageid}}",
+	"apihelp-timedtext-param-trackformat": "{{doc-apihelp-param|trackformat}}",
+	"apihelp-timedtext-param-tracktype": "{{doc-apihelp-param|type}}",
+	"apihelp-timedtext-param-lang": "{{doc-apihelp-param|lang}}",
+	"apihelp-timedtext-example-1": "{{doc-apihelp-example|timedtext}}"
 }
