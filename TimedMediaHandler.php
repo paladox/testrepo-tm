@@ -329,6 +329,10 @@ $wgHooks['PageRenderingHash'][] = 'TimedMediaHandlerHooks::changePageRenderingHa
 // See also T123695 and T123823
 $wgHooks['CanonicalNamespaces'][] = 'TimedMediaHandlerHooks::addCanonicalNamespaces';
 
+// API classes
+$wgAutoloadClasses['ApiTimedText'] = "$timedMediaDir/api/ApiTimedText.php";
+$wgAPIModules['timedtext'] = 'ApiTimedText';
+
 // We register some modules dynamically, since they depend on the configuration
 $wgHooks['ResourceLoaderRegisterModules'][] =
 	'TimedMediaHandlerHooks::resourceLoaderRegisterModules';

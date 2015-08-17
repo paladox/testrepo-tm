@@ -202,5 +202,12 @@
 	"apihelp-transcodereset-param-title": "{{doc-apihelp-param|transcodereset|title}}",
 	"apihelp-transcodereset-param-transcodekey": "{{doc-apihelp-param|transcodereset|transcodekey}}",
 	"apihelp-transcodereset-example-1": "{{doc-apihelp-example|transcodereset}}",
-	"apihelp-transcodereset-example-2": "{{doc-apihelp-example|transcodereset}}"
+	"apihelp-transcodereset-example-2": "{{doc-apihelp-example|transcodereset}}",
+	"apihelp-timedtext-description": "{{doc-apihelp-description|timedtext}}",
+	"apihelp-timedtext-param-title": "{{doc-apihelp-param|title}}",
+	"apihelp-timedtext-param-pageid": "{{doc-apihelp-param|pageid}}",
+	"apihelp-timedtext-param-trackformat": "{{doc-apihelp-param|trackformat}}",
+	"apihelp-timedtext-param-tracktype": "{{doc-apihelp-param|type}}",
+	"apihelp-timedtext-param-lang": "{{doc-apihelp-param|lang}}",
+	"apihelp-timedtext-example-1": "{{doc-apihelp-example|timedtext}}"
 }

@@ -184,5 +184,12 @@
 	"apihelp-transcodereset-param-title": "The media file title.",
 	"apihelp-transcodereset-param-transcodekey": "The transcode key you wish to reset. Fetch from [[Special:ApiHelp/query+transcodestatus|action=query&prop=transcodestatus]].",
 	"apihelp-transcodereset-example-1": "Reset all transcodes for [[:File:Clip.webm]]",
-	"apihelp-transcodereset-example-2": "Reset the '360_560kbs.webm' transcode key for [[:File:Clip.webm]]"
+	"apihelp-transcodereset-example-2": "Reset the '360_560kbs.webm' transcode key for [[:File:Clip.webm]]",
+	"apihelp-timedtext-description": "Provides timed text content for usage by <track> elements",
+	"apihelp-timedtext-param-title": "The media file title for which to retrieve timed text",
+	"apihelp-timedtext-param-pageid": "The pageid of the media file for which to retrieve timed text",
+	"apihelp-timedtext-param-trackformat": "The file format in which to return timed text",
+	"apihelp-timedtext-param-tracktype": "The type of text content to retrieve",
+	"apihelp-timedtext-param-lang": "The language of the timed text to retrieve",
+	"apihelp-timedtext-example-1": "Fetch an SRT subtitle file in German for the file Example.ogv"
 }
