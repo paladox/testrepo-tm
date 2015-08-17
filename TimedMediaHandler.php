@@ -310,7 +310,13 @@ $wgAutoloadClasses['SpecialOrphanedTimedText'] = "$timedMediaDir/SpecialOrphaned
 // See also T123695 and T123823
 $wgHooks['CanonicalNamespaces'][] = 'TimedMediaHandlerHooks::addCanonicalNamespaces';
 
+// API classes
+$wgAutoloadClasses['ApiTimedText'] = "$timedMediaDir/api/ApiTimedText.php";
+$wgAPIModules['timedtext'] = 'ApiTimedText';
+
 // Register remaining Timed Media Handler hooks right after initial setup
+// This way if you set a variable like $wgTimedTextNS in LocalSettings.php after you include TimedMediaHandler
+// we can still read the variable values
 $wgExtensionFunctions[] = 'TimedMediaHandlerHooks::register';
 
 # add Special pages
