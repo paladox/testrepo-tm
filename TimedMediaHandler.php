@@ -281,6 +281,10 @@ $wgMessagesDirs['MwEmbed.TimedText'] = __DIR__ . '/MwEmbedModules/TimedText/i18n
 $wgAutoloadClasses['SpecialTimedMediaHandler'] = "$timedMediaDir/SpecialTimedMediaHandler.php";
 $wgAutoloadClasses['SpecialOrphanedTimedText'] = "$timedMediaDir/SpecialOrphanedTimedText.php";
 
+// API classes
+$wgAutoloadClasses['ApiTimedText'] = "$timedMediaDir/api/ApiTimedText.php";
+$wgAPIModules['timedtext'] = 'ApiTimedText';
+
 // Register all Timed Media Handler hooks right after initial setup
 // This way if you set a variable like $wgTimedTextNS in LocalSettings.php after you include TimedMediaHandler
 // we can still read the variable values
