@@ -244,7 +244,7 @@ class TextHandler {
 			$textTracks[] = [
 				// @todo Should eventually add special entry point and output proper WebVTT format:
 				// http://www.whatwg.org/specs/web-apps/current-work/webvtt.html
-				'src' => $this->getFullURL( $subTitle, $contentType ),
+				'src' => $this->getFullURL( $languageKey, $timedTextExtension ),
 				'kind' => 'subtitles',
 				'type' => $contentType,
 				'title' => $this->getPrefixedDBkey( $subTitle ),
@@ -324,24 +324,19 @@ class TextHandler {
 	 * Retrieve a url to the raw subtitle file
 	 * Only use for local and foreignDb requests
 	 *
-	 * @param Title|ForeignTitle $pageTitle
+	 * @param string $lang
+	 * @param string $format
 	 * @return string
 	 */
-	function getFullURL( $pageTitle, $contentType ) {
-		if ( $pageTitle instanceof Title ) {
-			return $pageTitle->getFullURL( [
-				'action' => 'raw',
-				'ctype' => $contentType
-			] );
-		} elseif ( $pageTitle instanceof ForeignTitle ) {
-			$query = 'title=' . wfUrlencode( $pageTitle->getFullText() ) . '&';
-			$query .= wfArrayToCgi( [
-				'action' => 'raw',
-				'ctype' => $contentType
-			] );
-			// Note: This will return false if scriptDirUrl is not set for repo.
-			return $this->file->repo->makeUrl( $query );
-		}
-		return null;
+	function getFullURL( $lang, $format ) {
+		$query = wfArrayToCgi( [
+			'action' => 'timedtext',
+			'title' => $this->file->getTitle(),
+			'lang' => $lang,
+			'textformat' => $format,
+		] );
+
+		// Note: This will return false if scriptDirUrl is not set for repo.
+		return $this->file->repo->makeUrl( $query, 'api' );
 	}
 }
