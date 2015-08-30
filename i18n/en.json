@@ -77,6 +77,8 @@
 	"timedmedia-derivative-desc-720p.ogv": "High quality downloadable Ogg video (720P)",
 	"timedmedia-derivative-1080p.ogv": "Ogg 1080P",
 	"timedmedia-derivative-desc-1080p.ogv": "Full HD downloadable Ogg video (1080P)",
+	"timedmedia-derivative-2160p.ogv": "Ogg 2160P",
+	"timedmedia-derivative-desc-2160p.ogv": "Full 4K downloadable Ogg video (2160P)",
 	"timedmedia-derivative-160p.webm": "WebM 160P",
 	"timedmedia-derivative-desc-160p.webm": "Web streamable WebM (160P)",
 	"timedmedia-derivative-360p.webm": "WebM 360P",
