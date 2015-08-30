@@ -91,6 +91,8 @@
 	"timedmedia-derivative-desc-720p.ogv": "{{optional}} A type of media format encoding",
 	"timedmedia-derivative-1080p.ogv": "{{optional}} A type of media format encoding",
 	"timedmedia-derivative-desc-1080p.ogv": "{{optional}} A type of media format encoding",
+	"timedmedia-derivative-2160p.ogv": "{{optional}} A type of media format encoding",
+	"timedmedia-derivative-desc-2160p.ogv": "{{optional}} A type of media format encoding",
 	"timedmedia-derivative-160p.webm": "{{optional}} A type of media format encoding",
 	"timedmedia-derivative-desc-160p.webm": "{{optional}} A type of media format encoding",
 	"timedmedia-derivative-360p.webm": "{{optional}} A type of media format encoding",
