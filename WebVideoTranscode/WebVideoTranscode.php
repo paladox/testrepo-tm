@@ -32,6 +32,7 @@ class WebVideoTranscode {
 	const ENC_OGV_480P = '480p.ogv';
 	const ENC_OGV_720P = '720p.ogv';
 	const ENC_OGV_1080P = '1080p.ogv';
+	const ENC_OGV_1080P = '2160p.ogv';
 
 	// WebM VP8/Vorbis profiles:
 	const ENC_WEBM_160P = '160p.webm';
@@ -146,10 +147,21 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'theora',
 				'type'                       => 'video/ogg; codecs="theora, vorbis"',
 			),
-
 		WebVideoTranscode::ENC_OGV_1080P =>
 			array(
 				'maxSize'                    => '1920x1080',
+				'videoQuality'               => 6,
+				'audioQuality'               => 3,
+				'noUpscaling'                => 'true',
+				//'twopass'                    => 'true', // temporarily disabled for broken ffmpeg2theora
+				'optimize'                   => 'true',
+				'keyframeInterval'           => '128',
+				'videoCodec'                 => 'theora',
+				'type'                       => 'video/ogg; codecs="theora, vorbis"',
+			),
+		WebVideoTranscode::ENC_OGV_2160P =>
+			array(
+				'maxSize'                    => '4096x2160',
 				'videoQuality'               => 6,
 				'audioQuality'               => 3,
 				'noUpscaling'                => 'true',
