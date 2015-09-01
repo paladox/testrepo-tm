@@ -197,6 +197,8 @@ class TimedMediaHandlerHooks {
 			// Check for timed text page:
 			$wgHooks[ 'ArticleFromTitle' ][] = 'TimedMediaHandlerHooks::checkForTimedTextPage';
 			$wgHooks[ 'ArticleContentOnDiff' ][] = 'TimedMediaHandlerHooks::checkForTimedTextDiff';
+
+			$wgHooks[ 'SkinTemplateNavigation' ][] = 'TimedMediaHandlerHooks::onSkinTemplateNavigation';
 		} else {
 			$wgTimedTextNS = false;
 			// overwrite TimedText.ShowInterface for video with mw-provider=local
@@ -260,6 +262,21 @@ class TimedMediaHandlerHooks {
 		return true;
 	}
 
+	public static function onSkinTemplateNavigation( SkinTemplate &$sktemplate, array &$links ) {
+		if( self::isTimedMediaHandlerTitle( $sktemplate->getTitle() ) ) {
+			/*
+			$links['namespaces']['timedtext'] = array(
+				'class' => 'TimedText',
+				'text' => $sktemplate->msg( 'nstab-timedtext' )->text(),
+				'href' => '//test'
+			);
+			*/
+
+			$tttitle = Title::makeTitleSafe( NS_TIMEDTEXT, $sktemplate->getTitle()->getDBkey() );
+			$links['namespaces']['timedtext'] = $sktemplate->tabAction( $tttitle, 'timedtext', false, '', false );
+		}
+	}
+
 	/**
 	 * Wraps the isTranscodableFile function
 	 * @param $title Title
@@ -311,6 +328,22 @@ class TimedMediaHandlerHooks {
 			return true;
 		}
 		return false;
+	}
+
+	public static function isTimedMediaHandlerTitle( $title ) {
+		if( $title->getNamespace() != NS_FILE ){
+			return false;
+		}
+		$file = wfFindFile( $title );
+		// Can't find file
+		if( !$file ){
+			return false;
+		}
+		$handler = $file->getHandler();
+		if( !$handler ) {
+			return false;
+		}
+		return $handler instanceof TimedMediaHandler;
 	}
 
 	/**
