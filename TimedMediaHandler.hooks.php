@@ -203,6 +203,7 @@ class TimedMediaHandlerHooks {
 		if ( $wgEnableLocalTimedText ) {
 			define( "NS_TIMEDTEXT", $wgTimedTextNS );
 			define( "NS_TIMEDTEXT_TALK", $wgTimedTextNS +1 );
+			define( 'CONTENT_MODEL_TIMEDTEXT', 'TimedText' );
 
 			$wgExtraNamespaces[NS_TIMEDTEXT] = "TimedText";
 			$wgExtraNamespaces[NS_TIMEDTEXT_TALK] = "TimedText_talk";
@@ -210,6 +211,7 @@ class TimedMediaHandlerHooks {
 			// Check for timed text page:
 			$wgHooks[ 'ArticleFromTitle' ][] = 'TimedMediaHandlerHooks::checkForTimedTextPage';
 			$wgHooks[ 'ArticleContentOnDiff' ][] = 'TimedMediaHandlerHooks::checkForTimedTextDiff';
+			$wgContentHandlers[CONTENT_MODEL_TIMEDTEXT] = 'TimedTextContentHandler';
 		} else {
 			$wgTimedTextNS = false;
 			// overwrite TimedText.ShowInterface for video with mw-provider=local
