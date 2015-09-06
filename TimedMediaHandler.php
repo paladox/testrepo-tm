@@ -261,6 +261,8 @@ $wgAutoloadClasses['WAVHandler'] = "$timedMediaDir/handlers/WAVHandler/WAVHandle
 $wgAutoloadClasses['ForeignApiQueryAllPages'] = "$timedMediaDir/handlers/TextHandler/TextHandler.php";
 $wgAutoloadClasses['TextHandler'] = "$timedMediaDir/handlers/TextHandler/TextHandler.php";
 $wgAutoloadClasses['TimedTextPage'] = "$timedMediaDir/TimedTextPage.php";
+$wgAutoloadClasses['TimedTextContent\Content'] = "$timedMediaDir/TimedTextContent.php";
+$wgAutoloadClasses['TimedTextContentHandler'] = "$timedMediaDir/TimedTextContentHandler.php";
 
 // Transcode support
 $wgAutoloadClasses['WebVideoTranscodeJob'] = "$timedMediaDir/WebVideoTranscode/WebVideoTranscodeJob.php";
@@ -301,7 +303,7 @@ $wgExtensionCredits['media'][] = array(
 	'path'           => __FILE__,
 	'name'           => 'TimedMediaHandler',
 	'namemsg'        => 'timedmediahandler-extensionname',
-	'author'         => array( 'Michael Dale', 'Tim Starling', 'James Heinrich', 'Jan Gerber', 'Brion Vibber' ),
+	'author'         => array( 'Michael Dale', 'Tim Starling', 'James Heinrich', 'Jan Gerber', 'Brion Vibber', 'Derk-Jan Hartman' ),
 	'url'            => 'https://www.mediawiki.org/wiki/Extension:TimedMediaHandler',
 	'descriptionmsg' => 'timedmediahandler-desc',
 	'version'        => '0.4.0',
