@@ -288,6 +288,9 @@ $wgAutoloadClasses['ForeignApiQueryAllPages'] =
 	"$timedMediaDir/handlers/TextHandler/TextHandler.php";
 $wgAutoloadClasses['TextHandler'] = "$timedMediaDir/handlers/TextHandler/TextHandler.php";
 $wgAutoloadClasses['TimedTextPage'] = "$timedMediaDir/TimedTextPage.php";
+$wgAutoloadClasses['TimedMediaHandler\TimedText\ContentHandler'] = "$timedMediaDir/TimedTextContentHandler.php";
+$wgAutoloadClasses['TimedMediaHandler\TimedText\ViewAction'] = "$timedMediaDir/TimedTextViewAction.php";
+$wgAutoloadClasses['FixTimedTextPagesContentModel'] = "$timedMediaDir/maintenance/fixTimedTextPagesContentModel.php";
 
 // Transcode support
 $wgAutoloadClasses['WebVideoTranscodeJob'] =
