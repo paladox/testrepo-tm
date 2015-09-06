@@ -1,53 +1,78 @@
 <?php
 /**
- * TimedText page display the current video with subtitles to the right.
- * @deprecated
+ * Created on April 21, 2016
+ *
+ * Copyright © 2015 Derk-Jan Hartman "hartman.wiki@gmail.com"
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * http://www.gnu.org/copyleft/gpl.html
+ *
+ * Timed Text Page view action for the TimedText contentmodel
+ * Displays the current video with subtitles to the right.
+ *
+ * @file
+ * @ingroup Extensions
+ * @ingroup TimedText
+ * @author Derk-Jan Hartman <hartman.wiki@gmail.com>
+ * @since 1.27
  */
-class TimedTextPage extends Article {
+namespace TimedMediaHandler\TimedText;
+
+use ViewAction;
+use Title;
+use Revision;
+use Language;
+use Xml;
+
+class PageViewAction extends ViewAction {
 	// The width of the video plane:
 	static private $videoWidth = 400;
-	static private $knownTimedTextExtensions = array( 'srt', 'vtt' );
+	// TODO need to move to to a less specific class
+	static private $knownTimedTextExtensions = [ 'srt', 'vtt' ];
 
-	public function view() {
-		$request = $this->getContext()->getRequest();
-		$out = $this->getContext()->getOutput();
-		$user = $this->getContext()->getUser();
-
-		$diff = $request->getVal( 'diff' );
-
-		if ( $this->getTitle()->getNamespace() != NS_TIMEDTEXT || isset( $diff ) ) {
-			parent::view();
+	public function show() {
+		global $wgTimedTextNS;
+		$out = $this->getOutput();
+		$title = $this->page->getTitle();
+		// TODO handle the preview of the content of the diff
+		if ( !$title->inNamespace( $wgTimedTextNS )
+			|| $out->isPrintable()
+			|| $this->getContext()->getRequest()->getCheck( 'diff' )
+		) {
+			$this->page->view();
 			return;
 		}
-		$this->renderOutput( $out );
-	}
-
-	/**
-	 * Render TimedText to given output
-	 * @param $out OutputPage
-	 */
-	public function renderOutput( $out ) {
+		$wikiPage = $this->page->getPage();
+		$content = $wikiPage->getContent( Revision::FOR_THIS_USER, $this->getUser() );
+		if ( $content === null
+			|| $content->getModel() !== CONTENT_MODEL_TIMEDTEXT
+			|| $content->isRedirect()
+		) {
+			$this->page->view();
+			return;
+		}
 		// parse page title:
-		$titleParts = explode( '.', $this->getTitle()->getDBkey() );
+		$titleParts = explode( '.', $title->getDBkey() );
 		$timedTextExtension = array_pop( $titleParts );
 		$languageKey = array_pop( $titleParts );
 
-		$oldid = $this->getOldID();
-		# Are we looking at an old revision
-		if ( $oldid && $this->mRevision ) {
-			$this->fetchContentObject();
-			$out->setRevisionId( $this->getRevIdFetched() );
-			$this->setOldSubtitle( $oldid );
-
-			if ( !$this->showDeletedRevisionHeader() ) {
-				wfDebug( __METHOD__ . ": cannot view deleted revision\n" );
-				return;
-			}
-		}
+		// Our custom view
 
 		// Check for File name without text extension:
 		// i.e TimedText:myfile.ogg
-		$fileTitle = Title::newFromText( $this->getTitle()->getDBkey(), NS_FILE );
+		$fileTitle = Title::newFromText( $title->getDBkey(), NS_FILE );
 		$file = wfFindFile( $fileTitle );
 		// Check for a valid srt page, present redirect form for the full title match:
 		if ( !in_array( $timedTextExtension, self::$knownTimedTextExtensions ) &&
@@ -88,19 +113,20 @@ class TimedTextPage extends Article {
 		}
 
 		// Set title
-		$message = $this->exists() ?
+		$message = $this->page->exists() ?
 			'mwe-timedtext-language-subtitles-for-clip' :
 			'mwe-timedtext-language-no-subtitles-for-clip';
 		$out->setPageTitle( wfMessage( $message, $languageName, $videoTitle ) );
 
 		// Get the video with with a max of 600 pixel page
+		// TODO get rid of table layout here
 		$out->addHTML(
-			xml::tags( 'table', array( 'style'=> 'border:none' ),
+			xml::tags( 'table', [ 'style'=> 'border:none' ],
 				xml::tags( 'tr', null,
-					xml::tags( 'td', array( 'valign' => 'top',  'width' => self::$videoWidth ),
+					xml::tags( 'td', [ 'valign' => 'top',  'width' => self::$videoWidth ],
 						$this->getVideoHTML( $videoTitle )
 					) .
-					xml::tags( 'td', array( 'valign' => 'top' ), $this->getTimedTextHTML( $languageName ) )
+					xml::tags( 'td', [ 'valign' => 'top' ], $this->getTimedTextHTML( $languageName ) )
 				)
 			)
 		);
@@ -131,13 +157,13 @@ class TimedTextPage extends Article {
 		$langSelect = Xml::languageSelector( $language, false, null, $attrs, null );
 
 		$out->addHTML(
-			Xml::tags( 'div', array( 'style' => 'text-align:center' ),
+			Xml::tags( 'div', [ 'style' => 'text-align:center' ],
 				Xml::tags( 'div', null,
 					wfMessage( 'timedmedia-subtitle-new-desc', $lang->getCode() )->parse()
 				) .
 				$langSelect[1] .
 				Xml::tags( 'button',
-					array( 'id' => 'timedmedia-tt-go' ),
+					[ 'id' => 'timedmedia-tt-go' ],
 					wfMessage( 'timedmedia-subtitle-new-go' )->escaped()
 				)
 			)
@@ -157,9 +183,9 @@ class TimedTextPage extends Article {
 			return wfMessage( 'timedmedia-subtitle-no-video' )->escaped();
 		} else {
 			$videoTransform = $file->transform(
-				array(
+				[
 					'width' => self::$videoWidth
-				)
+				]
 			);
 			return $videoTransform->toHTML();
 		}
@@ -172,14 +198,15 @@ class TimedTextPage extends Article {
 	 * @return Message|string
 	 */
 	private function getTimedTextHTML( $languageName ) {
-		if ( !$this->exists() ) {
+		if ( !$this->page->exists() ) {
 			return wfMessage( 'timedmedia-subtitle-no-subtitles',  $languageName );
 		}
 		return Xml::element(
 			'pre',
-			array( 'style' => 'margin-top: 0px;' ),
-			$this->getContent(),
+			[ 'style' => 'margin-top: 0px;' ],
+			$this->page->getContent(),
 			false
 		);
 	}
+
 }
