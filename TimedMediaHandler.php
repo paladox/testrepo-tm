@@ -291,6 +291,16 @@ $wgAutoloadClasses['WAVHandler'] = "$timedMediaDir/handlers/WAVHandler/WAVHandle
 // Text handler
 $wgAutoloadClasses['TextHandler'] = "$timedMediaDir/handlers/TextHandler/TextHandler.php";
 $wgAutoloadClasses['TimedTextPage'] = "$timedMediaDir/TimedTextPage.php";
+$wgAutoloadClasses['TimedMediaHandler\TimedText\Content'] = "$timedMediaDir/TimedTextContent.php";
+$wgAutoloadClasses['TimedMediaHandler\TimedText\ContentHandler'] =
+	"$timedMediaDir/TimedTextContentHandler.php";
+$wgAutoloadClasses['TimedMediaHandler\TimedText\PageViewAction'] =
+	"$timedMediaDir/TimedTextViewAction.php";
+$wgAutoloadClasses['FixTimedTextPagesContentModel'] =
+	"$timedMediaDir/maintenance/fixTimedTextPagesContentModel.php";
+
+define( 'CONTENT_MODEL_TIMEDTEXT', 'TimedText' );
+$wgContentHandlers[CONTENT_MODEL_TIMEDTEXT] = 'TimedMediaHandler\TimedText\ContentHandler';
 
 // Transcode support
 $wgAutoloadClasses['WebVideoTranscodeJob'] =
