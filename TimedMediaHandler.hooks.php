@@ -328,9 +328,12 @@ class TimedMediaHandlerHooks {
 		 * Add support for the "TimedText" NameSpace
 		 */
 		if ( $wgEnableLocalTimedText ) {
+			define( 'CONTENT_MODEL_TIMEDTEXT', 'TimedText' );
+
 			// Check for timed text page:
 			$wgHooks[ 'ArticleFromTitle' ][] = 'TimedMediaHandlerHooks::checkForTimedTextPage';
 			$wgHooks[ 'ArticleContentOnDiff' ][] = 'TimedMediaHandlerHooks::checkForTimedTextDiff';
+			$wgContentHandlers[CONTENT_MODEL_TIMEDTEXT] = 'TimedTextContentHandler';
 		} else {
 			// overwrite TimedText.ShowInterface for video with mw-provider=local
 			$wgMwEmbedModuleConfig['TimedText.ShowInterface.local'] = 'off';
