@@ -178,8 +178,8 @@ class TimedMediaHandlerHooks {
 
 	// Register TimedMediaHandler Hooks
 	public static function register() {
-		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue, $wgMediaHandlers,
-		$wgResourceModules, $wgExcludeFromThumbnailPurge,
+		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue, $wgMediaHandlers, $wgTimedTextNS,
+		$wgNamespaceContentModels, $wgResourceModules, $wgExcludeFromThumbnailPurge,
 		$wgFileExtensions, $wgTmhEnableMp4Uploads, $wgExtensionAssetsPath,
 		$wgMwEmbedModuleConfig, $wgEnableLocalTimedText, $wgTmhFileExtensions,
 		$wgTmhTheoraTwoPassEncoding, $wgTmhWebPlayer, $wgWikimediaJenkinsCI;
@@ -328,9 +328,10 @@ class TimedMediaHandlerHooks {
 		 * Add support for the "TimedText" NameSpace
 		 */
 		if ( $wgEnableLocalTimedText ) {
-			// Check for timed text page:
-			$wgHooks[ 'ArticleFromTitle' ][] = 'TimedMediaHandlerHooks::checkForTimedTextPage';
-			$wgHooks[ 'ArticleContentOnDiff' ][] = 'TimedMediaHandlerHooks::checkForTimedTextDiff';
+			// These hooks are for old style non ContentHandler views
+//			$wgHooks[ 'ArticleFromTitle' ][] = 'TimedMediaHandlerHooks::checkForTimedTextPage';
+//			$wgHooks[ 'ArticleContentOnDiff' ][] = 'TimedMediaHandlerHooks::checkForTimedTextDiff';
+			$wgNamespaceContentModels[$wgTimedTextNS] = CONTENT_MODEL_TIMEDTEXT;
 		} else {
 			// overwrite TimedText.ShowInterface for video with mw-provider=local
 			$wgMwEmbedModuleConfig['TimedText.ShowInterface.local'] = 'off';
@@ -403,7 +404,10 @@ class TimedMediaHandlerHooks {
 	public static function checkForTimedTextPage( &$title, &$article ) {
 		global $wgTimedTextNS;
 		if ( $title->getNamespace() === $wgTimedTextNS ) {
-			$article = new TimedTextPage( $title );
+			$page = new TimedTextPage( $title );
+			if ( $page->getContentModel() === CONTENT_MODEL_WIKITEXT ) {
+				$article = $page;
+			}
 		}
 		return true;
 	}
@@ -417,8 +421,10 @@ class TimedMediaHandlerHooks {
 		global $wgTimedTextNS;
 		if ( $output->getTitle()->getNamespace() === $wgTimedTextNS ) {
 			$article = new TimedTextPage( $output->getTitle() );
-			$article->renderOutput( $output );
-			return false;
+			if ( $page->getContentModel() === CONTENT_MODEL_WIKITEXT ) {
+				$article->renderOutput( $output );
+				return false;
+			}
 		}
 		return true;
 	}
@@ -665,6 +671,7 @@ class TimedMediaHandlerHooks {
 	}
 
 	public static function checkSchemaUpdates( DatabaseUpdater $updater ) {
+		global $wgContentHandlerUseDB;
 		$base = __DIR__;
 
 		switch ( $updater->getDB()->getType() ) {
@@ -679,6 +686,11 @@ class TimedMediaHandlerHooks {
 			// TODO
 			break;
 		}
+
+		if ( isset( $wgContentHandlerUseDB ) && $wgContentHandlerUseDB ) {
+			$updater->addPostDatabaseUpdateMaintenance( 'FixTimedTextPagesContentModel' );
+		}
+
 		return true;
 	}
 
@@ -708,4 +720,6 @@ class TimedMediaHandlerHooks {
 		}
 		return true;
 	}
+
+
 }
