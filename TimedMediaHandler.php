@@ -140,7 +140,7 @@ $wgEnabledTranscodeSet = array(
 	WebVideoTranscode::ENC_WEBM_1080P,
 
 	// A 4K full high quality WebM stream
-	// WebVideoTranscode::ENC_WEBM_2160P,
+	WebVideoTranscode::ENC_WEBM_2160P,
 
 
 	// Ogg Theora/Vorbis
