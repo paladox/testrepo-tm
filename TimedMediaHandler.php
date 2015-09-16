@@ -142,6 +142,25 @@ $wgEnabledTranscodeSet = array(
 	// A 4K full high quality WebM stream
 	// WebVideoTranscode::ENC_WEBM_2160P,
 
+	// WebM VP9/Opus
+	// primary free/open video format
+	// supported by Chrome/Firefox/Opera but not Safari/IE/Edge
+
+	// Medium-bitrate web streamable WebM video
+	WebVideoTranscode::ENC_VP9_360P,
+
+	// Moderate-bitrate web streamable WebM video
+	WebVideoTranscode::ENC_VP9_480P,
+
+	// A high quality WebM stream
+	WebVideoTranscode::ENC_VP9_720P,
+
+	// A full-HD high quality WebM stream
+	WebVideoTranscode::ENC_VP9_1080P,
+
+	// A 4K full high quality WebM stream
+	// WebVideoTranscode::ENC_VP9_2160P,
+
 
 	// Ogg Theora/Vorbis
 	// Fallback for Safari/IE/Edge with ogv.js
