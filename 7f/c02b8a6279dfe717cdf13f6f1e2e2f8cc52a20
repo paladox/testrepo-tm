@@ -1,0 +1,9 @@
+Verified+2: jenkins-bot
+Code-Review+2: EBernhardson <ebernhardson@wikimedia.org>
+Code-Review+1: Paladox <thomasmulhall410@yahoo.com>
+Code-Review+1: DCausse <dcausse@wikimedia.org>
+Submitted-by: jenkins-bot
+Submitted-at: Tue, 22 Sep 2015 17:49:36 +0000
+Reviewed-on: https://gerrit.wikimedia.org/r/240072
+Project: mediawiki/extensions/TimedMediaHandler
+Branch: refs/heads/master
