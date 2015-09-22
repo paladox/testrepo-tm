@@ -16,7 +16,7 @@ LocalSettings.php:
 	require( "$IP/extensions/MwEmbedSupport/MwEmbedSupport.php" );
 
 	// TimedMediaHandler
-    require( "$IP/extensions/TimedMediaHandler/TimedMediaHandler.php" );
+	require( "$IP/extensions/TimedMediaHandler/TimedMediaHandler.php" );
 
 
 == Running Transcodes ==
