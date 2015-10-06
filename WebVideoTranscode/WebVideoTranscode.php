@@ -241,7 +241,7 @@ class WebVideoTranscode {
 				'bufDelay'                   => '256',
 				'videoCodec'                 => 'vp9',
 				'audioCodec'                 => 'opus',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
+				'type'                       => 'video/webm; codecs="vp9, vorbis, opus"',
 			),
 		WebVideoTranscode::ENC_VP9_480P =>
 			array(
@@ -254,7 +254,7 @@ class WebVideoTranscode {
 				'bufDelay'                   => '256',
 				'videoCodec'                 => 'vp9',
 				'audioCodec'                 => 'opus',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
+				'type'                       => 'video/webm; codecs="vp9, vorbis, opus"',
 			),
 		WebVideoTranscode::ENC_VP9_720P =>
 			array(
@@ -268,7 +268,7 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp9',
 				'audioCodec'                 => 'opus',
 				'tileColumns'                => '2',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
+				'type'                       => 'video/webm; codecs="vp9, vorbis, opus"',
 			),
 		WebVideoTranscode::ENC_VP9_1080P =>
 			 array(
@@ -282,7 +282,7 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp9',
 				'audioCodec'                 => 'opus',
 				'tileColumns'                => '4',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
+				'type'                       => 'video/webm; codecs="vp9, vorbis, opus"',
 			),
 		WebVideoTranscode::ENC_VP9_2160P =>
 			 array(
@@ -296,7 +296,7 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp9',
 				'audioCodec'                 => 'opus',
 				'tileColumns'                => '4',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
+				'type'                       => 'video/webm; codecs="vp9, vorbis, opus"',
 			),
 
 		// Losly defined per PCF guide to mp4 profiles:
