@@ -31,95 +31,100 @@
  * @package     File_Ogg
  * @version     CVS: $Id: Bitstream.php,v 1.3 2005/11/08 19:36:18 djg Exp $
  */
-class File_Ogg_Bitstream
-{
-    /**
-     * The serial number of this logical stream.
-     *
-     * @var     int
-     * @access  private
-     */
-    var $_streamSerial;
-    /**
-     * @access  private
-     */
-    var $_streamData;
-    /**
-     * @access  private
-     */
-    var $_filePointer;
-    /**
-     * The number of bits used in this stream.
-     *
-     * @var     int
-     * @access  private
-     */
-    var $_streamSize;
+// @codingStandardsIgnoreStart
+class File_Ogg_Bitstream {
+// @codingStandardsIgnoreEnd
+	/**
+	 * The serial number of this logical stream.
+	 *
+	 * @var     int
+	 * @access  private
+	 */
+	// @codingStandardsIgnoreStart
+	public $_streamSerial;
+	// @codingStandardsIgnoreEnd
+	/**
+	 * @access  private
+	 */
+	// @codingStandardsIgnoreStart
+	public $_streamData;
+	// @codingStandardsIgnoreEnd
+	/**
+	 * @access  private
+	 */
+	// @codingStandardsIgnoreStart
+	public $_filePointer;
+	// @codingStandardsIgnoreEnd
+	/**
+	 * The number of bits used in this stream.
+	 *
+	 * @var     int
+	 * @access  private
+	 */
+	// @codingStandardsIgnoreStart
+	public $_streamSize;
+	// @codingStandardsIgnoreEnd
 
-    /**
-     * The last granule position in the stream
-     * @var     int
-     * @access  private
-     */
-    var $_lastGranulePos;
+	/**
+	 * The last granule position in the stream
+	 * @var     int
+	 * @access  private
+	 */
+	// @codingStandardsIgnoreStart
+	public $_lastGranulePos;
+	// @codingStandardsIgnoreEnd
 
-    /**
-     * Constructor for a generic logical stream.
-     *
-     * @param   int     $streamSerial   Serial number of the logical stream.
-     * @param   array   $streamData     Data for the requested logical stream.
-     * @param   string  $filePath       Location of a file on the filesystem.
-     * @param   pointer $filePointer    File pointer for the current physical stream.
-     * @access  private
-     */
-    function __construct($streamSerial, $streamData, $filePointer)
-    {
-        $this->_streamSerial    = $streamSerial;
-        $this->_streamData      = $streamData;
-        $this->_filePointer     = $filePointer;
-        $this->_firstGranulePos = $streamData['first_granule_pos'];
-        $this->_lastGranulePos  = $streamData['last_granule_pos'];
-        $this->_streamSize      = $streamData['data_length'];
-        $this->_group           = $streamData['pages'][0]['group'];
-    }
+	/**
+	 * Constructor for a generic logical stream.
+	 *
+	 * @param   int     $streamSerial   Serial number of the logical stream.
+	 * @param   array   $streamData     Data for the requested logical stream.
+	 * @param   string  $filePath       Location of a file on the filesystem.
+	 * @param   pointer $filePointer    File pointer for the current physical stream.
+	 * @access  private
+	 */
+	function __construct( $streamSerial, $streamData, $filePointer ) {
+		$this->_streamSerial    = $streamSerial;
+		$this->_streamData      = $streamData;
+		$this->_filePointer     = $filePointer;
+		$this->_firstGranulePos = $streamData['first_granule_pos'];
+		$this->_lastGranulePos  = $streamData['last_granule_pos'];
+		$this->_streamSize      = $streamData['data_length'];
+		$this->_group           = $streamData['pages'][0]['group'];
+	}
 
-    /**
-     * Gives the serial number of this stream.
-     *
-     * The stream serial number is of fairly academic importance, as it makes little
-     * difference to the end user.  The serial number is used by the Ogg physical
-     * stream to distinguish between concurrent logical streams.
-     *
-     * @return  int
-     * @access  public
-     */
-    function getSerial()
-    {
-        return ($this->_streamSerial);
-    }
+	/**
+	 * Gives the serial number of this stream.
+	 *
+	 * The stream serial number is of fairly academic importance, as it makes little
+	 * difference to the end user.  The serial number is used by the Ogg physical
+	 * stream to distinguish between concurrent logical streams.
+	 *
+	 * @return  int
+	 * @access  public
+	 */
+	function getSerial() {
+		return ( $this->_streamSerial );
+	}
 
-    /**
-     * Gives the size (in bits) of this stream.
-     *
-     * This function returns the size of the Vorbis stream within the Ogg
-     * physical stream.
-     *
-     * @return  int
-     * @access  public
-     */
-    function getSize()
-    {
-        return ($this->_streamSize);
-    }
+	/**
+	 * Gives the size (in bits) of this stream.
+	 *
+	 * This function returns the size of the Vorbis stream within the Ogg
+	 * physical stream.
+	 *
+	 * @return  int
+	 * @access  public
+	 */
+	function getSize() {
+		return ( $this->_streamSize );
+	}
 
-    /**
-     * Get the multiplexed group ID
-     */
-    function getGroup()
-    {
-        return $this->_group;
-    }
+	/**
+	 * Get the multiplexed group ID
+	 */
+	function getGroup() {
+		return $this->_group;
+	}
 
 }
-
-?>
