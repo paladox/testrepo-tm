@@ -11,28 +11,31 @@ class TranscodeStatusTable {
 	 * @param $file File
 	 * @return string
 	 */
-	public static function getHTML( $file ){
+	public static function getHTML( $file ) {
 		global $wgUser, $wgOut;
 
 		// Add transcode table css and javascript:
 		$wgOut->addModules( array( 'ext.tmh.transcodetable' ) );
 
-		$o = '<h2 id="transcodestatus">' . wfMessage( 'timedmedia-status-header' )->escaped() . '</h2>';
+		// @codingStandardsIgnoreStart
+		$o= '<h2 id="transcodestatus">' . wfMessage( 'timedmedia-status-header' )->escaped() . '</h2>';
 		// Give the user a purge page link
 		$o.= Linker::link(
 			$file->getTitle(),
-			wfMessage('timedmedia-update-status')->escaped(),
+			wfMessage( 'timedmedia-update-status' )->escaped(),
 			array(),
 			array( 'action'=> 'purge' )
 		);
 
-		$o.= Xml::openElement( 'table', array( 'class' => 'wikitable mw-filepage-transcodestatus' ) ) . "\n"
+		$o.= Xml::openElement( 'table',
+			array( 'class' => 'wikitable mw-filepage-transcodestatus' )
+		) . "\n"
 			. '<tr>'
 			. '<th>' . wfMessage( 'timedmedia-transcodeinfo' )->escaped() . '</th>'
 			. '<th>' . wfMessage( 'timedmedia-transcodebitrate' )->escaped() . '</th>'
 			. '<th>' . wfMessage( 'timedmedia-direct-link' )->escaped() . '</th>';
 
-		if( $wgUser->isAllowed( 'transcode-reset' ) ) {
+		if ( $wgUser->isAllowed( 'transcode-reset' ) ) {
 			$o.= '<th>' . wfMessage( 'timedmedia-actions' )->escaped() . '</th>';
 		}
 
@@ -44,6 +47,7 @@ class TranscodeStatusTable {
 
 		$o.=  Xml::closeElement( 'table' );
 		return $o;
+		// @codingStandardsIgnoreEnd
 	}
 
 	/**
@@ -55,7 +59,7 @@ class TranscodeStatusTable {
 			$settings = WebVideoTranscode::$derivativeSettings[$key];
 			if ( isset( $settings['videoCodec'] ) ) {
 				return $settings['videoCodec'];
-			} else if ( isset( $settings['audioCodec'] ) ) {
+			} elseif ( isset( $settings['audioCodec'] ) ) {
 				return $settings['audioCodec'];
 			} else {
 				// this this shouldn't happen...
@@ -72,9 +76,11 @@ class TranscodeStatusTable {
 	 * @param $file File
 	 * @return string
 	 */
-	public static function getTranscodeRows( $file ){
-		global $wgUser, $wgLang;
-		$o='';
+	public static function getTranscodeRows( $file ) {
+		global $wgUser;
+		// @codingStandardsIgnoreStart
+		$o= '';
+		// @codingStandardsIgnoreEnd
 
 		$transcodeRows = WebVideoTranscode::getTranscodeState( $file );
 
@@ -88,36 +94,37 @@ class TranscodeStatusTable {
 
 			if ( $aIndex === false && $bIndex === false ) {
 				return -strnatcmp( $a, $b );
-			} else if ( $aIndex === false ) {
+			} elseif ( $aIndex === false ) {
 				return 1;
-			} else if ( $bIndex === false ) {
+			} elseif ( $bIndex === false ) {
 				return -1;
-			} else if ( $aIndex === $bIndex ) {
+			} elseif ( $aIndex === $bIndex ) {
 				return -strnatcmp( $a, $b );
 			} else {
 				return ( $aIndex - $bIndex );
 			}
 		} );
 
-		foreach( $transcodeRows as $transcodeKey => $state ){
-			$o.='<tr>';
+		foreach ( $transcodeRows as $transcodeKey => $state ) {
+			// @codingStandardsIgnoreStart
+			$o.= '<tr>';
 			// Encode info:
-			$o.='<td>' . wfMessage('timedmedia-derivative-' . $transcodeKey )->escaped() . '</td>';
-			$o.='<td>' . self::getTranscodeBitrate( $file, $state ) . '</td>';
+			$o.= '<td>' . wfMessage('timedmedia-derivative-' . $transcodeKey )->escaped() . '</td>';
+			$o.= '<td>' . self::getTranscodeBitrate( $file, $state ) . '</td>';
 
 			// Download file
-			$o.='<td>';
+			$o.= '<td>';
 			$o.= ( !is_null( $state['time_success'] ) ) ?
 				'<a href="'.self::getSourceUrl( $file, $transcodeKey ) .'" title="'.wfMessage
 				('timedmedia-download' )->escaped() .'"><div class="download-btn"><span>' .
 				wfMessage('timedmedia-download' )->escaped(). '</span></div></a></td>' :
 				wfMessage('timedmedia-not-ready' )->escaped();
-			$o.='</td>';
+			$o.= '</td>';
 
 			// Check if we should include actions:
-			if( $wgUser->isAllowed( 'transcode-reset' ) ){
+			if ( $wgUser->isAllowed( 'transcode-reset' ) ) {
 				// include reset transcode action buttons
-				$o.='<td class="mw-filepage-transcodereset"><a href="#" data-transcodekey="' .
+				$o.= '<td class="mw-filepage-transcodereset"><a href="#" data-transcodekey="' .
 					htmlspecialchars( $transcodeKey ). '">' . wfMessage('timedmedia-reset')->escaped() .
 					'</a></td>';
 			}
@@ -127,6 +134,7 @@ class TranscodeStatusTable {
 			$o.='<td>' . self::getTranscodeDuration( $file, $state ) . '</td>';
 
 			$o.='</tr>';
+			// @codingStandardsIgnoreEnd
 		}
 		return $o;
 	}
@@ -136,7 +144,7 @@ class TranscodeStatusTable {
 	 * @param $transcodeKey string
 	 * @return string
 	 */
-	public static function getSourceUrl( $file, $transcodeKey ){
+	public static function getSourceUrl( $file, $transcodeKey ) {
 		return WebVideoTranscode::getTranscodedUrlForFile( $file, $transcodeKey );
 	}
 
@@ -147,7 +155,7 @@ class TranscodeStatusTable {
 	 */
 	public static function getTranscodeDuration( $file, $state ) {
 		global $wgLang;
-		if( !is_null( $state['time_success'] ) ) {
+		if ( !is_null( $state['time_success'] ) ) {
 			$startTime = wfTimestamp( TS_UNIX, $state['time_startwork'] );
 			$endTime = wfTimestamp( TS_UNIX, $state['time_success'] );
 			$delta = $endTime - $startTime;
@@ -165,7 +173,7 @@ class TranscodeStatusTable {
 	 */
 	public static function getTranscodeBitrate( $file, $state ) {
 		global $wgLang;
-		if( !is_null( $state['time_success'] ) ) {
+		if ( !is_null( $state['time_success'] ) ) {
 			return $wgLang->formatBitrate( $state['final_bitrate'] );
 		} else {
 			return '';
@@ -177,17 +185,17 @@ class TranscodeStatusTable {
 	 * @param $state
 	 * @return string
 	 */
-	public static function getStatusMsg( $file, $state ){
+	public static function getStatusMsg( $file, $state ) {
 		global $wgContLang;
 		// Check for success:
-		if( !is_null( $state['time_success'] ) ) {
+		if ( !is_null( $state['time_success'] ) ) {
 			return wfMessage( 'timedmedia-completed-on',
 				$wgContLang->timeAndDate( $state[ 'time_success' ] ) )->escaped();
 		}
 		// Check for error:
-		if( !is_null( $state['time_error'] ) ){
+		if ( !is_null( $state['time_error'] ) ) {
 			$attribs = array();
-			if( !is_null( $state['error'] ) ){
+			if ( !is_null( $state['error'] ) ) {
 				$attribs = array(
 					'class' => 'mw-tmh-pseudo-error-link',
 					'data-error' => $state['error'],
@@ -200,21 +208,23 @@ class TranscodeStatusTable {
 			);
 		}
 
-		//$db = wfGetDB( DB_SLAVE );
+		// $db = wfGetDB( DB_SLAVE );
 		// Check for started encoding
-		if( !is_null( $state['time_startwork'] ) ){
-			$timePassed = time() - wfTimestamp ( TS_UNIX, $state['time_startwork'] );
+		if ( !is_null( $state['time_startwork'] ) ) {
+			$timePassed = time() - wfTimestamp( TS_UNIX, $state['time_startwork'] );
 			// Get the rough estimate of time done: ( this is not very costly considering everything else
 			// that happens in an action=purge video page request )
+			// @codingStandardsIgnoreStart
 			/*$filePath = WebVideoTranscode::getTargetEncodePath( $file, $state['key'] );
-			if( is_file( $filePath ) ){
+			if ( is_file( $filePath ) ) {
 				$targetSize = WebVideoTranscode::getProjectedFileSize( $file, $state['key'] );
-				if( $targetSize === false ){
+				if ( $targetSize === false ) {
 					$doneMsg = wfMessage( 'timedmedia-unknown-target-size', $wgLang->formatSize( filesize( $filePath ) ) )->escaped();
 				} else {
 					$doneMsg = wfMessage('timedmedia-percent-done', round( filesize( $filePath ) / $targetSize, 2 ) )->escaped();
 				}
 			}	*/
+			// @codingStandardsIgnoreEnd
 			// Predicting percent done is not working well right now ( disabled for now )
 			$doneMsg = '';
 			return wfMessage(
@@ -223,14 +233,14 @@ class TranscodeStatusTable {
 			)->escaped();
 		}
 		// Check for job added ( but not started encoding )
-		if( !is_null( $state['time_addjob'] ) ){
-			$timePassed = time() - wfTimestamp ( TS_UNIX, $state['time_addjob'] );
+		if ( !is_null( $state['time_addjob'] ) ) {
+			$timePassed = time() - wfTimestamp( TS_UNIX, $state['time_addjob'] );
 			return wfMessage(
 				'timedmedia-in-job-queue',
 				TimedMediaHandler::getTimePassedMsg( $timePassed )
 			)->escaped();
 		}
 		// Return unknown status error:
-		return wfMessage('timedmedia-status-unknown')->escaped();
+		return wfMessage( 'timedmedia-status-unknown' )->escaped();
 	}
 }
