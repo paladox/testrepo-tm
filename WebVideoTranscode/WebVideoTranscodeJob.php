@@ -10,13 +10,15 @@
  * Job for web video transcode
  *
  * Support two modes
- * 1) non-free media transcode ( delays the media file being inserted, adds note to talk page once ready)
+ * 1) non-free media transcode ( delays the media file being inserted,
+ *    adds note to talk page once ready)
  * 2) derivatives for video ( makes new sources for the asset )
  *
  * @ingroup JobQueue
  */
 
 class WebVideoTranscodeJob extends Job {
+	// @codingStandardsIgnoreStart
 	var $targetEncodeFile = null;
 	var $sourceFilePath = null;
 
@@ -24,6 +26,7 @@ class WebVideoTranscodeJob extends Job {
 	 * @var File
 	 */
 	var $file;
+	// @codingStandardsIgnoreEnd
 
 	public function __construct( $title, $params, $id = 0 ) {
 		parent::__construct( 'webVideoTranscode', $title, $params, $id );
@@ -34,7 +37,7 @@ class WebVideoTranscodeJob extends Job {
 	 * Local function to debug output ( jobs don't have access to the maintenance output class )
 	 * @param $msg string
 	 */
-	private function output( $msg ){
+	private function output( $msg ) {
 		print $msg . "\n";
 	}
 
@@ -42,7 +45,7 @@ class WebVideoTranscodeJob extends Job {
 	 * @return File
 	 */
 	private function getFile() {
-		if( !$this->file ){
+		if ( !$this->file ) {
 			$this->file = wfLocalFile( $this->title );
 		}
 		return $this->file;
@@ -51,8 +54,8 @@ class WebVideoTranscodeJob extends Job {
 	/**
 	 * @return string
 	 */
-	private function getTargetEncodePath(){
-		if( !$this->targetEncodeFile ){
+	private function getTargetEncodePath() {
+		if ( !$this->targetEncodeFile ){
 			$file = $this->getFile();
 			$transcodeKey = $this->params[ 'transcodeKey' ];
 			$this->targetEncodeFile = WebVideoTranscode::getTargetEncodeFile( $file, $transcodeKey );
@@ -63,7 +66,7 @@ class WebVideoTranscodeJob extends Job {
 	/**
 	 * purge temporary encode target
 	 */
-	private function purgeTargetEncodeFile () {
+	private function purgeTargetEncodeFile() {
 		if ( $this->targetEncodeFile ) {
 			$this->targetEncodeFile->purge();
 			$this->targetEncodeFile = null;
@@ -73,8 +76,8 @@ class WebVideoTranscodeJob extends Job {
 	/**
 	 * @return string|bool
 	 */
-	private function getSourceFilePath(){
-		if( !$this->sourceFilePath ){
+	private function getSourceFilePath() {
+		if ( !$this->sourceFilePath ){
 			$file = $this->getFile();
 			$this->source = $file->repo->getLocalReference( $file->getPath() );
 			if ( !$this->source ) {
@@ -92,7 +95,7 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $error string
 	 *
 	 */
-	private function setTranscodeError( $transcodeKey, $error ){
+	private function setTranscodeError( $transcodeKey, $error ) {
 		$dbw = wfGetDB( DB_MASTER );
 		$dbw->update(
 			'transcode',
@@ -119,7 +122,7 @@ class WebVideoTranscodeJob extends Job {
 		$file = $this->getFile();
 
 		// Validate the file exists:
-		if( !$file ){
+		if ( !$file ) {
 			$this->output( $this->title . ': File not found ' );
 			return false;
 		}
@@ -127,7 +130,7 @@ class WebVideoTranscodeJob extends Job {
 		// Validate the transcode key param:
 		$transcodeKey = $this->params['transcodeKey'];
 		// Build the destination target
-		if( ! isset(  WebVideoTranscode::$derivativeSettings[ $transcodeKey ] )){
+		if ( !isset( WebVideoTranscode::$derivativeSettings[ $transcodeKey ] ) ) {
 			$error = "Transcode key $transcodeKey not found, skipping";
 			$this->output( $error );
 			$this->setLastError( $error );
@@ -135,7 +138,7 @@ class WebVideoTranscodeJob extends Job {
 		}
 
 		// Validate the source exists:
-		if( !$this->getSourceFilePath() || !is_file( $this->getSourceFilePath() ) ){
+		if ( !$this->getSourceFilePath() || !is_file( $this->getSourceFilePath() ) ) {
 			$status = $this->title . ': Source not found ' . $this->getSourceFilePath();
 			$this->output( $status );
 			$this->setTranscodeError( $transcodeKey, $status );
@@ -160,7 +163,7 @@ class WebVideoTranscodeJob extends Job {
 			),
 			__METHOD__
 		);
-		if( ! is_null( $dbStartTime ) ){
+		if ( !is_null( $dbStartTime ) ) {
 			$error = 'Error, running transcode job, for job that has already started';
 			$this->output( $error );
 			return true;
@@ -184,14 +187,17 @@ class WebVideoTranscodeJob extends Job {
 		// Check the codec see which encode method to call;
 		if ( isset( $options[ 'novideo' ] ) ) {
 			$status = $this->ffmpegEncode( $options );
-		} elseif( $options['videoCodec'] == 'theora' && $wgFFmpeg2theoraLocation !== false ){
+		} elseif( $options['videoCodec'] == 'theora' && $wgFFmpeg2theoraLocation !== false ) {
 			$status = $this->ffmpeg2TheoraEncode( $options );
-		} elseif( $options['videoCodec'] == 'vp8' || $options['videoCodec'] == 'vp9' || $options['videoCodec'] == 'h264' || ( $options['videoCodec'] == 'theora' && $wgFFmpeg2theoraLocation === false ) ){
+		} elseif( $options['videoCodec'] == 'vp8' || $options['videoCodec'] == 'vp9' ||
+			$options['videoCodec'] == 'h264' ||
+				( $options['videoCodec'] == 'theora' && $wgFFmpeg2theoraLocation === false )
+		) {
 			// Check for twopass:
-			if( isset( $options['twopass'] ) ){
+			if ( isset( $options['twopass'] ) ){
 				// ffmpeg requires manual two pass
 				$status = $this->ffmpegEncode( $options, 1 );
-				if( $status && !is_string($status) ){
+				if ( $status && !is_string( $status ) ) {
 					$status = $this->ffmpegEncode( $options, 2 );
 				}
 			} else {
@@ -202,7 +208,8 @@ class WebVideoTranscodeJob extends Job {
 			$status =  'Error unknown target encode codec:' . $options['videoCodec'];
 		}
 
-		// Remove any log files all useful info should be in status and or we are done with 2 passs encoding
+		// Remove any log files,
+		// all useful info should be in status and or we are done with 2 passs encoding
 		$this->removeFffmpgeLogFiles();
 
 		// Do a quick check to confirm the job was not restarted or removed while we were transcoding
@@ -215,23 +222,28 @@ class WebVideoTranscodeJob extends Job {
 		);
 
 		// Check for ( hopefully rare ) issue of or job restarted while transcode in progress
-		if(  $dbw->timestamp( $jobStartTimeCache ) != $dbw->timestamp( $dbStartTime ) ){
-			$this->output('Possible Error, transcode task restarted, removed, or completed while transcode was in progress');
-			// if an error; just error out, we can't remove temp files or update states, because the new job may be doing stuff.
-			if( $status !== true ){
+		if ( $dbw->timestamp( $jobStartTimeCache ) != $dbw->timestamp( $dbStartTime ) ) {
+			$this->output(
+				'Possible Error,
+					transcode task restarted, removed, or completed while transcode was in progress'
+			);
+			// if an error; just error out,
+			// we can't remove temp files or update states, because the new job may be doing stuff.
+			if ( $status !== true ) {
 				$this->setTranscodeError( $transcodeKey, $status );
 				return false;
 			}
-			// else just continue with db updates, and when the new job comes around it won't start because it will see
+			// else just continue with db updates,
+			// and when the new job comes around it won't start because it will see
 			// that the job has already been started.
 		}
 
 		// If status is oky and target does not exist, reset status
-		if( $status === true && !is_file( $this->getTargetEncodePath() ) ) {
+		if ( $status === true && !is_file( $this->getTargetEncodePath() ) ) {
 			$status = 'Target does not exist: ' . $this->getTargetEncodePath();
 		}
 		// If status is ok and target is larger than 0 bytes
-		if( $status === true && filesize( $this->getTargetEncodePath() ) > 0 ){
+		if ( $status === true && filesize( $this->getTargetEncodePath() ) > 0 ) {
 			$file = $this->getFile();
 			$storeOptions = null;
 			if ( version_compare( $wgVersion, '1.23c', '>' ) &&
@@ -249,14 +261,17 @@ class WebVideoTranscodeJob extends Job {
 				$storeOptions
 			);
 			if ( !$result->isOK() ) {
-				// no need to invalidate all pages with video. Because all pages remain valid ( no $transcodeKey derivative )
+				// no need to invalidate all pages with video.
+				// Because all pages remain valid ( no $transcodeKey derivative )
 				// just clear the file page ( so that the transcode table shows the error )
 				$this->title->invalidateCache();
 				$this->setTranscodeError( $transcodeKey, $result->getWikiText() );
 				$status = false;
 			} else {
-				$bitrate = round( intval( filesize( $this->getTargetEncodePath() ) /  $file->getLength() ) * 8 );
-				//wfRestoreWarnings();
+				$bitrate = round(
+					intval( filesize( $this->getTargetEncodePath() ) /  $file->getLength() ) * 8
+				);
+				// wfRestoreWarnings();
 				// Update the transcode table with success time:
 				$dbw->update(
 					'transcode',
@@ -277,11 +292,12 @@ class WebVideoTranscodeJob extends Job {
 		} else {
 			// Update the transcode table with failure time and error
 			$this->setTranscodeError( $transcodeKey, $status );
-			// no need to invalidate all pages with video. Because all pages remain valid ( no $transcodeKey derivative )
+			// no need to invalidate all pages with video.
+			// Because all pages remain valid ( no $transcodeKey derivative )
 			// just clear the file page ( so that the transcode table shows the error )
 			$this->title->invalidateCache();
 		}
-		//done with encoding target, clean up
+		// done with encoding target, clean up
 		$this->purgeTargetEncodeFile();
 
 		// Clear the webVideoTranscode cache ( so we don't keep out dated table cache around )
@@ -290,22 +306,22 @@ class WebVideoTranscodeJob extends Job {
 		$url = WebVideoTranscode::getTranscodedUrlForFile( $file, $transcodeKey );
 		SquidUpdate::purge( array( $url ) );
 
-		if ($status !== true) {
+		if ( $status !== true ) {
 			$this->setLastError( $status );
 		}
 		return $status === true;
 	}
 
-	function removeFffmpgeLogFiles(){
+	function removeFffmpgeLogFiles() {
 		$path =  $this->getTargetEncodePath();
 		$dir = dirname( $path );
 		if ( is_dir( $dir ) ) {
 			$dh = opendir( $dir );
 			if ( $dh ) {
-				while ( ($file = readdir($dh)) !== false ) {
+				while ( ( $file = readdir( $dh ) ) !== false ) {
 					$log_path = "$dir/$file";
 					$ext = strtolower( pathinfo( $log_path, PATHINFO_EXTENSION ) );
-					if( $ext == 'log' && substr( $log_path, 0 , strlen($path)  ) == $path ){
+					if ( $ext == 'log' && substr( $log_path, 0, strlen( $path ) ) == $path ) {
 						wfSuppressWarnings();
 						unlink( $log_path );
 						wfRestoreWarnings();
@@ -322,59 +338,84 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $pass int
 	 * @return bool|string
 	 */
-	function ffmpegEncode( $options, $pass=0 ){
+	function ffmpegEncode( $options, $pass=0 ) {
 		global $wgFFmpegLocation, $wgTranscodeBackgroundMemoryLimit;
 
-		if( !is_file( $this->getSourceFilePath() ) ) {
+		if ( !is_file( $this->getSourceFilePath() ) ) {
 			return "source file is missing, " . $this->getSourceFilePath() . ". Encoding failed.";
 		}
 
 		// Set up the base command
-		$cmd = wfEscapeShellArg( $wgFFmpegLocation ) . ' -y -i ' . wfEscapeShellArg( $this->getSourceFilePath() );
+		$cmd = wfEscapeShellArg(
+			$wgFFmpegLocation
+		) . ' -y -i ' . wfEscapeShellArg( $this->getSourceFilePath() );
 
-
-		if( isset( $options['vpre'] ) ){
+		if ( isset( $options['vpre'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -vpre ' . wfEscapeShellArg( $options['vpre'] );
+			// @codingStandardsIgnoreEnd
 		}
 
-		if ( isset( $options['novideo'] )  ) {
+		if ( isset( $options['novideo'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= " -vn ";
-		} elseif( $options['videoCodec'] == 'vp8' || $options['videoCodec'] == 'vp9' ){
+			// @codingStandardsIgnoreEnd
+		} elseif( $options['videoCodec'] == 'vp8' || $options['videoCodec'] == 'vp9' ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= $this->ffmpegAddWebmVideoOptions( $options, $pass );
-		} elseif( $options['videoCodec'] == 'h264'){
+			// @codingStandardsIgnoreEnd
+		} elseif( $options['videoCodec'] == 'h264' ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= $this->ffmpegAddH264VideoOptions( $options, $pass );
-		} elseif( $options['videoCodec'] == 'theora'){
+			// @codingStandardsIgnoreEnd
+		} elseif( $options['videoCodec'] == 'theora' ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= $this->ffmpegAddTheoraVideoOptions( $options, $pass );
+			// @codingStandardsIgnoreEnd
 		}
 		// Add size options:
-		$cmd .= $this->ffmpegAddVideoSizeOptions( $options ) ;
+		$cmd .= $this->ffmpegAddVideoSizeOptions( $options );
 
 		// Check for start time
-		if( isset( $options['starttime'] ) ){
+		if ( isset( $options['starttime'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -ss ' . wfEscapeShellArg( $options['starttime'] );
+			// @codingStandardsIgnoreEnd
 		} else {
 			$options['starttime'] = 0;
 		}
 		// Check for end time:
-		if( isset( $options['endtime'] ) ){
-			$cmd.= ' -t ' . intval( $options['endtime'] )  - intval($options['starttime'] ) ;
+		if ( isset( $options['endtime'] ) ) {
+			// @codingStandardsIgnoreStart
+			$cmd.= ' -t ' . intval( $options['endtime'] )  - intval( $options['starttime'] );
+			// @codingStandardsIgnoreEnd
 		}
 
 		if ( $pass == 1 || isset( $options['noaudio'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -an';
+			// @codingStandardsIgnoreEnd
 		} else {
+			// @codingStandardsIgnoreStart
 			$cmd.= $this->ffmpegAddAudioOptions( $options, $pass );
+			// @codingStandardsIgnoreEnd
 		}
 
 		if ( $pass != 0 ) {
+			// @codingStandardsIgnoreStart
 			$cmd.=" -pass " .wfEscapeShellArg( $pass ) ;
 			$cmd.=" -passlogfile " . wfEscapeShellArg( $this->getTargetEncodePath() .'.log' );
+			// @codingStandardsIgnoreEnd			
 		}
 		// And the output target:
-		if ($pass == 1) {
+		if ( $pass == 1 ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' /dev/null';
+			// @codingStandardsIgnoreEnd
 		} else{
+			// @codingStandardsIgnoreStart
 			$cmd.= " " . $this->getTargetEncodePath();
+			// @codingStandardsIgnoreEnd
 		}
 
 		$this->output( "Running cmd: \n\n" .$cmd . "\n" );
@@ -383,7 +424,7 @@ class WebVideoTranscodeJob extends Job {
 		$retval = 0;
 		$shellOutput = $this->runShellExec( $cmd, $retval );
 
-		if( $retval != 0 ){
+		if ( $retval != 0 ) {
 			return $cmd .
 				"\n\nExitcode: $retval\nMemory: $wgTranscodeBackgroundMemoryLimit\n\n" .
 				$shellOutput;
@@ -398,36 +439,48 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $pass
 	 * @return string
 	 */
-	function ffmpegAddH264VideoOptions( $options, $pass ){
+	function ffmpegAddH264VideoOptions( $options, $pass ) {
 		global $wgFFmpegThreads;
 		// Set the codec:
+		// @codingStandardsIgnoreStart
 		$cmd= " -threads " . intval( $wgFFmpegThreads ) . " -vcodec libx264";
+		// @codingStandardsIgnoreEnd
 		// Check for presets:
-		if( isset( $options['preset'] ) ){
+		if ( isset( $options['preset'] ) ) {
 			// Add the two vpre types:
-			switch( $options['preset'] ){
+			switch ( $options['preset'] ) {
 				case 'ipod320':
+					// @codingStandardsIgnoreStart
 					$cmd .= " -profile:v baseline -preset slow -coder 0 -bf 0 -weightb 1 -level 13 -maxrate 768k -bufsize 3M";
+					// @codingStandardsIgnoreEnd
 				break;
 				case '720p':
 				case 'ipod640':
+					// @codingStandardsIgnoreStart
 					$cmd .= " -profile:v baseline -preset slow -coder 0 -bf 0 -refs 1 -weightb 1 -level 31 -maxrate 10M -bufsize 10M";
+					// @codingStandardsIgnoreEnd
 				break;
 				default:
 					// in the default case just pass along the preset to ffmpeg
+					// @codingStandardsIgnoreStart
 					$cmd.= " -vpre " . wfEscapeShellArg( $options['preset'] );
+					// @codingStandardsIgnoreEnd
 				break;
 			}
 		}
-		if( isset( $options['videoBitrate'] ) ){
+		if ( isset( $options['videoBitrate'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= " -b " . wfEscapeShellArg (  $options['videoBitrate'] );
+			// @codingStandardsIgnoreEnd
 		}
 		// Output mp4
+		// @codingStandardsIgnoreStart
 		$cmd.=" -f mp4";
+		// @codingStandardsIgnoreEnd
 		return $cmd;
 	}
 
-	function ffmpegAddVideoSizeOptions( $options ){
+	function ffmpegAddVideoSizeOptions( $options ) {
 		$cmd = '';
 		// Get a local pointer to the file object
 		$file = $this->getFile();
@@ -438,17 +491,21 @@ class WebVideoTranscodeJob extends Job {
 		} else {
 			$aspectRatio = $file->getWidth() . ':' . $file->getHeight();
 		}
-		if (isset( $options['maxSize'] )) {
+		if ( isset( $options['maxSize'] ) ) {
 			// Get size transform ( if maxSize is > file, file size is used:
 
 			list( $width, $height ) = WebVideoTranscode::getMaxSizeTransform( $file, $options['maxSize'] );
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -s ' . intval( $width ) . 'x' . intval( $height );
+			// @codingStandardsIgnoreEnd
 		} elseif (
-			(isset( $options['width'] ) && $options['width'] > 0 )
+			( isset( $options['width'] ) && $options['width'] > 0 )
 			&&
-			(isset( $options['height'] ) && $options['height'] > 0 )
-		){
+			( isset( $options['height'] ) && $options['height'] > 0 )
+		) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -s ' . intval( $options['width'] ) . 'x' . intval( $options['height'] );
+			// @codingStandardsIgnoreEnd
 		}
 
 		// Handle crop:
@@ -458,9 +515,11 @@ class WebVideoTranscodeJob extends Job {
 			'cropLeft' => '-cropleft',
 			'cropRight' => '-cropright'
 		);
-		foreach( $optionMap as $name => $cmdArg ){
-			if( isset($options[$name]) ){
+		foreach ( $optionMap as $name => $cmdArg ) {
+			if ( isset( $options[$name] ) ) {
+				// @codingStandardsIgnoreStart
 				$cmd.= " $cmdArg " .  wfEscapeShellArg( $options[$name] );
+				// @codingStandardsIgnoreEnd
 			}
 		}
 		return $cmd;
@@ -472,7 +531,7 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $pass
 	 * @return string
 	 */
-	function ffmpegAddWebmVideoOptions( $options, $pass ){
+	function ffmpegAddWebmVideoOptions( $options, $pass ) {
 		global $wgFFmpegThreads;
 
 		// Get a local pointer to the file object
@@ -481,53 +540,77 @@ class WebVideoTranscodeJob extends Job {
 		$cmd =' -threads ' . intval( $wgFFmpegThreads );
 
 		// check for presets:
-		if( isset($options['preset']) ){
-			if ($options['preset'] == "360p") {
+		if ( isset( $options['preset'] ) ) {
+			if ( $options['preset'] == "360p" ) {
+				// @codingStandardsIgnoreStart
 				$cmd.= " -vpre libvpx-360p";
+				// @codingStandardsIgnoreEnd
 			} elseif ( $options['preset'] == "720p" ) {
+				// @codingStandardsIgnoreStart
 				$cmd.= " -vpre libvpx-720p";
+				// @codingStandardsIgnoreEnd
 			} elseif ( $options['preset'] == "1080p" ) {
+				// @codingStandardsIgnoreStart
 				$cmd.= " -vpre libvpx-1080p";
+				// @codingStandardsIgnoreEnd
 			}
 		}
 
 		// Add the boiler plate vp8 ffmpeg command:
+		// @codingStandardsIgnoreStart
 		$cmd.=" -skip_threshold 0 -bufsize 6000k -rc_init_occupancy 4000";
+		// @codingStandardsIgnoreEnd
 
 		// Check for video quality:
 		if ( isset( $options['videoQuality'] ) && $options['videoQuality'] >= 0 ) {
 			// Map 0-10 to 63-0, higher values worse quality
 			$quality = 63 - intval( intval( $options['videoQuality'] )/10 * 63 );
+			// @codingStandardsIgnoreStart
 			$cmd .= " -qmin " . wfEscapeShellArg( $quality );
 			$cmd .= " -qmax " . wfEscapeShellArg( $quality );
+			// @codingStandardsIgnoreEnd
 		}
 
 		// Check for video bitrate:
 		if ( isset( $options['videoBitrate'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= " -qmin 1 -qmax 51";
 			$cmd.= " -vb " . wfEscapeShellArg( $options['videoBitrate'] * 1000 );
+			// @codingStandardsIgnoreEnd
 		}
 		// Set the codec:
 		if ( $options['videoCodec'] === 'vp9' ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= " -vcodec libvpx-vp9";
+			// @codingStandardsIgnoreEnd
 			if ( isset( $options['tileColumns'] ) ) {
+				// @codingStandardsIgnoreStart
 				$cmd.= ' -tile-columns ' . wfEscapeShellArg( $options['tileColumns'] );
+				// @codingStandardsIgnoreEnd
 			}
 		} else {
+			// @codingStandardsIgnoreStart
 			$cmd.= " -vcodec libvpx";
+			// @codingStandardsIgnoreEnd
 		}
 
 		// Check for keyframeInterval
-		if( isset( $options['keyframeInterval'] ) ){
+		if ( isset( $options['keyframeInterval'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -g ' . wfEscapeShellArg( $options['keyframeInterval'] );
 			$cmd.= ' -keyint_min ' . wfEscapeShellArg( $options['keyframeInterval'] );
+			// @codingStandardsIgnoreEnd
 		}
-		if( isset( $options['deinterlace'] ) ){
+		if ( isset( $options['deinterlace'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -deinterlace';
+			// @codingStandardsIgnoreEnd
 		}
 
 		// Output WebM
+		// @codingStandardsIgnoreStart
 		$cmd.=" -f webm";
+		// @codingStandardsIgnoreEnd
 
 		return $cmd;
 	}
@@ -542,7 +625,7 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $pass
 	 * @return string
 	 */
-	function ffmpegAddTheoraVideoOptions( $options, $pass ){
+	function ffmpegAddTheoraVideoOptions( $options, $pass ) {
 		global $wgFFmpegThreads;
 
 		// Get a local pointer to the file object
@@ -554,32 +637,46 @@ class WebVideoTranscodeJob extends Job {
 		if ( isset( $options['videoQuality'] ) && $options['videoQuality'] >= 0 ) {
 			// Map 0-10 to 63-0, higher values worse quality
 			$quality = 63 - intval( intval( $options['videoQuality'] )/10 * 63 );
+			// @codingStandardsIgnoreStart
 			$cmd .= " -qmin " . wfEscapeShellArg( $quality );
 			$cmd .= " -qmax " . wfEscapeShellArg( $quality );
+			// @codingStandardsIgnoreEnd
 		}
 
 		// Check for video bitrate:
 		if ( isset( $options['videoBitrate'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= " -qmin 1 -qmax 51";
 			$cmd.= " -vb " . wfEscapeShellArg( $options['videoBitrate'] * 1000 );
+			// @codingStandardsIgnoreEnd
 		}
 		// Set the codec:
+		// @codingStandardsIgnoreStart
 		$cmd.= " -vcodec theora";
+		// @codingStandardsIgnoreEnd
 
 		// Check for keyframeInterval
-		if( isset( $options['keyframeInterval'] ) ){
+		if ( isset( $options['keyframeInterval'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -g ' . wfEscapeShellArg( $options['keyframeInterval'] );
 			$cmd.= ' -keyint_min ' . wfEscapeShellArg( $options['keyframeInterval'] );
+			// @codingStandardsIgnoreEnd
 		}
-		if( isset( $options['deinterlace'] ) ){
+		if ( isset( $options['deinterlace'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -deinterlace';
+			// @codingStandardsIgnoreEnd
 		}
-		if( isset( $options['framerate'] ) ) {
+		if ( isset( $options['framerate'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -r ' . wfEscapeShellArg( $options['framerate'] );
+			// @codingStandardsIgnoreEnd
 		}
 
 		// Output Ogg
+		// @codingStandardsIgnoreStart
 		$cmd.=" -f ogg";
+		// @codingStandardsIgnoreEnd
 
 		return $cmd;
 	}
@@ -589,22 +686,30 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $pass
 	 * @return string
 	 */
-	function ffmpegAddAudioOptions( $options, $pass ){
+	function ffmpegAddAudioOptions( $options, $pass ) {
 		$cmd ='';
-		if( isset( $options['audioQuality'] ) ){
+		if ( isset( $options['audioQuality'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= " -aq " . wfEscapeShellArg( $options['audioQuality'] );
+			// @codingStandardsIgnoreEnd
 		}
-		if( isset( $options['audioBitrate'] )){
+		if ( isset( $options['audioBitrate'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= ' -ab ' . intval( $options['audioBitrate'] ) * 1000;
+			// @codingStandardsIgnoreEnd
 		}
-		if( isset( $options['samplerate'] ) ){
+		if ( isset( $options['samplerate'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= " -ar " .  wfEscapeShellArg( $options['samplerate'] );
+			// @codingStandardsIgnoreEnd
 		}
-		if( isset( $options['channels'] ) ){
+		if ( isset( $options['channels'] ) ) {
+			// @codingStandardsIgnoreStart
 			$cmd.= " -ac " . wfEscapeShellArg( $options['channels'] );
+			// @codingStandardsIgnoreEnd
 		}
 
-		if( isset( $options['audioCodec'] ) ){
+		if ( isset( $options['audioCodec'] ) ) {
 			$encoders = array(
 				'vorbis'	=> 'libvorbis',
 				'opus'		=> 'libopus',
@@ -615,14 +720,20 @@ class WebVideoTranscodeJob extends Job {
 			} else {
 				$codec = $options['audioCodec'];
 			}
+			// @codingStandardsIgnoreStart
 			$cmd.= " -acodec " . wfEscapeShellArg( $codec );
+			// @codingStandardsIgnoreEnd
 			if ( $codec === 'aac' ) {
 				// the aac encoder is currently "experimental" in libav 9? :P
+				// @codingStandardsIgnoreStart
 				$cmd .= ' -strict experimental';
+				// @codingStandardsIgnoreEnd
 			}
 		} else {
 			// if no audio codec set use vorbis :
+			// @codingStandardsIgnoreStart
 			$cmd.= " -acodec libvorbis ";
+			// @codingStandardsIgnoreEnd
 		}
 		return $cmd;
 	}
@@ -632,19 +743,21 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $options array
 	 * @return bool|string
 	 */
-	function ffmpeg2TheoraEncode( $options ){
+	function ffmpeg2TheoraEncode( $options ) {
 		global $wgFFmpeg2theoraLocation, $wgTranscodeBackgroundMemoryLimit;
 
-		if( !is_file( $this->getSourceFilePath() ) ) {
+		if ( !is_file( $this->getSourceFilePath() ) ) {
 			return "source file is missing, " . $this->getSourceFilePath() . ". Encoding failed.";
 		}
 
 		// Set up the base command
-		$cmd = wfEscapeShellArg( $wgFFmpeg2theoraLocation ) . ' ' . wfEscapeShellArg( $this->getSourceFilePath() );
+		$cmd = wfEscapeShellArg(
+			$wgFFmpeg2theoraLocation
+		) . ' ' . wfEscapeShellArg( $this->getSourceFilePath() );
 
 		$file = $this->getFile();
 
-		if( isset( $options['maxSize'] ) ){
+		if ( isset( $options['maxSize'] ) ) {
 			list( $width, $height ) = WebVideoTranscode::getMaxSizeTransform( $file, $options['maxSize'] );
 			$options['width'] = $width;
 			$options['height'] = $height;
@@ -653,24 +766,32 @@ class WebVideoTranscodeJob extends Job {
 		}
 
 		// Add in the encode settings
-		foreach( $options as $key => $val ){
-			if( isset( self::$foggMap[$key] ) ){
-				if( is_array(  self::$foggMap[$key] ) ){
+		foreach ( $options as $key => $val ) {
+			if ( isset( self::$foggMap[$key] ) ) {
+				if ( is_array( self::$foggMap[$key] ) ) {
+					// @codingStandardsIgnoreStart
 					$cmd.= ' '. implode(' ', self::$foggMap[$key] );
-				} elseif ($val == 'true' || $val === true){
+					// @codingStandardsIgnoreEnd
+				} elseif ( $val == 'true' || $val === true ) {
+					// @codingStandardsIgnoreStart
 					$cmd.= ' '. self::$foggMap[$key];
-				} elseif ($val == 'false' || $val === false){
-					//ignore "false" flags
+					// @codingStandardsIgnoreEnd
+				} elseif ( $val == 'false' || $val === false ) {
+					// ignore "false" flags
 				} else {
-					//normal get/set value
+					// normal get/set value
+					// @codingStandardsIgnoreStart
 					$cmd.= ' '. self::$foggMap[$key] . ' ' . wfEscapeShellArg( $val );
+					// @codingStandardsIgnoreEnd
 				}
 			}
 		}
 
 		// Add the output target:
 		$outputFile = $this->getTargetEncodePath();
+		// @codingStandardsIgnoreStart
 		$cmd.= ' -o ' . wfEscapeShellArg ( $outputFile );
+		// @codingStandardsIgnoreEnd
 
 		$this->output( "Running cmd: \n\n" .$cmd . "\n" );
 
@@ -678,7 +799,7 @@ class WebVideoTranscodeJob extends Job {
 		$shellOutput = $this->runShellExec( $cmd, $retval );
 
 		// ffmpeg2theora returns 0 status on some errors, so also check for file
-		if( $retval != 0 || !is_file( $outputFile ) || filesize( $outputFile ) === 0 ){
+		if ( $retval != 0 || !is_file( $outputFile ) || filesize( $outputFile ) === 0 ) {
 			return $cmd .
 				"\n\nExitcode: $retval\nMemory: $wgTranscodeBackgroundMemoryLimit\n\n" .
 				$shellOutput;
@@ -695,7 +816,7 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $retval String, refrence variable to return the exit code
 	 * @return string
 	 */
-	public function runShellExec( $cmd, &$retval ){
+	public function runShellExec( $cmd, &$retval ) {
 		global $wgTranscodeBackgroundTimeLimit,
 			$wgTranscodeBackgroundMemoryLimit,
 			$wgTranscodeBackgroundSizeLimit,
@@ -705,23 +826,23 @@ class WebVideoTranscodeJob extends Job {
 		$caller = wfGetCaller();
 
 		// Check if background tasks are enabled
-		if( $wgEnableNiceBackgroundTranscodeJobs === false ){
+		if ( $wgEnableNiceBackgroundTranscodeJobs === false ) {
 			// Directly execute the shell command:
 			$limits = array(
 				"filesize" => $wgTranscodeBackgroundSizeLimit,
 				"memory" => $wgTranscodeBackgroundMemoryLimit,
 				"time" => $wgTranscodeBackgroundTimeLimit
 			);
-			return wfShellExec( $cmd . ' 2>&1', $retval , array(), $limits,
+			return wfShellExec( $cmd . ' 2>&1', $retval, array(), $limits,
 				array( 'profileMethod' => $caller ) );
 		}
 
 		$encodingLog = $this->getTargetEncodePath() . '.stdout.log';
 		$retvalLog = $this->getTargetEncodePath() . '.retval.log';
 		// Check that we can actually write to these files
-		//( no point in running the encode if we can't write )
+		// ( no point in running the encode if we can't write )
 		wfSuppressWarnings();
-		if( ! touch( $encodingLog) || ! touch( $retvalLog ) ){
+		if ( !touch( $encodingLog ) || !touch( $retvalLog ) ) {
 			wfRestoreWarnings();
 			$retval = 1;
 			return "Error could not write to target location";
@@ -730,12 +851,12 @@ class WebVideoTranscodeJob extends Job {
 
 		// Fork out a process for running the transcode
 		$pid = pcntl_fork();
-		if ($pid == -1) {
+		if ( $pid == -1 ) {
 			$errorMsg = '$wgEnableNiceBackgroundTranscodeJobs enabled but failed pcntl_fork';
 			$retval = 1;
-			$this->output( $errorMsg);
+			$this->output( $errorMsg );
 			return $errorMsg;
-		} elseif ( $pid == 0) {
+		} elseif ( $pid == 0 ) {
 			// we are the child
 			$this->runChildCmd( $cmd, $retval, $encodingLog, $retvalLog, $caller );
 			// dont remove any temp files in the child process, this is done
@@ -748,7 +869,7 @@ class WebVideoTranscodeJob extends Job {
 			exit( $retval );
 		} else {
 			// we are the parent monitor and return status
-			return $this->monitorTranscode($pid, $retval, $encodingLog, $retvalLog);
+			return $this->monitorTranscode( $pid, $retval, $encodingLog, $retvalLog );
 		}
 	}
 
@@ -759,28 +880,29 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $retvalLog
 	 * @param string $caller The calling method
 	 */
-	public function runChildCmd( $cmd, &$retval, $encodingLog, $retvalLog, $caller ){
-		global $wgTranscodeBackgroundTimeLimit,
-			$wgTranscodeBackgroundMemoryLimit,
-			$wgTranscodeBackgroundSizeLimit;
+	public function runChildCmd( $cmd, &$retval, $encodingLog, $retvalLog, $caller ) {
+		global $wgTranscodeBackgroundTimeLimit, $wgTranscodeBackgroundMemoryLimit,
+		$wgTranscodeBackgroundSizeLimit;
+
 		// In theory we should use pcntl_exec but not sure how to get the stdout, ensure
 		// we don't max php memory with the same protections provided by wfShellExec.
 
 		// pcntl_exec requires a direct path to the exe and arguments as an array:
-		//$cmd = explode(' ', $cmd );
-		//$baseCmd = array_shift( $cmd );
-		//print "run:" . $baseCmd . " args: " . print_r( $cmd, true );
-		//$status  = pcntl_exec($baseCmd , $cmd );
+		// $cmd = explode(' ', $cmd );
+		// $baseCmd = array_shift( $cmd );
+		// print "run:" . $baseCmd . " args: " . print_r( $cmd, true );
+		// $status  = pcntl_exec($baseCmd , $cmd );
 
 		// Directly execute the shell command:
-		//global $wgTranscodeBackgroundPriority;
-		//$status = wfShellExec( 'nice -n ' . $wgTranscodeBackgroundPriority . ' '. $cmd . ' 2>&1', $retval );
+		// global $wgTranscodeBackgroundPriority;
+		// $status =
+		// wfShellExec( 'nice -n ' . $wgTranscodeBackgroundPriority . ' '. $cmd . ' 2>&1', $retval );
 		$limits = array(
 			"filesize" => $wgTranscodeBackgroundSizeLimit,
 			"memory" => $wgTranscodeBackgroundMemoryLimit,
 			"time" => $wgTranscodeBackgroundTimeLimit
 		);
-		$status = wfShellExec( $cmd . ' 2>&1', $retval , array(), $limits,
+		$status = wfShellExec( $cmd . ' 2>&1', $retval, array(), $limits,
 			array( 'profileMethod' => $caller ) );
 
 		// Output the status:
@@ -798,7 +920,7 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $retvalLog
 	 * @return string
 	 */
-	public function monitorTranscode( $pid, &$retval, $encodingLog, $retvalLog ){
+	public function monitorTranscode( $pid, &$retval, $encodingLog, $retvalLog ) {
 		global $wgTranscodeBackgroundTimeLimit, $wgLang;
 		$errorMsg = '';
 		$loopCount = 0;
@@ -806,32 +928,36 @@ class WebVideoTranscodeJob extends Job {
 		$startTime = time();
 		$fileIsNotGrowing = false;
 
+		// @codingStandardsIgnoreStart
 		$this->output( "Encoding with pid: $pid \npcntl_waitpid: " . pcntl_waitpid( $pid, $status, WNOHANG OR WUNTRACED) .
 			"\nisProcessRunning: " . self::isProcessRunningKillZombie( $pid ) . "\n" );
+		// @codingStandardsIgnoreEnd
 
-		// Check that the child process is still running ( note this does not work well with  pcntl_waitpid
-		// for some reason :(
-		while( self::isProcessRunningKillZombie( $pid ) ) {
-			//$this->output( "$pid is running" );
+		// Check that the child process is still running
+		// ( note this does not work well with  pcntl_waitpid for some reason :( )
+		while ( self::isProcessRunningKillZombie( $pid ) ) {
+			// $this->output( "$pid is running" );
 
 			// Check that the target file is growing ( every 5 seconds )
-			if( $loopCount == 10 ){
+			if ( $loopCount == 10 ) {
 				// only run check if we are outputing to target file
 				// ( two pass encoding does not output to target on first pass )
 				clearstatcache();
-				$newFileSize = is_file( $this->getTargetEncodePath() ) ? filesize( $this->getTargetEncodePath() ) : 0;
+				$newFileSize = is_file(
+					$this->getTargetEncodePath()
+				) ? filesize( $this->getTargetEncodePath() ) : 0;
 				// Don't start checking for file growth until we have an initial positive file size:
-				if( $newFileSize > 0 ){
-					$this->output(  $wgLang->formatSize( $newFileSize ). ' Total size, encoding ' .
+				if ( $newFileSize > 0 ) {
+					$this->output( $wgLang->formatSize( $newFileSize ). ' Total size, encoding ' .
 						$wgLang->formatSize( ( $newFileSize - $oldFileSize ) / 5 ) . ' per second' );
-					if( $newFileSize == $oldFileSize ){
-						if( $fileIsNotGrowing ){
+					if ( $newFileSize == $oldFileSize ) {
+						if ( $fileIsNotGrowing ) {
 							$errorMsg = "Target File is not increasing in size, kill process.";
 							$this->output( $errorMsg );
 							// file is not growing in size, kill proccess
 							$retval = 1;
 
-							//posix_kill( $pid, 9);
+							// posix_kill( $pid, 9);
 							self::killProcess( $pid );
 							break;
 						}
@@ -848,13 +974,15 @@ class WebVideoTranscodeJob extends Job {
 			}
 
 			// Check if we have global job run-time has been exceeded:
-			if ( $wgTranscodeBackgroundTimeLimit && time() - $startTime  > $wgTranscodeBackgroundTimeLimit ){
+			if (
+				$wgTranscodeBackgroundTimeLimit && time() - $startTime  > $wgTranscodeBackgroundTimeLimit
+			) {
 				$errorMsg = "Encoding exceeded max job run time ( "
 					. TimedMediaHandler::seconds2npt( $wgTranscodeBackgroundTimeLimit ) . " ), kill process.";
 				$this->output( $errorMsg );
 				// File is not growing in size, kill proccess
 				$retval = 1;
-				//posix_kill( $pid, 9);
+				// posix_kill( $pid, 9);
 				self::killProcess( $pid );
 				break;
 			}
@@ -869,15 +997,19 @@ class WebVideoTranscodeJob extends Job {
 		wfSuppressWarnings();
 		$returnCodeFile = file_get_contents( $retvalLog );
 		wfRestoreWarnings();
-		//$this->output( "TranscodeJob:: Child pcntl return:". $returnPcntl . ' Log file exit code:' . $returnCodeFile . "\n" );
+		// @codingStandardsIgnoreStart
+		// $this->output( "TranscodeJob:: Child pcntl return:". $returnPcntl . ' Log file exit code:' . $returnCodeFile . "\n" );
+		// @codingStandardsIgnoreEnd
 
 		// File based exit code seems more reliable than pcntl_wexitstatus
 		$retval = $returnCodeFile;
 
 		// return the encoding log contents ( will be inserted into error table if an error )
 		// ( will be ignored and removed if success )
-		if( $errorMsg!= '' ){
+		if ( $errorMsg!= '' ) {
+			// @codingStandardsIgnoreStart
 			$errorMsg.="\n\n";
+			// @codingStandardsIgnoreEnd
 		}
 		return $errorMsg . file_get_contents( $encodingLog );
 	}
@@ -887,14 +1019,14 @@ class WebVideoTranscodeJob extends Job {
 	 * @param $pid int
 	 * @return bool
 	 */
-	public static function isProcessRunningKillZombie( $pid ){
+	public static function isProcessRunningKillZombie( $pid ) {
 		exec( "ps $pid", $processState );
-		if( !isset( $processState[1] ) ){
+		if ( !isset( $processState[1] ) ) {
 			return false;
 		}
-		if( strpos( $processState[1], '<defunct>' ) !== false ){
+		if ( strpos( $processState[1], '<defunct>' ) !== false ) {
 			// posix kill does not seem to work
-			//posix_kill( $pid, 9);
+			// posix_kill( $pid, 9);
 			self::killProcess( $pid );
 			return false;
 		}
@@ -907,10 +1039,10 @@ class WebVideoTranscodeJob extends Job {
 	* @param $pid int
 	* @return bool
 	*/
-	public static function killProcess( $pid ){
+	public static function killProcess( $pid ) {
 		exec( "kill -9 $pid" );
 		exec( "ps $pid", $processState );
-		if( isset( $processState[1] ) ){
+		if ( isset( $processState[1] ) ) {
 			return false;
 		}
 		return true;
@@ -941,9 +1073,9 @@ class WebVideoTranscodeJob extends Job {
 		'cropLeft'		=> "--cropleft",
 		'cropRight'		=> "--cropright",
 		'keyframeInterval'=> "--keyint",
-		'denoise'		=> array("--pp", "de"),
+		'denoise'		=> array( "--pp", "de" ),
 		'deinterlace'	=> "--deinterlace",
-		'novideo'		=> array("--novideo", "--no-skeleton"),
+		'novideo'		=> array( "--novideo", "--no-skeleton" ),
 		'bufDelay'		=> "--buf-delay",
 		// audio
 		'audioQuality'	=> "-a",
