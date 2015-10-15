@@ -19,14 +19,16 @@ class TimedMediaIframeOutput {
 	 */
 	static function iframeHook( &$title, &$article, $doOutput = true ) {
 		global $wgRequest, $wgOut, $wgEnableIframeEmbed;
-		if( !$wgEnableIframeEmbed )
-			return true; //continue normal output iframes are "off" (maybe throw a warning in the future)
+		if ( !$wgEnableIframeEmbed ) {
+			// continue normal output iframes are "off" (maybe throw a warning in the future)
+			return true;
+		}
 
 		// Make sure we are in the right namespace and iframe=true was called:
-		if(	is_object( $title ) && $title->getNamespace() == NS_FILE  &&
-			$wgRequest->getVal('embedplayer') == 'yes' &&
+		if ( is_object( $title ) && $title->getNamespace() == NS_FILE &&
+			$wgRequest->getVal( 'embedplayer' ) == 'yes' &&
 			$wgEnableIframeEmbed &&
-			$doOutput ){
+			$doOutput ) {
 
 			if ( self::outputIframe( $title ) ) {
 				// Turn off output of anything other than the iframe
@@ -43,9 +45,9 @@ class TimedMediaIframeOutput {
 	 * @throws Exception
 	 */
 	static function outputIframe( $title ) {
-		global $wgEnableIframeEmbed, $wgOut, $wgUser, $wgBreakFrames;
+		global $wgEnableIframeEmbed, $wgOut, $wgBreakFrames;
 
-		if( !$wgEnableIframeEmbed ){
+		if ( !$wgEnableIframeEmbed ) {
 			return false;
 		}
 
@@ -117,6 +119,7 @@ class TimedMediaIframeOutput {
 	</div>
 	<?php echo $wgOut->getBottomScripts(); ?>
 	<script>
+	// @codingStandardsIgnoreStart
 		window.RLQ.push( function() {
 			mw.loader.using( 'mw.MwEmbedSupport', function() {
 				// only enable fullscreen if enabled in iframe
@@ -142,6 +145,7 @@ class TimedMediaIframeOutput {
 				} );
 			} );
 		} );
+	// @codingStandardsIgnoreEnd
 	</script>
 </body>
 </html>
