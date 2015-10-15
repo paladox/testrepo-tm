@@ -33,94 +33,99 @@ define( 'OGG_OPUS_COMMENTS_PAGE_OFFSET', 1 );
  * @package     File_Ogg
  * @version     1
  */
-class File_Ogg_Opus extends File_Ogg_Media
-{
-    /**
-     * @access  private
-     */
-    function __construct($streamSerial, $streamData, $filePointer)
-    {
-        parent::__construct($streamSerial, $streamData, $filePointer);
-        $this->_decodeHeader();
-        $this->_decodeCommentsHeader();
+// @codingStandardsIgnoreStart
+class File_Ogg_Opus extends File_Ogg_Media {
+// @codingStandardsIgnoreEnd
+	/**
+	 * @access  private
+	 */
+	function __construct( $streamSerial, $streamData, $filePointer ) {
+		parent::__construct( $streamSerial, $streamData, $filePointer );
+		$this->_decodeHeader();
+		$this->_decodeCommentsHeader();
 
-        $endSec =  $this->getSecondsFromGranulePos( $this->_lastGranulePos );
-        $startSec = $this->getSecondsFromGranulePos( $this->_firstGranulePos );
+		$endSec =  $this->getSecondsFromGranulePos( $this->_lastGranulePos );
+		$startSec = $this->getSecondsFromGranulePos( $this->_firstGranulePos );
 
-        if( $startSec > 1){
-            $this->_streamLength = $endSec - $startSec;
-            $this->_startOffset = $startSec;
-        }else{
-            $this->_streamLength = $endSec;
-        }
-        $this->_avgBitrate = $this->_streamLength ? ($this->_streamSize * 8) / $this->_streamLength : 0;
-    }
+		if ( $startSec > 1 ) {
+			$this->_streamLength = $endSec - $startSec;
+			$this->_startOffset = $startSec;
+		} else {
+			$this->_streamLength = $endSec;
+		}
+		$this->_avgBitrate = $this->_streamLength ? ( $this->_streamSize * 8 ) / $this->_streamLength : 0;
+	}
 
-    function getSecondsFromGranulePos( $granulePos ){
-        return (( '0x' . substr( $granulePos, 0, 8 ) ) * pow(2, 32)
-            + ( '0x' . substr( $granulePos, 8, 8 ) )
-            - $this->_header['pre_skip'])
-            / 48000;
-    }
+	function getSecondsFromGranulePos( $granulePos ) {
+		return ( ( '0x' . substr( $granulePos, 0, 8 ) ) * pow( 2, 32 )
+			+ ( '0x' . substr( $granulePos, 8, 8 ) )
+			- $this->_header['pre_skip'] )
+			/ 48000;
+	}
 
-    /**
-     * Get a short string describing the type of the stream
-     * @return string
-     */
-    function getType()
-    {
-        return 'Opus';
-    }
+	/**
+	 * Get a short string describing the type of the stream
+	 * @return string
+	 */
+	function getType() {
+		return 'Opus';
+	}
 
-    /**
-     * Decode the stream header
-     * @access  private
-     */
-    function _decodeHeader()
-    {
-        fseek($this->_filePointer, $this->_streamData['pages'][0]['body_offset'], SEEK_SET);
-        // The first 8 characters should be "OpusHead".
-        if (fread($this->_filePointer, 8) != 'OpusHead')
-            throw new OggException("Stream is undecodable due to a malformed header.", OGG_ERROR_UNDECODABLE);
+	/**
+	 * Decode the stream header
+	 * @access  private
+	 */
+	// @codingStandardsIgnoreStart
+	function _decodeHeader() {
+	// @codingStandardsIgnoreEnd
+		fseek( $this->_filePointer, $this->_streamData['pages'][0]['body_offset'], SEEK_SET );
+		// The first 8 characters should be "OpusHead".
+		if ( fread( $this->_filePointer, 8 ) != 'OpusHead' ) {
+			throw new OggException(
+				"Stream is undecodable due to a malformed header.", OGG_ERROR_UNDECODABLE
+			);
+		}
 
-        $this->_header = File_Ogg::_readLittleEndian($this->_filePointer, array(
-            'opus_version'          => 8,
-            'nb_channels'           => 8,
-            'pre_skip'              => 16,
-            'audio_sample_rate'     => 32,
-            'output_gain'           => 16,
-            'channel_mapping_family'=> 8,
-        ));
-        $this->_channels = $this->_header['nb_channels'];
-    }
+		$this->_header = File_Ogg::_readLittleEndian( $this->_filePointer, array(
+			'opus_version'          => 8,
+			'nb_channels'           => 8,
+			'pre_skip'              => 16,
+			'audio_sample_rate'     => 32,
+			'output_gain'           => 16,
+			'channel_mapping_family'=> 8,
+		) );
+		$this->_channels = $this->_header['nb_channels'];
+	}
 
-    /**
-     * Get an associative array containing header information about the stream
-     * @access  public
-     * @return  array
-     */
-    function getHeader() {
-        return $this->_header;
-    }
+	/**
+	 * Get an associative array containing header information about the stream
+	 * @access  public
+	 * @return  array
+	 */
+	function getHeader() {
+		return $this->_header;
+	}
 
-    function getSampleRate()
-    {
-        //Opus always outputs 48kHz, the header only lists
-        //the samplerate of the source as reference
-        return 48000;
-    }
+	function getSampleRate() {
+		// Opus always outputs 48kHz, the header only lists
+		// the samplerate of the source as reference
+		return 48000;
+	}
 
-    /**
-     * Decode the comments header
-     * @access private
-     */
-    function _decodeCommentsHeader()
-    {
-        $id = 'OpusTags';
-        $this->_decodeCommonHeader(false, OGG_OPUS_COMMENTS_PAGE_OFFSET);
-        if(fread($this->_filePointer, strlen($id)) !== $id)
-            throw new OggException("Stream is undecodable due to a malformed header.", OGG_ERROR_UNDECODABLE);
-        $this->_decodeBareCommentsHeader();
-    }
+	/**
+	 * Decode the comments header
+	 * @access private
+	 */
+	// @codingStandardsIgnoreStart
+	function _decodeCommentsHeader() {
+	// @codingStandardsIgnoreEnd
+		$id = 'OpusTags';
+		$this->_decodeCommonHeader( false, OGG_OPUS_COMMENTS_PAGE_OFFSET );
+		if ( fread( $this->_filePointer, strlen( $id ) ) !== $id ) {
+			throw new OggException(
+				"Stream is undecodable due to a malformed header.", OGG_ERROR_UNDECODABLE
+			);
+		}
+		$this->_decodeBareCommentsHeader();
+	}
 }
-?>
