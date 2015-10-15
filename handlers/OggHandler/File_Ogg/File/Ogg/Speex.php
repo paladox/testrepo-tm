@@ -32,91 +32,94 @@
  * @package     File_Ogg
  * @version     CVS: $Id: Speex.php,v 1.10 2005/11/16 20:43:27 djg Exp $
  */
-class File_Ogg_Speex extends File_Ogg_Media
-{
-    /**
-     * @access  private
-     */
-    function __construct($streamSerial, $streamData, $filePointer)
-    {
-        parent::__construct($streamSerial, $streamData, $filePointer);
-        $this->_decodeHeader();
-        $this->_decodeCommentsHeader();
-        $endSec =
-            (( '0x' . substr( $this->_lastGranulePos, 0, 8 ) ) * pow(2, 32)
-            + ( '0x' . substr( $this->_lastGranulePos, 8, 8 ) ))
-            / $this->_header['rate'];
+// @codingStandardsIgnoreStart
+class File_Ogg_Speex extends File_Ogg_Media {
+// @codingStandardsIgnoreEnd
+	/**
+	 * @access  private
+	 */
+	function __construct( $streamSerial, $streamData, $filePointer ) {
+		parent::__construct( $streamSerial, $streamData, $filePointer );
+		$this->_decodeHeader();
+		$this->_decodeCommentsHeader();
+		$endSec =
+			( ( '0x' . substr( $this->_lastGranulePos, 0, 8 ) ) * pow( 2, 32 )
+			+ ( '0x' . substr( $this->_lastGranulePos, 8, 8 ) ) )
+			/ $this->_header['rate'];
 
-         $startSec	 =
-            (( '0x' . substr( $this->_firstGranulePos, 0, 8 ) ) * pow(2, 32)
-            + ( '0x' . substr( $this->_firstGranulePos, 8, 8 ) ))
-            / $this->_header['rate'];
+		 $startSec =
+			( ( '0x' . substr( $this->_firstGranulePos, 0, 8 ) ) * pow( 2, 32 )
+			+ ( '0x' . substr( $this->_firstGranulePos, 8, 8 ) ) )
+			/ $this->_header['rate'];
 
-         //make sure the offset is worth taking into account oggz_chop related hack
-	    if( $startSec > 1){
-            $this->_streamLength = $endSec - $startSec;
-            $this->_startOffset = $startSec;
-	    }else{
-            $this->_streamLength = $endSec;
-	    }
-      }
+		// make sure the offset is worth taking into account oggz_chop related hack
+		if ( $startSec > 1 ) {
+			$this->_streamLength = $endSec - $startSec;
+			$this->_startOffset = $startSec;
+		} else {
+			$this->_streamLength = $endSec;
+		}
+	}
 
-    /**
-     * Get a short string describing the type of the stream
-     * @return string
-     */
-    function getType()
-    {
-        return 'Speex';
-    }
+	/**
+	 * Get a short string describing the type of the stream
+	 * @return string
+	 */
+	function getType() {
+		return 'Speex';
+	}
 
-    /**
-     * Decode the stream header
-     * @access  private
-     */
-    function _decodeHeader()
-    {
-        fseek($this->_filePointer, $this->_streamData['pages'][0]['body_offset'], SEEK_SET);
-        // The first 8 characters should be "Speex   ".
-        if (fread($this->_filePointer, 8) != 'Speex   ')
-            throw new OggException("Stream is undecodable due to a malformed header.", OGG_ERROR_UNDECODABLE);
+	/**
+	 * Decode the stream header
+	 * @access  private
+	 */
+	// @codingStandardsIgnoreStart
+	function _decodeHeader() {
+		// @codingStandardsIgnoreEnd
+		fseek( $this->_filePointer, $this->_streamData['pages'][0]['body_offset'], SEEK_SET );
+		// The first 8 characters should be "Speex   ".
+		if ( fread( $this->_filePointer, 8 ) != 'Speex' ) {
+			throw new OggException(
+				"Stream is undecodable due to a malformed header.", OGG_ERROR_UNDECODABLE
+			);
+		}
 
-        $this->_version = fread($this->_filePointer, 20);
-        $this->_header = File_Ogg::_readLittleEndian($this->_filePointer, array(
-            'speex_version_id'      => 32,
-            'header_size'           => 32,
-            'rate'                  => 32,
-            'mode'                  => 32,
-            'mode_bitstream_version'=> 32,
-            'nb_channels'           => 32,
-            'bitrate'               => 32,
-            'frame_size'            => 32,
-            'vbr'                   => 32,
-            'frames_per_packet'     => 32,
-            'extra_headers'         => 32,
-            'reserved1'             => 32,
-            'reserved2'             => 32
-        ));
-        $this->_header['speex_version'] = $this->_version;
-    }
+		$this->_version = fread( $this->_filePointer, 20 );
+		$this->_header = File_Ogg::_readLittleEndian( $this->_filePointer, array(
+			'speex_version_id'      => 32,
+			'header_size'           => 32,
+			'rate'                  => 32,
+			'mode'                  => 32,
+			'mode_bitstream_version'=> 32,
+			'nb_channels'           => 32,
+			'bitrate'               => 32,
+			'frame_size'            => 32,
+			'vbr'                   => 32,
+			'frames_per_packet'     => 32,
+			'extra_headers'         => 32,
+			'reserved1'             => 32,
+			'reserved2'             => 32
+		) );
+		$this->_header['speex_version'] = $this->_version;
+	}
 
-    /**
-     * Get an associative array containing header information about the stream
-     * @access  public
-     * @return  array
-     */
-    function getHeader() {
-        return $this->_header;
-    }
+	/**
+	 * Get an associative array containing header information about the stream
+	 * @access  public
+	 * @return  array
+	 */
+	function getHeader() {
+		return $this->_header;
+	}
 
-    /**
-     * Decode the comments header
-     * @access  private
-     */
-    function _decodeCommentsHeader()
-    {
-        fseek($this->_filePointer, $this->_streamData['pages'][1]['body_offset'], SEEK_SET);
-        $this->_decodeBareCommentsHeader();
-    }
+	/**
+	 * Decode the comments header
+	 * @access  private
+	 */
+	// @codingStandardsIgnoreStart
+	function _decodeCommentsHeader() {
+	// @codingStandardsIgnoreEnd
+		fseek( $this->_filePointer, $this->_streamData['pages'][1]['body_offset'], SEEK_SET );
+		$this->_decodeBareCommentsHeader();
+	}
 }
-?>
