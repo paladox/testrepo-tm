@@ -9,15 +9,19 @@
 
 class TimedMediaHandlerHooks {
 	// Register TimedMediaHandler Hooks
-	public static function register(){
-		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue,
-		$wgMediaHandlers, $wgResourceModules, $wgExcludeFromThumbnailPurge, $wgExtraNamespaces,
-		$wgParserOutputHooks, $wgTimedTextNS, $wgFileExtensions, $wgTmhEnableMp4Uploads,
-		$wgExtensionAssetsPath, $wgMwEmbedModuleConfig, $timedMediaDir,
-		$wgEnableLocalTimedText, $wgTmhFileExtensions, $wgTmhTheoraTwoPassEncoding;
+	public static function register() {
+		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue, $wgMediaHandlers,
+		$wgResourceModules, $wgExcludeFromThumbnailPurge, $wgExtraNamespaces, $wgParserOutputHooks,
+		$wgTimedTextNS, $wgFileExtensions, $wgTmhEnableMp4Uploads, $wgExtensionAssetsPath,
+		$wgMwEmbedModuleConfig, $wgEnableLocalTimedText, $wgTmhFileExtensions,
+		$wgTmhTheoraTwoPassEncoding;
+
+		// @codingStandardsIgnoreStart 
+		global $timedMediaDir;
+		// @codingStandardsIgnoreEnd 
 
 		// Remove mp4 if not enabled:
-		if( $wgTmhEnableMp4Uploads === false ){
+		if ( $wgTmhEnableMp4Uploads === false ) {
 			$index = array_search( 'mp4', $wgFileExtensions );
 			if ( $index !== false ) {
 				array_splice( $wgFileExtensions, $index, 1 );
@@ -25,7 +29,7 @@ class TimedMediaHandlerHooks {
 		}
 
 		// Enable experimental 2-pass Theora encoding if enabled:
-		if( $wgTmhTheoraTwoPassEncoding ) {
+		if ( $wgTmhTheoraTwoPassEncoding ) {
 			foreach( WebVideoTranscode::$derivativeSettings as $key => &$settings ) {
 				if( isset( $settings['videoCodec'] ) && $settings['videoCodec'] === 'theora' ) {
 					$settings['twopass'] = 'true';
@@ -33,7 +37,7 @@ class TimedMediaHandlerHooks {
 			}
 		}
 
-		if( !class_exists( 'MwEmbedResourceManager' ) ) {
+		if ( !class_exists( 'MwEmbedResourceManager' ) ) {
 			echo "TimedMediaHandler requires the MwEmbedSupport extension.\n";
 			exit( 1 );
 		}
@@ -163,7 +167,8 @@ class TimedMediaHandlerHooks {
 		$wgHooks['BeforePageDisplay'][] = 'TimedMediaHandlerHooks::pageOutputHook';
 
 		// Make sure modules are loaded on image pages that don't have a media file in the wikitext.
-		$wgHooks['ImageOpenShowImageInlineBefore'][] = 'TimedMediaHandlerHooks::onImageOpenShowImageInlineBefore';
+		$wgHooks['ImageOpenShowImageInlineBefore'][] =
+			'TimedMediaHandlerHooks::onImageOpenShowImageInlineBefore';
 
 		// Exclude transcoded assets from normal thumbnail purging
 		// ( a maintenance script could handle transcode asset purging)
@@ -199,9 +204,10 @@ class TimedMediaHandlerHooks {
 		}
 
 		// Add transcode status to video asset pages:
-		$wgHooks[ 'ImagePageAfterImageLinks' ][] = 'TimedMediaHandlerHooks::checkForTranscodeStatus';
-		$wgHooks[ 'NewRevisionFromEditComplete' ][] = 'TimedMediaHandlerHooks::onNewRevisionFromEditComplete';
-		$wgHooks[ 'ArticlePurge' ][] = 'TimedMediaHandlerHooks::onArticlePurge';
+		$wgHooks['ImagePageAfterImageLinks'][] = 'TimedMediaHandlerHooks::checkForTranscodeStatus';
+		$wgHooks['NewRevisionFromEditComplete'][] =
+			'TimedMediaHandlerHooks::onNewRevisionFromEditComplete';
+		$wgHooks['ArticlePurge'][] = 'TimedMediaHandlerHooks::onArticlePurge';
 
 		$wgHooks['LoadExtensionSchemaUpdates'][] = 'TimedMediaHandlerHooks::checkSchemaUpdates';
 		$wgHooks['wgQueryPages'][] = 'TimedMediaHandlerHooks::onwgQueryPages';
@@ -231,7 +237,7 @@ class TimedMediaHandlerHooks {
 	 * @param $article Article
 	 * @return bool
 	 */
-	public static function checkForTimedTextPage( &$title, &$article ){
+	public static function checkForTimedTextPage( &$title, &$article ) {
 		global $wgTimedTextNS;
 		if ( $title->getNamespace() === $wgTimedTextNS ) {
 			$article = new TimedTextPage( $title );
@@ -259,8 +265,8 @@ class TimedMediaHandlerHooks {
 	 * @param $title Title
 	 * @return bool
 	 */
-	public static function isTranscodableTitle( $title ){
-		if( $title->getNamespace() != NS_FILE ){
+	public static function isTranscodableTitle( $title ) {
+		if ( $title->getNamespace() != NS_FILE ) {
 			return false;
 		}
 		$file = wfFindFile( $title );
@@ -272,36 +278,36 @@ class TimedMediaHandlerHooks {
 	 * @param $file File object
 	 * @return bool
 	 */
-	public static function isTranscodableFile( & $file ){
+	public static function isTranscodableFile( & $file ) {
 		global $wgEnableTranscode, $wgEnabledAudioTranscodeSet;
 
 		// don't show the transcode table if transcode is disabled
-		if( !$wgEnableTranscode && !$wgEnabledAudioTranscodeSet ){
+		if ( !$wgEnableTranscode && !$wgEnabledAudioTranscodeSet ) {
 			return false;
 		}
 		// Can't find file
-		if( !$file ){
+		if ( !$file ) {
 			return false;
 		}
 		// We can only transcode local files
-		if( !$file->isLocal() ){
+		if ( !$file->isLocal() ) {
 			return false;
 		}
 
 		$handler = $file->getHandler();
 		// Not able to transcode files without handler
-		if( !$handler ) {
+		if ( !$handler ) {
 			return false;
 		}
 		$mediaType = $handler->getMetadataType( $file );
 		// If ogg or webm format and not audio we can "transcode" this file
 		$isAudio = $handler instanceof TimedMediaHandler && $handler->isAudio( $file );
-		if( ( $mediaType == 'webm' || $mediaType == 'ogg' || $mediaType =='mp4' )
+		if ( ( $mediaType == 'webm' || $mediaType == 'ogg' || $mediaType =='mp4' )
 			&& !$isAudio
-		){
+		) {
 			return true;
 		}
-		if( $isAudio && count( $wgEnabledAudioTranscodeSet ) ) {
+		if ( $isAudio && count( $wgEnabledAudioTranscodeSet ) ) {
 			return true;
 		}
 		return false;
@@ -312,10 +318,10 @@ class TimedMediaHandlerHooks {
 	 * @param $html string
 	 * @return bool
 	 */
-	public static function checkForTranscodeStatus( $article, &$html ){
+	public static function checkForTranscodeStatus( $article, &$html ) {
 		// load the file:
 		$file = wfFindFile( $article->getTitle() );
-		if( self::isTranscodableFile( $file ) ){
+		if ( self::isTranscodableFile( $file ) ) {
 			$html .= TranscodeStatusTable::getHTML( $file );
 		}
 		return true;
@@ -325,10 +331,10 @@ class TimedMediaHandlerHooks {
 	 * @param $image UploadBase
 	 * @return bool
 	 */
-	public static function checkUploadComplete( $upload ){
+	public static function checkUploadComplete( $upload ) {
 		$file = $upload->getLocalFile();
 		// Check that the file is a transcodable asset:
-		if( $file && self::isTranscodableFile( $file ) ){
+		if ( $file && self::isTranscodableFile( $file ) ) {
 			// Remove all the transcode files and db states for this asset
 			WebVideoTranscode::removeTranscodes( $file );
 			WebVideoTranscode::startJobQueue( $file );
@@ -346,8 +352,8 @@ class TimedMediaHandlerHooks {
 	 * @param $user User
 	 * @return bool
 	 */
-	public static function checkTitleMove( $title, $newTitle, $user ){
-		if( self::isTranscodableTitle( $title ) ){
+	public static function checkTitleMove( $title, $newTitle, $user ) {
+		if ( self::isTranscodableTitle( $title ) ) {
 			// Remove all the transcode files and db states for this asset
 			// ( will be re-added the first time the asset is displayed with its new title )
 			$file = wfFindFile( $title );
@@ -368,7 +374,7 @@ class TimedMediaHandlerHooks {
 	 */
 	public static function onFileDeleteComplete( $file, $oldimage, $article, $user, $reason ) {
 		if ( !$oldimage ) {
-			if( self::isTranscodableFile( $file ) ){
+			if ( self::isTranscodableFile( $file ) ) {
 				WebVideoTranscode::removeTranscodes( $file );
 			}
 		}
@@ -381,9 +387,9 @@ class TimedMediaHandlerHooks {
 	public static function onNewRevisionFromEditComplete( $article, Revision $rev, $baseID, User $user ) {
 		if ( $baseID !== false ) {
 			// Check if the article is a file and remove transcode files:
-			if( $article->getTitle()->getNamespace() == NS_FILE ) {
+			if ( $article->getTitle()->getNamespace() == NS_FILE ) {
 				$file = wfFindFile( $article->getTitle() );
-				if( self::isTranscodableFile( $file ) ){
+				if ( self::isTranscodableFile( $file ) ) {
 					WebVideoTranscode::removeTranscodes( $file );
 					WebVideoTranscode::startJobQueue( $file );
 				}
@@ -398,7 +404,7 @@ class TimedMediaHandlerHooks {
 	 * automated process to see their status and reset them.
 	 */
 	public static function onArticlePurge( $article ) {
-		if( $article->getTitle()->getNamespace() == NS_FILE ) {
+		if ( $article->getTitle()->getNamespace() == NS_FILE ) {
 			$file = wfFindFile( $article->getTitle() );
 			if( self::isTranscodableFile( $file ) ){
 				WebVideoTranscode::cleanupTranscodes( $file );
@@ -506,7 +512,7 @@ class TimedMediaHandlerHooks {
 	 * Return false here to evict existing parseroutput cache
 	 */
 	public static function rejectParserCacheValue( $parserOutput, $wikiPage, $parserOptions ) {
-		if(
+		if (
 			$parserOutput->getExtensionData( 'mw_ext_TMH_hasTimedMediaTransform' )
 			|| isset( $parserOutput->hasTimedMediaTransform )
 		) {
