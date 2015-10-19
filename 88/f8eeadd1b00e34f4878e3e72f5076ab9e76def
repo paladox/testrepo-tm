@@ -1,0 +1,8 @@
+Code-Review+2: Reedy <reedy@wikimedia.org>
+Code-Review+1: Brion VIBBER <brion@wikimedia.org>
+Verified+2: jenkins-bot
+Submitted-by: jenkins-bot
+Submitted-at: Mon, 19 Oct 2015 17:11:26 +0000
+Reviewed-on: https://gerrit.wikimedia.org/r/247292
+Project: mediawiki/extensions/TimedMediaHandler
+Branch: refs/heads/master
