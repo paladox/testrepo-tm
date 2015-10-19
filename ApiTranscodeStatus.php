@@ -9,7 +9,7 @@
 
 if ( !defined( 'MEDIAWIKI' ) ) {
 	// Eclipse helper - will be ignored in production
-	require_once( "ApiBase.php" );
+	require_once ( __DIR__ . "/../../includes/api/ApiBase.php" );
 }
 
 class ApiTranscodeStatus extends ApiQueryBase {
@@ -27,15 +27,17 @@ class ApiTranscodeStatus extends ApiQueryBase {
 			 */
 			foreach ( $images as $img ) {
 				// if its a "transcode" add the transcode status table output
-				if( TimedMediaHandlerHooks::isTranscodableTitle( $img->getTitle() ) ){
+				if ( TimedMediaHandlerHooks::isTranscodableTitle( $img->getTitle() ) ) {
 					$transcodeStatus = WebVideoTranscode::getTranscodeState( $img );
 					// remove useless properties
-					foreach($transcodeStatus as $key=>&$val ){
+					foreach ( $transcodeStatus as $key=>&$val ) {
 						unset( $val['id'] );
-						unset( $val['image_name']);
+						unset( $val['image_name'] );
 						unset( $val['key'] );
 					}
-					$result->addValue( array( 'query', 'pages', $img->getTitle()->getArticleID() ), 'transcodestatus', $transcodeStatus );
+					$result->addValue( array(
+						'query', 'pages', $img->getTitle()->getArticleID() ), 'transcodestatus', $transcodeStatus
+					);
 				}
 			}
 		}
@@ -62,7 +64,7 @@ class ApiTranscodeStatus extends ApiQueryBase {
 	 * @deprecated since MediaWiki core 1.25
 	 */
 	protected function getExamples() {
-		return array (
+		return array(
 			'api.php?action=query&prop=transcodestatus&titles=File:Clip.webm',
 		);
 	}
