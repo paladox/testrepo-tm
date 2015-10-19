@@ -399,10 +399,12 @@ class TimedMediaHandlerHooks {
 		$testDir = __DIR__ . '/tests/phpunit/';
 		$testFiles = array(
 			'TestTimeParsing.php',
+			'ApiTestCaseVideoUpload.php',
 			'TestApiUploadVideo.php',
 			'TestVideoThumbnail.php',
 			'TestVideoTranscode.php',
 			'TestOggHandler.php',
+			'TestWebMHandler.php',
 			'TestTimedMediaTransformOutput.php',
 			'TestTimedMediaHandler.php'
 		);

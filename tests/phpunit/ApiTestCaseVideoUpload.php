@@ -10,13 +10,13 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 // Include core class ApiTestCaseUpload ( not part of base autoLoader )
 global $IP;
-require_once( "$IP/tests/phpunit/includes/api/ApiTestCaseUpload.php" );
+require_once ( "$IP/tests/phpunit/includes/api/ApiTestCaseUpload.php" );
 
 abstract class ApiTestCaseVideoUpload extends ApiTestCaseUpload {
 	/**
 	 * @return Array set of test files with associated metadata
 	 */
-	static function mediaFilesProvider(){
+	static function mediaFilesProvider() {
 		return array(
 			array(
 				// Double wrap the file array to match phpunit data provider conventions
@@ -54,7 +54,7 @@ abstract class ApiTestCaseVideoUpload extends ApiTestCaseUpload {
 		parent::tearDown();
 
 		$testMediaFiles = $this->mediaFilesProvider();
-		foreach( $testMediaFiles as $file ){
+		foreach ( $testMediaFiles as $file ) {
 			$file = $file[0];
 			// Clean up and delete all files
 			$this->deleteFileByFilename( $file['filePath'] );
@@ -88,7 +88,7 @@ abstract class ApiTestCaseVideoUpload extends ApiTestCaseUpload {
 	/**
 	 * uploads a file:
 	 */
-	public function uploadFile( $file ){
+	public function uploadFile( $file ) {
 		global $wgUser;
 		// get a session object
 		$session = $this->doLogin();
@@ -116,15 +116,14 @@ abstract class ApiTestCaseVideoUpload extends ApiTestCaseUpload {
 			'ignorewarnings' => true
 		);
 
-		try{
+		try {
 			list( $result, , ) = $this->doApiRequestWithToken( $params, $session );
-		} catch( Exception $e ) {
+		} catch ( Exception $e ) {
 			// Could not upload mark test that called uploadFile as incomplete
 			$this->markTestIncomplete( $e->getMessage() );
 		}
 
 		return $result;
-
 	}
 
 }
