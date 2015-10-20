@@ -236,7 +236,7 @@ $wgTmhTheoraTwoPassEncoding = false;
 // List of extensions handled by Timed Media Handler since its referenced in a few places.
 // you should not modify this variable
 
-$wgTmhFileExtensions = [ 'ogg', 'ogv', 'oga', 'flac', 'opus', 'wav', 'webm', 'mp4' ];
+$wgTmhFileExtensions = [ 'ogg', 'ogv', 'oga', 'flac', 'opus', 'wav', 'webm', 'mp4', 'm4a' ];
 
 $wgFileExtensions = array_merge( $wgFileExtensions, $wgTmhFileExtensions );
 
