@@ -17,9 +17,13 @@ class TimedMediaHandlerHooks {
 		$wgMwEmbedModuleConfig, $wgEnableLocalTimedText, $wgTmhFileExtensions,
 		$wgTmhTheoraTwoPassEncoding;
 
-		// Remove mp4 if not enabled:
+		// Remove mp4/m4a if not enabled:
 		if ( $wgTmhEnableMp4Uploads === false ) {
 			$index = array_search( 'mp4', $wgFileExtensions );
+			if ( $index !== false ) {
+				array_splice( $wgFileExtensions, $index, 1 );
+			}
+			$index = array_search( 'm4a', $wgFileExtensions );
 			if ( $index !== false ) {
 				array_splice( $wgFileExtensions, $index, 1 );
 			}
@@ -52,6 +56,7 @@ class TimedMediaHandlerHooks {
 		$wgMediaHandlers['audio/webm'] = 'WebMHandler';
 		$wgMediaHandlers['video/webm'] = 'WebMHandler';
 		$wgMediaHandlers['video/mp4'] = 'Mp4Handler';
+		$wgMediaHandlers['audio/mp4'] = 'Mp4Handler';
 		$wgMediaHandlers['audio/x-flac'] = 'FLACHandler';
 		$wgMediaHandlers['audio/flac'] = 'FLACHandler';
 		$wgMediaHandlers['audio/wav'] = 'WAVHandler';
