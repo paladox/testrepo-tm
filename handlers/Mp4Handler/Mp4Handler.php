@@ -71,9 +71,54 @@ class Mp4Handler extends ID3Handler {
 		 */
 		// @codingStandardsIgnoreEnd
 		// all h.264 encodes are currently simple profile
-		return 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"';
+		$baseType = ( $file->getWidth() == 0 && $file->getHeight() == 0 )? 'audio' : 'video';
+		$baseType .= '/mp4';
+		$streamTypes = $this->getCodecs( $file );
+		if ( !$streamTypes ) {
+			return $baseType;
+		}
+		$codecs = strtolower( implode( ", ", $streamTypes ) );
+		return $baseType . '; codecs="' . $codecs . '"';
 	}
+
 	/**
+	 * This function should get proper codec descriptions of the streams.
+	 *
+	 * @param $file File
+	 * @return array|bool
+	 */
+	function getCodecs( $file ) {
+		$streamTypes = array();
+		$metadata = self::unpackMetadata( $file->getMetadata() );
+		if ( !$metadata || isset( $metadata['error'] ) ) {
+			return false;
+		}
+		// Video should be before audio
+		if ( isset( $metadata['video'] ) && $metadata['video']['dataformat'] == 'quicktime' ) {
+			// all h.264 encodes are currently simple profile
+			// but we should be able to retrieve and map proper info from $info['quicktime'][$atomname] etc..
+			$streamTypes[] =  'avc1.42E01E';
+			// test how ID3 output works with audio.
+			// https://github.com/JamesHeinrich/getID3/blob/HEAD/structure.txt
+		}
+
+		if ( isset( $metadata['audio'] ) && $metadata['audio']['dataformat'] == 'mp4' ) {
+			if ( isset( $metadata['audio']['codec'] )
+				&&
+				strpos( $metadata['audio']['codec'], 'AAC' ) !== false
+			) {
+				$streamTypes[] =  'mp4a.40.2';
+			} else {
+				wfDebug( 'Unsupported audio coded for mp4' . $metadata['audio']['codec'] );
+			}
+		}
+		return array_unique( $streamTypes );
+	}
+
+	/**
+	 * Gets descriptions of the streams, that are user readable.
+	 * TODO reuse stuff from getCodecs ??
+	 *
 	 * @param $file File
 	 * @return array|bool
 	 */
@@ -82,6 +127,10 @@ class Mp4Handler extends ID3Handler {
 		$metadata = self::unpackMetadata( $file->getMetadata() );
 		if ( !$metadata || isset( $metadata['error'] ) ) {
 			return false;
+		}
+		// id3 gives 'V_VP8' for what we call VP8
+		if ( isset( $metadata['video'] ) && $metadata['video']['dataformat'] == 'quicktime' ) {
+			$streamTypes[] =  '';
 		}
 		if ( isset( $metadata['audio'] ) && $metadata['audio']['dataformat'] == 'mp4' ) {
 			if ( isset( $metadata['audio']['codec'] )
@@ -92,10 +141,6 @@ class Mp4Handler extends ID3Handler {
 			} else {
 				$streamTypes[] = $metadata['audio']['codec'];
 			}
-		}
-		// id3 gives 'V_VP8' for what we call VP8
-		if ( isset( $metadata['video'] ) && $metadata['video']['dataformat'] == 'quicktime' ) {
-			$streamTypes[] =  'h.264';
 		}
 
 		return $streamTypes;
@@ -110,13 +155,19 @@ class Mp4Handler extends ID3Handler {
 		if ( !$streamTypes ) {
 			return parent::getShortDesc( $file );
 		}
-		return wfMessage( 'timedmedia-mp4-short-video', implode( '/', $streamTypes )
-		)->timeperiodParams(
-			$this->getLength( $file )
-		)->text();
+		// TODO
+		// if streamtypes has at least 1 video stream
+		$msg = 'timedmedia-mp4-short-video';
+		// else if streamtypes has audio but no video
+		// $msg = 'timedmedia-mp4-short-audio';
+		// else
+		// $msg = 'timedmedia-mp4-short-general';
+		return wfMessage( $msg, implode( '/', $streamTypes )
+			)->timeperiodParams( $this->getLength( $file ) )->text();
 	}
 
 	/**
+	 * TODO Expand for audio stream support
 	 * @param $file File
 	 * @return String
 	 */
