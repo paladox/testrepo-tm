@@ -26,23 +26,8 @@ class TranscodeStatusTable {
 			array( 'action'=> 'purge' )
 		);
 
-		$o.= Xml::openElement( 'table', array( 'class' => 'wikitable mw-filepage-transcodestatus' ) ) . "\n"
-			. '<tr>'
-			. '<th>' . wfMessage( 'timedmedia-transcodeinfo' )->escaped() . '</th>'
-			. '<th>' . wfMessage( 'timedmedia-transcodebitrate' )->escaped() . '</th>'
-			. '<th>' . wfMessage( 'timedmedia-direct-link' )->escaped() . '</th>';
+		$o.= self::getTranscodesTable( $file );
 
-		if( $wgUser->isAllowed( 'transcode-reset' ) ) {
-			$o.= '<th>' . wfMessage( 'timedmedia-actions' )->escaped() . '</th>';
-		}
-
-		$o.= '<th>' . wfMessage( 'timedmedia-status' )->escaped() . '</th>';
-		$o.= '<th>' . wfMessage( 'timedmedia-transcodeduration' )->escaped() . '</th>';
-		$o.= "</tr>\n";
-
-		$o.= self::getTranscodeRows( $file );
-
-		$o.=  Xml::closeElement( 'table' );
 		return $o;
 	}
 
@@ -72,11 +57,15 @@ class TranscodeStatusTable {
 	 * @param $file File
 	 * @return string
 	 */
-	public static function getTranscodeRows( $file ){
+	public static function getTranscodesTable( $file ){
 		global $wgUser, $wgLang;
 		$o='';
 
 		$transcodeRows = WebVideoTranscode::getTranscodeState( $file );
+
+		if ( empty( $transcodeRows ) ) {
+			return $o;
+		}
 
 		uksort( $transcodeRows, function( $a, $b ) {
 			$formatOrder = array( 'vp9', 'vp8', 'h264', 'theora', 'opus', 'vorbis', 'aac' );
@@ -98,6 +87,20 @@ class TranscodeStatusTable {
 				return ( $aIndex - $bIndex );
 			}
 		} );
+
+		$o.= Xml::openElement( 'table', array( 'class' => 'wikitable mw-filepage-transcodestatus' ) ) . "\n"
+			. '<tr>'
+			. '<th>' . wfMessage( 'timedmedia-transcodeinfo' )->escaped() . '</th>'
+			. '<th>' . wfMessage( 'timedmedia-transcodebitrate' )->escaped() . '</th>'
+			. '<th>' . wfMessage( 'timedmedia-direct-link' )->escaped() . '</th>';
+
+		if( $wgUser->isAllowed( 'transcode-reset' ) ) {
+			$o.= '<th>' . wfMessage( 'timedmedia-actions' )->escaped() . '</th>';
+		}
+
+		$o.= '<th>' . wfMessage( 'timedmedia-status' )->escaped() . '</th>';
+		$o.= '<th>' . wfMessage( 'timedmedia-transcodeduration' )->escaped() . '</th>';
+		$o.= "</tr>\n";
 
 		foreach( $transcodeRows as $transcodeKey => $state ){
 			$o.='<tr>';
@@ -128,6 +131,8 @@ class TranscodeStatusTable {
 
 			$o.='</tr>';
 		}
+		$o.=  Xml::closeElement( 'table' );
+
 		return $o;
 	}
 
