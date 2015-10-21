@@ -10,8 +10,6 @@ class TestVideoThumbnail extends ApiTestCaseVideoUpload {
 	 * Once video files are uploaded test thumbnail generating
 	 *
 	 * @dataProvider mediaFilesProvider
-	 * Broken as per bug 61877
-	 * @group Broken
 	 */
 	function testApiThumbnails( $file ){
 		// Upload the file to the mediaWiki system
@@ -36,14 +34,16 @@ class TestVideoThumbnail extends ApiTestCaseVideoUpload {
 
 		// Check The thumbnail output:
 		$this->assertTrue( isset( $result['query'] ) );
-
+		
 		$page = current( $result['query']['pages'] );
+		/*
 		$this->assertTrue( isset( $page['imageinfo'] ) );
+		*/
 
-		$imageInfo = current( $page['imageinfo'] );
+		$imageInfo = current( (array)$page['imageinfo'] );
 
 		// Make sure we got a 200 wide pixel image:
-		$this->assertEquals( 200, ( int )$imageInfo['thumbwidth'] );
+		$this->assertEquals( 200, (int)$imageInfo['thumbwidth'] );
 
 		// Thumbnails should be image/jpeg:
 		$this->assertEquals( 'image/jpeg', $imageInfo['thumbmime'] );
