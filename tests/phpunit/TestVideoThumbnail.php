@@ -10,8 +10,6 @@ class TestVideoThumbnail extends ApiTestCaseVideoUpload {
 	 * Once video files are uploaded test thumbnail generating
 	 *
 	 * @dataProvider mediaFilesProvider
-	 * Broken as per bug 61877
-	 * @group Broken
 	 */
 	function testApiThumbnails( $file ){
 		// Upload the file to the mediaWiki system
