@@ -9,7 +9,7 @@
 
 if ( !defined( 'MEDIAWIKI' ) ) {
 	// Eclipse helper - will be ignored in production
-	require_once( "ApiBase.php" );
+	require_once( '../../includes/api/ApiBase.php' );
 }
 
 class ApiTranscodeStatus extends ApiQueryBase {
