@@ -1,7 +1,7 @@
 .mediaContainer,
 .PopUpMediaTransform {
 	position : relative;
-	display: block;
+	display: inline-block;
 }
 .thumb .mediaContainer,
 .thumb .PopUpMediaTransform {
