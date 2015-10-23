@@ -186,20 +186,23 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 	function getImagePopUp() {
 		// pop up videos set the autoplay attribute to true:
 		$autoPlay = true;
-		return Xml::tags( 'div', array(
+
+		return Xml::tags( 'span', array(
 				'id' => self::PLAYER_ID_PREFIX . TimedMediaTransformOutput::$serial++,
 				'class' => 'PopUpMediaTransform',
-				'style' => "width:" . $this->getPlayerWidth() . "px;",
+				// 'style' => "width:" . $this->getPlayerWidth() . "px;",
 				'videopayload' => $this->getHtmlMediaTagOutput( $this->getPopupPlayerSize(), $autoPlay ),
 				),
 			Xml::tags( 'img', array(
 				'alt' => $this->file->getTitle(),
-				'style' => "width:" . $this->getPlayerWidth() . "px;height:" .
-							$this->getPlayerHeight() . "px",
+				// 'style' => "width:" . $this->getPlayerWidth() . "px;height:" .
+						// $this->getPlayerHeight() . "px",
+				'width' => $this->getPlayerWidth(),
+				'height' => $this->getPlayerHeight(),
 				'src' =>  $this->getUrl(),
 			), '' )
 			.
-			// For javascript disabled browsers provide a link to the asset:
+			// For really, really old non-video-capable browsers provide a link to the asset:
 			Xml::tags( 'a', array(
 					'href'=> $this->file->getUrl(),
 					'title' => wfMessage( 'timedmedia-play-media' )->escaped(),
