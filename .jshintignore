@@ -1,4 +1,5 @@
 MwEmbedModules
+resources/videojs
 
 node_modules
 vendor
