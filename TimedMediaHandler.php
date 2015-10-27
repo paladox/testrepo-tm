@@ -14,7 +14,8 @@ $wgAutoloadClasses['WebVideoTranscode'] = "$timedMediaDir/WebVideoTranscode/WebV
 $wgAvailableRights[] = 'transcode-reset';
 $wgAvailableRights[] = 'transcode-status';
 
-
+// Configure the webplayer. Allowed values: mwembed, videojs
+$wgTmhWebPlayer = 'mwembed';
 
 /*** MwEmbed module configuration: *********************************/
 
@@ -304,6 +305,6 @@ $wgExtensionCredits['media'][] = array(
 	'author'         => array( 'Michael Dale', 'Tim Starling', 'James Heinrich', 'Jan Gerber', 'Brion Vibber' ),
 	'url'            => 'https://www.mediawiki.org/wiki/Extension:TimedMediaHandler',
 	'descriptionmsg' => 'timedmediahandler-desc',
-	'version'        => '0.4.0',
+	'version'        => '0.5.0',
 	'license-name'   => 'GPL-2.0+',
 );
