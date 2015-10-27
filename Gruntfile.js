@@ -13,6 +13,7 @@ module.exports = function ( grunt ) {
 			all: [
 				'**/*.js',
 				'!MwEmbedModules/**',
+				'!resources/videojs/**',
 				'!node_modules/**'
 			]
 		},
