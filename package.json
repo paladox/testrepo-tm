@@ -10,6 +10,8 @@
     "grunt-banana-checker": "0.4.0",
     "grunt-jscs": "2.3.0",
     "jscs-preset-wikimedia": "~1.0.0",
-    "grunt-jsonlint": "1.0.6"
+    "grunt-jsonlint": "1.0.6",
+    "video.js": "^5.2.1",
+    "videojs-resolution-switcher": "^0.2.2"
   }
 }
