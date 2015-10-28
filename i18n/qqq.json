@@ -71,6 +71,8 @@
 	"timedmedia-reset": "Used as action link text and as dialog title.\n\nThe contents of the dialog is {{msg-mw|Timedmedia-reset-confirm}}.",
 	"timedmedia-reset-confirm": "Used as confirmation message in the dialog which has the title {{msg-mw|Timedmedia-reset}}.",
 	"timedmedia-reset-error": "Used as generic error message.",
+	"timedmedia-reset-button-ok": "OK button in dialog to start transcode.",
+	"timedmedia-reset-button-cancel": "Cancel button in dialog to start transcode.",
 	"timedmedia-ogg": "{{optional}}\nUsed as <code>$1</code> in the following messages:\n* {{msg-mw|Timedmedia-source-audio-file-desc}}\n* {{msg-mw|Timedmedia-source-file-desc}}\n* {{msg-mw|Timedmedia-source-file}}",
 	"timedmedia-webm": "{{optional}}\nUsed as <code>$1</code> in the following messages:\n* {{msg-mw|Timedmedia-source-audio-file-desc}}\n* {{msg-mw|Timedmedia-source-file-desc}}\n* {{msg-mw|Timedmedia-source-file}}",
 	"timedmedia-mp4": "{{Optional}}\nUsed as <code>$1</code> in the following messages:\n* {{msg-mw|Timedmedia-source-audio-file-desc}}\n* {{msg-mw|Timedmedia-source-file-desc}}\n* {{msg-mw|Timedmedia-source-file}}",

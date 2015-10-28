@@ -53,6 +53,8 @@
 	"timedmedia-reset": "Reset transcode",
 	"timedmedia-reset-confirm": "Resetting this transcode will remove any existing file (if present), and it will re-add the transcode to the job queue. It will take some time to re-transcode.<br /><br />\nAre you sure you want to proceed?",
 	"timedmedia-reset-error": "Error in resetting transcode job.",
+	"timedmedia-reset-button-ok": "OK",
+	"timedmedia-reset-button-cancel": "Cancel",
 	"timedmedia-ogg": "Ogg",
 	"timedmedia-webm": "WebM",
 	"timedmedia-mp4": "MP4",

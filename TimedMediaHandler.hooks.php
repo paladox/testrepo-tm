@@ -102,11 +102,11 @@ class TimedMediaHandlerHooks {
 				'styles' => 'resources/transcodeTable.css',
 				'dependencies' => array(
 					'mediawiki.api.edit',
-					'mw.MwEmbedSupport',
+					'oojs-ui',
 				),
 				'messages'=> array(
-					'mwe-ok',
-					'mwe-cancel',
+					'timedmedia-reset-button-confirm',
+					'timedmedia-reset-button-cancel',
 					'timedmedia-reset-error',
 					'timedmedia-reset',
 					'timedmedia-reset-confirm'
