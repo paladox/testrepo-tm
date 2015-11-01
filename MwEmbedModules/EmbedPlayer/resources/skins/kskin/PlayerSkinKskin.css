@@ -33,7 +33,7 @@
 	}
 }
 /*.ui-state-default */
-.k-player .play-btn-large:hover {
+.k-player:hover .play-btn-large {
 	background: url(images/ksprite.png) no-repeat 0px -377px;
 }
 

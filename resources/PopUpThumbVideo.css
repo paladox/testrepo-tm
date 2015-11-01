@@ -8,7 +8,7 @@
 	/* @embed */
 	background-image:url('player_big_play_button.png');
 }
-.PopUpMediaTransform a .play-btn-large :hover {
+.PopUpMediaTransform:hover a .play-btn-large {
 	/* @embed */
 	background-image:url('player_big_play_button_hover.png');
 }
