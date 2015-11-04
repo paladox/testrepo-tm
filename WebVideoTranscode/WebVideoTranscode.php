@@ -63,6 +63,781 @@ class WebVideoTranscode {
 	// Static cache of transcode state per instantiation
 	public static $transcodeState = array() ;
 
+	public static function TimedMediaHandlerConstantToString(
+		$value, array $defs, $prefix, $default
+	) {
+		foreach ( $defs as $defKey => $defValue ) {
+			if ( !defined( $defKey ) ) {
+				define( $defKey, $defValue );
+			} elseif ( $defValue !== constant( $defKey ) ) {
+				throw new Exception( 'TimedMediaHandler constant "'. $defKey . '" has unexpected value "' .
+					constant( $defKey ) . '" instead of "' . $defValue );
+			}
+		}
+		$invDefs = array_flip( $defs );
+		if ( is_int( $value ) ){
+			if ( array_key_exists( $value, $invDefs ) ) {
+				$value = $invDefs[$value];
+			} else {
+				return $default;
+			}
+		}
+		if ( is_string( $value ) ){
+			$newValues = array();
+			foreach ( $defs as $k => $v ) {
+				$newValues[$k] = preg_replace_callback( '/_(.)/', function ( $matches ) {
+					return strtoupper( $matches[1] );
+				}, strtolower( substr( $k, strlen( $prefix ) ) ) );
+			}
+			if ( array_key_exists( $value, $defs ) ) {
+				return $newValues[$value];
+			} elseif ( in_array( $value, $newValues ) ){
+				return $value;
+			}
+		}
+		return $default;
+	}
+
+	public static function TimedMediaHandlerModeToString(
+		$mode,
+		$default =
+			array(
+				'OGV_160P',
+				'OGV_240P',
+				'OGV_360P',
+				'OGV_480P',
+				'OGV_720P',
+				'OGV_1080P',
+				'WEBM_160P',
+				'WEBM_360P',
+				'WEBM_480P',
+				'WEBM_720P',
+				'WEBM_1080P',
+				'WEBM_2160P',
+				'VP9_360P',
+				'VP9_720P',
+				'VP9_1080P',
+				'VP9_2160P',
+				'H264_320P',
+				'H264_480P',
+				'H264_720P',
+				'H264_1080P',
+				'H264_2160P',
+				'OGG_VORBIS',
+				'OGG_OPUS',
+				'MP3',
+				'AAC'
+			)
+	) {
+
+		$defs = array(
+			WebVideoTranscode::ENC_OGV_160P =>
+				array(
+					'maxSize'                    => '288x160',
+					'videoBitrate'               => '160',
+					'framerate'                  => '15',
+					'audioQuality'               => '-1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+			WebVideoTranscode::ENC_OGV_240P =>
+				array(
+					'maxSize'                    => '426x240',
+					'videoBitrate'               => '512',
+					'audioQuality'               => '0',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+			WebVideoTranscode::ENC_OGV_360P =>
+				array(
+					'maxSize'                    => '640x360',
+					'videoBitrate'               => '1024',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+			WebVideoTranscode::ENC_OGV_480P =>
+				array(
+					'maxSize'                    => '854x480',
+					'videoBitrate'               => '2048',
+					'audioQuality'               => '2',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+
+			WebVideoTranscode::ENC_OGV_720P =>
+				array(
+					'maxSize'                    => '1280x720',
+					'videoQuality'               => 6,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+
+			WebVideoTranscode::ENC_OGV_1080P =>
+				array(
+					'maxSize'                    => '1920x1080',
+					'videoQuality'               => 6,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+
+			// WebM transcode:
+			WebVideoTranscode::ENC_WEBM_160P =>
+				array(
+					'maxSize'                    => '288x160',
+					'videoBitrate'               => '256',
+					'audioQuality'               => '-1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			WebVideoTranscode::ENC_WEBM_360P =>
+				array(
+					'maxSize'                    => '640x360',
+					'videoBitrate'               => '512',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			WebVideoTranscode::ENC_WEBM_480P =>
+				array(
+					'maxSize'                    => '854x480',
+					'videoBitrate'               => '1024',
+					'audioQuality'               => '2',
+					'samplerate'                 => '44100',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			WebVideoTranscode::ENC_WEBM_720P =>
+				array(
+					'maxSize'                    => '1280x720',
+					'videoQuality'               => 7,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			WebVideoTranscode::ENC_WEBM_1080P =>
+				 array(
+					'maxSize'                    => '1920x1080',
+					'videoQuality'               => 7,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			WebVideoTranscode::ENC_WEBM_2160P =>
+				 array(
+					'maxSize'                    => '4096x2160',
+					'videoQuality'               => 7,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+
+			// WebM VP9 transcode:
+			WebVideoTranscode::ENC_VP9_360P =>
+				array(
+					'maxSize'                    => '640x360',
+					'videoBitrate'               => '256',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+			WebVideoTranscode::ENC_VP9_480P =>
+				array(
+					'maxSize'                    => '854x480',
+					'videoBitrate'               => '512',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+			WebVideoTranscode::ENC_VP9_720P =>
+				array(
+					'maxSize'                    => '1280x720',
+					'videoBitrate'               => '1024',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'tileColumns'                => '2',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+			WebVideoTranscode::ENC_VP9_1080P =>
+				 array(
+					'maxSize'                    => '1920x1080',
+					'videoBitrate'               => '2048',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'tileColumns'                => '4',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+			WebVideoTranscode::ENC_VP9_2160P =>
+				 array(
+					'maxSize'                    => '4096x2160',
+					'videoBitrate'               => '8192',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'tileColumns'                => '4',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+
+			// Losly defined per PCF guide to mp4 profiles:
+			// https://develop.participatoryculture.org/index.php/ConversionMatrix
+			// and apple HLS profile guide:
+			// https://developer.apple.com/library/ios/#documentation/networkinginternet/conceptual/streamingmediaguide/UsingHTTPLiveStreaming/UsingHTTPLiveStreaming.html#//apple_ref/doc/uid/TP40008332-CH102-DontLinkElementID_24
+
+			WebVideoTranscode::ENC_H264_320P =>
+				array(
+					'maxSize' => '480x320',
+					'videoCodec' => 'h264',
+					'preset' => 'ipod320',
+					'videoBitrate' => '400k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '40k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+
+			WebVideoTranscode::ENC_H264_480P =>
+				array(
+					'maxSize' => '640x480',
+					'videoCodec' => 'h264',
+					'preset' => 'ipod640',
+					'videoBitrate' => '1200k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '64k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+
+			WebVideoTranscode::ENC_H264_720P =>
+				array(
+					'maxSize' => '1280x720',
+					'videoCodec' => 'h264',
+					'preset' => '720p',
+					'videoBitrate' => '2500k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '128k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+
+			WebVideoTranscode::ENC_H264_1080P =>
+				array(
+					'maxSize' => '1920x1080',
+					'videoCodec' => 'h264',
+					'videoBitrate' => '5000k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '128k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+			WebVideoTranscode::ENC_H264_2160P =>
+				array(
+					'maxSize' => '4096x2160',
+					'videoCodec' => 'h264',
+					'videoBitrate' => '16384k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '128k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+
+			//Audio profiles
+			WebVideoTranscode::ENC_OGG_VORBIS =>
+				array(
+					'audioCodec'                 => 'vorbis',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'novideo'                    => 'true',
+					'type'                       => 'audio/ogg; codecs="vorbis"',
+				),
+			WebVideoTranscode::ENC_OGG_OPUS =>
+				array(
+					'audioCodec'                 => 'opus',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'novideo'                    => 'true',
+					'type'                       => 'audio/ogg; codecs="opus"',
+				),
+			WebVideoTranscode::ENC_MP3 =>
+				array(
+					'audioCodec'                 => 'mp3',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'novideo'                    => 'true',
+					'type'                       => 'audio/mpeg',
+				),
+			WebVideoTranscode::ENC_AAC =>
+				array(
+					'audioCodec'                 => 'aac',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'novideo'                    => 'true',
+					'type'                       => 'audio/mp4; codecs="mp4a.40.5"',
+				),
+		);
+
+		return self::TimedMediaHandlerConstantToString( $mode, $defs, $prefix = 'WebVideoTranscode::ENC_', $default );
+	}
+
+	public static function TimedMediaHandlerModeToHashKey( $mode ) {
+		$defs = array(
+			'OGV_160P' =>
+				array(
+					'maxSize'                    => '288x160',
+					'videoBitrate'               => '160',
+					'framerate'                  => '15',
+					'audioQuality'               => '-1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+			'OGV_240P' =>
+				array(
+					'maxSize'                    => '426x240',
+					'videoBitrate'               => '512',
+					'audioQuality'               => '0',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+			'OGV_360P' =>
+				array(
+					'maxSize'                    => '640x360',
+					'videoBitrate'               => '1024',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+			'OGV_480P' =>
+				array(
+					'maxSize'                    => '854x480',
+					'videoBitrate'               => '2048',
+					'audioQuality'               => '2',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+
+			'OGV_720P' =>
+				array(
+					'maxSize'                    => '1280x720',
+					'videoQuality'               => 6,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+
+			'OGV_1080P' =>
+				array(
+					'maxSize'                    => '1920x1080',
+					'videoQuality'               => 6,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
+					'optimize'                   => 'true',
+					'keyframeInterval'           => '128',
+					'videoCodec'                 => 'theora',
+					'type'                       => 'video/ogg; codecs="theora, vorbis"',
+				),
+
+			// WebM transcode:
+			'WEBM_160P' =>
+				array(
+					'maxSize'                    => '288x160',
+					'videoBitrate'               => '256',
+					'audioQuality'               => '-1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			'WEBM_360P' =>
+				array(
+					'maxSize'                    => '640x360',
+					'videoBitrate'               => '512',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			'WEBM_480P' =>
+				array(
+					'maxSize'                    => '854x480',
+					'videoBitrate'               => '1024',
+					'audioQuality'               => '2',
+					'samplerate'                 => '44100',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			'WEBM_720P' =>
+				array(
+					'maxSize'                    => '1280x720',
+					'videoQuality'               => 7,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			'WEBM_1080P' =>
+				 array(
+					'maxSize'                    => '1920x1080',
+					'videoQuality'               => 7,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+			'WEBM_2160P' =>
+				 array(
+					'maxSize'                    => '4096x2160',
+					'videoQuality'               => 7,
+					'audioQuality'               => 3,
+					'noUpscaling'                => 'true',
+					'videoCodec'                 => 'vp8',
+					'type'                       => 'video/webm; codecs="vp8, vorbis"',
+				),
+
+			// WebM VP9 transcode:
+			'VP9_360P' =>
+				array(
+					'maxSize'                    => '640x360',
+					'videoBitrate'               => '256',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+			'VP9_480P' =>
+				array(
+					'maxSize'                    => '854x480',
+					'videoBitrate'               => '512',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+			'VP9_720P' =>
+				array(
+					'maxSize'                    => '1280x720',
+					'videoBitrate'               => '1024',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'tileColumns'                => '2',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+			'VP9_1080P' =>
+				 array(
+					'maxSize'                    => '1920x1080',
+					'videoBitrate'               => '2048',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'tileColumns'                => '4',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+			'VP9_2160P' =>
+				 array(
+					'maxSize'                    => '4096x2160',
+					'videoBitrate'               => '8192',
+					'samplerate'                 => '48000',
+					'noUpscaling'                => 'true',
+					'twopass'                    => 'true',
+					'keyframeInterval'           => '128',
+					'bufDelay'                   => '256',
+					'videoCodec'                 => 'vp9',
+					'audioCodec'                 => 'opus',
+					'tileColumns'                => '4',
+					'type'                       => 'video/webm; codecs="vp9, opus"',
+				),
+
+			// Losly defined per PCF guide to mp4 profiles:
+			// https://develop.participatoryculture.org/index.php/ConversionMatrix
+			// and apple HLS profile guide:
+			// https://developer.apple.com/library/ios/#documentation/networkinginternet/conceptual/streamingmediaguide/UsingHTTPLiveStreaming/UsingHTTPLiveStreaming.html#//apple_ref/doc/uid/TP40008332-CH102-DontLinkElementID_24
+
+			'H264_320P' =>
+				array(
+					'maxSize' => '480x320',
+					'videoCodec' => 'h264',
+					'preset' => 'ipod320',
+					'videoBitrate' => '400k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '40k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+
+			'H264_480P' =>
+				array(
+					'maxSize' => '640x480',
+					'videoCodec' => 'h264',
+					'preset' => 'ipod640',
+					'videoBitrate' => '1200k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '64k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+
+			'H264_720P' =>
+				array(
+					'maxSize' => '1280x720',
+					'videoCodec' => 'h264',
+					'preset' => '720p',
+					'videoBitrate' => '2500k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '128k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+
+			'H264_1080P' =>
+				array(
+					'maxSize' => '1920x1080',
+					'videoCodec' => 'h264',
+					'videoBitrate' => '5000k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '128k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+			'H264_2160P' =>
+				array(
+					'maxSize' => '4096x2160',
+					'videoCodec' => 'h264',
+					'videoBitrate' => '16384k',
+					'audioCodec' => 'aac',
+					'channels' => '2',
+					'audioBitrate' => '128k',
+					'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+				),
+
+			//Audio profiles
+			'OGG_VORBIS' =>
+				array(
+					'audioCodec'                 => 'vorbis',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'novideo'                    => 'true',
+					'type'                       => 'audio/ogg; codecs="vorbis"',
+				),
+			'OGG_OPUS' =>
+				array(
+					'audioCodec'                 => 'opus',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'novideo'                    => 'true',
+					'type'                       => 'audio/ogg; codecs="opus"',
+				),
+			'MP3' =>
+				array(
+					'audioCodec'                 => 'mp3',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'novideo'                    => 'true',
+					'type'                       => 'audio/mpeg',
+				),
+			'AAC' =>
+				array(
+					'audioCodec'                 => 'aac',
+					'audioQuality'               => '1',
+					'samplerate'                 => '44100',
+					'channels'                   => '2',
+					'noUpscaling'                => 'true',
+					'novideo'                    => 'true',
+					'type'                       => 'audio/mp4; codecs="mp4a.40.5"',
+				),
+		);
+
+		if ( array_key_exists( $mode, $defs ) ){
+			return $defs[$mode];
+		} else {
+			return $default;
+		}
+	}
+
+	public static function TimedMediaEncoding() {
+		$timedString = self::TimedMediaHandlerModeToString(
+			'OGV_160P',
+			'OGV_240P',
+			'OGV_360P',
+			'OGV_480P',
+			'OGV_720P',
+			'OGV_1080P',
+			'WEBM_160P',
+			'WEBM_360P',
+			'WEBM_480P',
+			'WEBM_720P',
+			'WEBM_1080P',
+			'WEBM_2160P',
+			'VP9_360P',
+			'VP9_720P',
+			'VP9_1080P',
+			'VP9_2160P',
+			'H264_320P',
+			'H264_480P',
+			'H264_720P',
+			'H264_1080P',
+			'H264_2160P',
+			'OGG_VORBIS',
+			'OGG_OPUS',
+			'MP3',
+			'AAC'
+		);
+		self::TimedMediaHandlerModeToHashKey( $timedString );
+	}
+
 	/**
 	* Encoding parameters are set via firefogg encode api
 	*
@@ -72,338 +847,9 @@ class WebVideoTranscode {
 	* http://firefogg.org/dev/index.html
 	*/
 	public static $derivativeSettings = array(
-		WebVideoTranscode::ENC_OGV_160P =>
-			array(
-				'maxSize'                    => '288x160',
-				'videoBitrate'               => '160',
-				'framerate'                  => '15',
-				'audioQuality'               => '-1',
-				'samplerate'                 => '44100',
-				'channels'                   => '2',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
-				'optimize'                   => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'theora',
-				'type'                       => 'video/ogg; codecs="theora, vorbis"',
-			),
-		WebVideoTranscode::ENC_OGV_240P =>
-			array(
-				'maxSize'                    => '426x240',
-				'videoBitrate'               => '512',
-				'audioQuality'               => '0',
-				'samplerate'                 => '44100',
-				'channels'                   => '2',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
-				'optimize'                   => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'theora',
-				'type'                       => 'video/ogg; codecs="theora, vorbis"',
-			),
-		WebVideoTranscode::ENC_OGV_360P =>
-			array(
-				'maxSize'                    => '640x360',
-				'videoBitrate'               => '1024',
-				'audioQuality'               => '1',
-				'samplerate'                 => '44100',
-				'channels'                   => '2',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
-				'optimize'                   => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'theora',
-				'type'                       => 'video/ogg; codecs="theora, vorbis"',
-			),
-		WebVideoTranscode::ENC_OGV_480P =>
-			array(
-				'maxSize'                    => '854x480',
-				'videoBitrate'               => '2048',
-				'audioQuality'               => '2',
-				'samplerate'                 => '44100',
-				'channels'                   => '2',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
-				'optimize'                   => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'theora',
-				'type'                       => 'video/ogg; codecs="theora, vorbis"',
-			),
-
-		WebVideoTranscode::ENC_OGV_720P =>
-			array(
-				'maxSize'                    => '1280x720',
-				'videoQuality'               => 6,
-				'audioQuality'               => 3,
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
-				'optimize'                   => 'true',
-				'keyframeInterval'           => '128',
-				'videoCodec'                 => 'theora',
-				'type'                       => 'video/ogg; codecs="theora, vorbis"',
-			),
-
-		WebVideoTranscode::ENC_OGV_1080P =>
-			array(
-				'maxSize'                    => '1920x1080',
-				'videoQuality'               => 6,
-				'audioQuality'               => 3,
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'false', // will be overridden by $wgTmhTheoraTwoPassEncoding
-				'optimize'                   => 'true',
-				'keyframeInterval'           => '128',
-				'videoCodec'                 => 'theora',
-				'type'                       => 'video/ogg; codecs="theora, vorbis"',
-			),
-
-		// WebM transcode:
-		WebVideoTranscode::ENC_WEBM_160P =>
-			array(
-				'maxSize'                    => '288x160',
-				'videoBitrate'               => '256',
-				'audioQuality'               => '-1',
-				'samplerate'                 => '44100',
-				'channels'                   => '2',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
-			),
-		WebVideoTranscode::ENC_WEBM_360P =>
-			array(
-				'maxSize'                    => '640x360',
-				'videoBitrate'               => '512',
-				'audioQuality'               => '1',
-				'samplerate'                 => '44100',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
-			),
-		WebVideoTranscode::ENC_WEBM_480P =>
-			array(
-				'maxSize'                    => '854x480',
-				'videoBitrate'               => '1024',
-				'audioQuality'               => '2',
-				'samplerate'                 => '44100',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
-			),
-		WebVideoTranscode::ENC_WEBM_720P =>
-			array(
-				'maxSize'                    => '1280x720',
-				'videoQuality'               => 7,
-				'audioQuality'               => 3,
-				'noUpscaling'                => 'true',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
-			),
-		WebVideoTranscode::ENC_WEBM_1080P =>
-			 array(
-				'maxSize'                    => '1920x1080',
-				'videoQuality'               => 7,
-				'audioQuality'               => 3,
-				'noUpscaling'                => 'true',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
-			),
-		WebVideoTranscode::ENC_WEBM_2160P =>
-			 array(
-				'maxSize'                    => '4096x2160',
-				'videoQuality'               => 7,
-				'audioQuality'               => 3,
-				'noUpscaling'                => 'true',
-				'videoCodec'                 => 'vp8',
-				'type'                       => 'video/webm; codecs="vp8, vorbis"',
-			),
-
-		// WebM VP9 transcode:
-		WebVideoTranscode::ENC_VP9_360P =>
-			array(
-				'maxSize'                    => '640x360',
-				'videoBitrate'               => '256',
-				'samplerate'                 => '48000',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp9',
-				'audioCodec'                 => 'opus',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
-			),
-		WebVideoTranscode::ENC_VP9_480P =>
-			array(
-				'maxSize'                    => '854x480',
-				'videoBitrate'               => '512',
-				'samplerate'                 => '48000',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp9',
-				'audioCodec'                 => 'opus',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
-			),
-		WebVideoTranscode::ENC_VP9_720P =>
-			array(
-				'maxSize'                    => '1280x720',
-				'videoBitrate'               => '1024',
-				'samplerate'                 => '48000',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp9',
-				'audioCodec'                 => 'opus',
-				'tileColumns'                => '2',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
-			),
-		WebVideoTranscode::ENC_VP9_1080P =>
-			 array(
-				'maxSize'                    => '1920x1080',
-				'videoBitrate'               => '2048',
-				'samplerate'                 => '48000',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp9',
-				'audioCodec'                 => 'opus',
-				'tileColumns'                => '4',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
-			),
-		WebVideoTranscode::ENC_VP9_2160P =>
-			 array(
-				'maxSize'                    => '4096x2160',
-				'videoBitrate'               => '8192',
-				'samplerate'                 => '48000',
-				'noUpscaling'                => 'true',
-				'twopass'                    => 'true',
-				'keyframeInterval'           => '128',
-				'bufDelay'                   => '256',
-				'videoCodec'                 => 'vp9',
-				'audioCodec'                 => 'opus',
-				'tileColumns'                => '4',
-				'type'                       => 'video/webm; codecs="vp9, opus"',
-			),
-
-		// Losly defined per PCF guide to mp4 profiles:
-		// https://develop.participatoryculture.org/index.php/ConversionMatrix
-		// and apple HLS profile guide:
-		// https://developer.apple.com/library/ios/#documentation/networkinginternet/conceptual/streamingmediaguide/UsingHTTPLiveStreaming/UsingHTTPLiveStreaming.html#//apple_ref/doc/uid/TP40008332-CH102-DontLinkElementID_24
-
-		WebVideoTranscode::ENC_H264_320P =>
-			array(
-				'maxSize' => '480x320',
-				'videoCodec' => 'h264',
-				'preset' => 'ipod320',
-				'videoBitrate' => '400k',
-				'audioCodec' => 'aac',
-				'channels' => '2',
-				'audioBitrate' => '40k',
-				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
-			),
-
-		WebVideoTranscode::ENC_H264_480P =>
-			array(
-				'maxSize' => '640x480',
-				'videoCodec' => 'h264',
-				'preset' => 'ipod640',
-				'videoBitrate' => '1200k',
-				'audioCodec' => 'aac',
-				'channels' => '2',
-				'audioBitrate' => '64k',
-				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
-			),
-
-		WebVideoTranscode::ENC_H264_720P =>
-			array(
-				'maxSize' => '1280x720',
-				'videoCodec' => 'h264',
-				'preset' => '720p',
-				'videoBitrate' => '2500k',
-				'audioCodec' => 'aac',
-				'channels' => '2',
-				'audioBitrate' => '128k',
-				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
-			),
-
-		WebVideoTranscode::ENC_H264_1080P =>
-			array(
-				'maxSize' => '1920x1080',
-				'videoCodec' => 'h264',
-				'videoBitrate' => '5000k',
-				'audioCodec' => 'aac',
-				'channels' => '2',
-				'audioBitrate' => '128k',
-				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
-			),
-		WebVideoTranscode::ENC_H264_2160P =>
-			array(
-				'maxSize' => '4096x2160',
-				'videoCodec' => 'h264',
-				'videoBitrate' => '16384k',
-				'audioCodec' => 'aac',
-				'channels' => '2',
-				'audioBitrate' => '128k',
-				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
-			),
-
-		//Audio profiles
-		WebVideoTranscode::ENC_OGG_VORBIS =>
-			array(
-				'audioCodec'                 => 'vorbis',
-				'audioQuality'               => '1',
-				'samplerate'                 => '44100',
-				'channels'                   => '2',
-				'noUpscaling'                => 'true',
-				'novideo'                    => 'true',
-				'type'                       => 'audio/ogg; codecs="vorbis"',
-			),
-		WebVideoTranscode::ENC_OGG_OPUS =>
-			array(
-				'audioCodec'                 => 'opus',
-				'audioQuality'               => '1',
-				'samplerate'                 => '44100',
-				'channels'                   => '2',
-				'noUpscaling'                => 'true',
-				'novideo'                    => 'true',
-				'type'                       => 'audio/ogg; codecs="opus"',
-			),
-		WebVideoTranscode::ENC_MP3 =>
-			array(
-				'audioCodec'                 => 'mp3',
-				'audioQuality'               => '1',
-				'samplerate'                 => '44100',
-				'channels'                   => '2',
-				'noUpscaling'                => 'true',
-				'novideo'                    => 'true',
-				'type'                       => 'audio/mpeg',
-			),
-		WebVideoTranscode::ENC_AAC =>
-			array(
-				'audioCodec'                 => 'aac',
-				'audioQuality'               => '1',
-				'samplerate'                 => '44100',
-				'channels'                   => '2',
-				'noUpscaling'                => 'true',
-				'novideo'                    => 'true',
-				'type'                       => 'audio/mp4; codecs="mp4a.40.5"',
-			),
+		WebVideoTranscode::TimedMediaEncoding
 	);
-
+	
 	/**
 	 * @param $file File
 	 * @param $transcodeKey string
