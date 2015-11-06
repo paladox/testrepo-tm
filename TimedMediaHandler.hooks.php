@@ -8,6 +8,34 @@
  */
 
 class TimedMediaHandlerHooks {
+
+	/**
+	 * Executed after processing extension.json
+	 */
+	public static function registerExtension() {
+		global $wgFileExtensions, $wgTmhFileExtensions, $wgEnabledTranscodeSet,
+		$wgEnabledAudioTranscodeSet;
+
+		// List of file extensions handled by Timed Media Handler since its referenced in
+		// a few places. You should not modify this variable.
+		$wgTmhFileExtensions = array( 'ogg', 'ogv', 'oga', 'flac', 'wav', 'webm', 'mp4' );
+
+		$wgFileExtensions = array_merge( $wgFileExtensions, $wgTmhFileExtensions );
+
+		/**
+		 * Default enabled transcodes
+		 *
+		 * -If set to empty array, no derivatives will be created
+		 * -Derivative keys encode settings are defined in WebVideoTranscode.php
+		 *
+		 * -These transcodes are *in addition to* the source file.
+		 * -Only derivatives with smaller width than the source asset size will be created
+		 * -Regardless of source size at least one WebM and Ogg source will be created from the $wgEnabledTranscodeSet
+		 * -Derivative jobs are added to the MediaWiki JobQueue the first time the asset is displayed
+		 * -Derivative should be listed min to max
+		 */
+	}
+
 	// Register TimedMediaHandler Hooks
 	public static function register(){
 		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue,
