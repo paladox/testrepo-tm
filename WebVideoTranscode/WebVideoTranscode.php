@@ -71,7 +71,7 @@ class WebVideoTranscode {
 	*
 	* http://firefogg.org/dev/index.html
 	*/
-	public static $derivativeSettings = array(
+	public static $derivativeSettingsOGV_160P = array(
 		WebVideoTranscode::ENC_OGV_160P =>
 			array(
 				'maxSize'                    => '288x160',
@@ -88,6 +88,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'theora',
 				'type'                       => 'video/ogg; codecs="theora, vorbis"',
 			),
+	);
+
+	public static $derivativeSettingsOGV_240P = array(
 		WebVideoTranscode::ENC_OGV_240P =>
 			array(
 				'maxSize'                    => '426x240',
@@ -103,6 +106,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'theora',
 				'type'                       => 'video/ogg; codecs="theora, vorbis"',
 			),
+	);
+
+	public static $derivativeSettingsOGV_360P = array(
 		WebVideoTranscode::ENC_OGV_360P =>
 			array(
 				'maxSize'                    => '640x360',
@@ -118,6 +124,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'theora',
 				'type'                       => 'video/ogg; codecs="theora, vorbis"',
 			),
+	);
+
+	public static $derivativeSettingsOGV_480P = array(
 		WebVideoTranscode::ENC_OGV_480P =>
 			array(
 				'maxSize'                    => '854x480',
@@ -133,7 +142,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'theora',
 				'type'                       => 'video/ogg; codecs="theora, vorbis"',
 			),
+	);
 
+	public static $derivativeSettingsOGV_720P = array(
 		WebVideoTranscode::ENC_OGV_720P =>
 			array(
 				'maxSize'                    => '1280x720',
@@ -146,7 +157,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'theora',
 				'type'                       => 'video/ogg; codecs="theora, vorbis"',
 			),
+	);
 
+	public static $derivativeSettingsOGV_1080P = array(
 		WebVideoTranscode::ENC_OGV_1080P =>
 			array(
 				'maxSize'                    => '1920x1080',
@@ -159,7 +172,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'theora',
 				'type'                       => 'video/ogg; codecs="theora, vorbis"',
 			),
+	);
 
+	public static $derivativeSettingsWEBM_160P = array(
 		// WebM transcode:
 		WebVideoTranscode::ENC_WEBM_160P =>
 			array(
@@ -175,6 +190,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp8',
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
+	);
+
+	public static $derivativeSettingsWEBM_360P = array(
 		WebVideoTranscode::ENC_WEBM_360P =>
 			array(
 				'maxSize'                    => '640x360',
@@ -188,6 +206,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp8',
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
+	);
+
+	public static $derivativeSettingsWEBM_480P = array(
 		WebVideoTranscode::ENC_WEBM_480P =>
 			array(
 				'maxSize'                    => '854x480',
@@ -201,6 +222,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp8',
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
+	);
+
+	public static $derivativeSettingsWEBM_720P = array(
 		WebVideoTranscode::ENC_WEBM_720P =>
 			array(
 				'maxSize'                    => '1280x720',
@@ -210,6 +234,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp8',
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
+	);
+
+	public static $derivativeSettingsWEBM_1080P = array(
 		WebVideoTranscode::ENC_WEBM_1080P =>
 			 array(
 				'maxSize'                    => '1920x1080',
@@ -219,6 +246,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp8',
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
+	);
+
+	public static $derivativeSettingsWEBM_2160P = array(
 		WebVideoTranscode::ENC_WEBM_2160P =>
 			 array(
 				'maxSize'                    => '4096x2160',
@@ -228,7 +258,9 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp8',
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
+	);
 
+	public static $derivativeSettingsVP9_360P = array(
 		// WebM VP9 transcode:
 		WebVideoTranscode::ENC_VP9_360P =>
 			array(
@@ -243,6 +275,9 @@ class WebVideoTranscode {
 				'audioCodec'                 => 'opus',
 				'type'                       => 'video/webm; codecs="vp9, opus"',
 			),
+	);
+
+	public static $derivativeSettingsVP9_480P = array(
 		WebVideoTranscode::ENC_VP9_480P =>
 			array(
 				'maxSize'                    => '854x480',
@@ -256,6 +291,9 @@ class WebVideoTranscode {
 				'audioCodec'                 => 'opus',
 				'type'                       => 'video/webm; codecs="vp9, opus"',
 			),
+	);
+
+	public static $derivativeSettingsVP9_720P = array(
 		WebVideoTranscode::ENC_VP9_720P =>
 			array(
 				'maxSize'                    => '1280x720',
@@ -270,6 +308,9 @@ class WebVideoTranscode {
 				'tileColumns'                => '2',
 				'type'                       => 'video/webm; codecs="vp9, opus"',
 			),
+	);
+
+	public static $derivativeSettingsVP9_1080P = array(
 		WebVideoTranscode::ENC_VP9_1080P =>
 			 array(
 				'maxSize'                    => '1920x1080',
@@ -284,6 +325,9 @@ class WebVideoTranscode {
 				'tileColumns'                => '4',
 				'type'                       => 'video/webm; codecs="vp9, opus"',
 			),
+	);
+
+	public static $derivativeSettingsVP9_2160P = array(
 		WebVideoTranscode::ENC_VP9_2160P =>
 			 array(
 				'maxSize'                    => '4096x2160',
@@ -298,7 +342,9 @@ class WebVideoTranscode {
 				'tileColumns'                => '4',
 				'type'                       => 'video/webm; codecs="vp9, opus"',
 			),
+	);
 
+	public static $derivativeSettingsH264_320P = array(
 		// Losly defined per PCF guide to mp4 profiles:
 		// https://develop.participatoryculture.org/index.php/ConversionMatrix
 		// and apple HLS profile guide:
@@ -315,7 +361,9 @@ class WebVideoTranscode {
 				'audioBitrate' => '40k',
 				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
 			),
+	);
 
+	public static $derivativeSettingsH264_480P = array(
 		WebVideoTranscode::ENC_H264_480P =>
 			array(
 				'maxSize' => '640x480',
@@ -327,7 +375,9 @@ class WebVideoTranscode {
 				'audioBitrate' => '64k',
 				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
 			),
+	);
 
+	public static $derivativeSettingsH264_720P = array(
 		WebVideoTranscode::ENC_H264_720P =>
 			array(
 				'maxSize' => '1280x720',
@@ -339,7 +389,9 @@ class WebVideoTranscode {
 				'audioBitrate' => '128k',
 				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
 			),
+	);
 
+	public static $derivativeSettingsH264_1080P = array(
 		WebVideoTranscode::ENC_H264_1080P =>
 			array(
 				'maxSize' => '1920x1080',
@@ -350,6 +402,9 @@ class WebVideoTranscode {
 				'audioBitrate' => '128k',
 				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
 			),
+	);
+
+	public static $derivativeSettingsH264_2160P = array(
 		WebVideoTranscode::ENC_H264_2160P =>
 			array(
 				'maxSize' => '4096x2160',
@@ -360,7 +415,9 @@ class WebVideoTranscode {
 				'audioBitrate' => '128k',
 				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
 			),
+	);
 
+	public static $derivativeSettingsOGG_VORBIS = array(
 		//Audio profiles
 		WebVideoTranscode::ENC_OGG_VORBIS =>
 			array(
@@ -372,6 +429,9 @@ class WebVideoTranscode {
 				'novideo'                    => 'true',
 				'type'                       => 'audio/ogg; codecs="vorbis"',
 			),
+	);
+
+	public static $derivativeSettingsOGG_OPUS = array(
 		WebVideoTranscode::ENC_OGG_OPUS =>
 			array(
 				'audioCodec'                 => 'opus',
@@ -382,6 +442,9 @@ class WebVideoTranscode {
 				'novideo'                    => 'true',
 				'type'                       => 'audio/ogg; codecs="opus"',
 			),
+	);
+
+	public static $derivativeSettingsMP3 = array(
 		WebVideoTranscode::ENC_MP3 =>
 			array(
 				'audioCodec'                 => 'mp3',
@@ -392,6 +455,9 @@ class WebVideoTranscode {
 				'novideo'                    => 'true',
 				'type'                       => 'audio/mpeg',
 			),
+	);
+
+	public static $derivativeSettingsAAC = array(
 		WebVideoTranscode::ENC_AAC =>
 			array(
 				'audioCodec'                 => 'aac',
@@ -474,10 +540,12 @@ class WebVideoTranscode {
 		global $wgEnabledTranscodeSet;
 		$maxSize = 0;
 		foreach( $wgEnabledTranscodeSet as $transcodeKey ){
-			if( isset( self::$derivativeSettings[$transcodeKey]['videoBitrate'] ) ){
-				$currentSize = self::$derivativeSettings[$transcodeKey]['maxSize'];
-				if( $currentSize > $maxSize ){
-					$maxSize = $currentSize;
+			if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+				if( isset( self::$derivativeSettingsOGV_160P[$transcodeKey]['videoBitrate'] ) ){
+					$currentSize = self::$derivativeSettingsOGV_160P[$transcodeKey]['maxSize'];
+					if( $currentSize > $maxSize ){
+						$maxSize = $currentSize;
+					}
 				}
 			}
 		}
@@ -492,13 +560,19 @@ class WebVideoTranscode {
 	 * @return number
 	 */
 	static public function getProjectedFileSize( $file, $transcodeKey ){
-		$settings = self::$derivativeSettings[$transcodeKey];
+		global $wgEnabledTranscodeSet, $wgEnabledAudioTranscodeSet;
+		if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+			$settingsGetProj = self::$derivativeSettingsOGV_160P[$transcodeKey];
+		}
+		$settings = $settingsGetProj;
 		if( $settings[ 'videoBitrate' ] && $settings['audioBitrate'] ){
-			return $file->getLength() * 8 * (
-				self::$derivativeSettings[$transcodeKey]['videoBitrate']
-				+
-				self::$derivativeSettings[$transcodeKey]['audioBitrate']
-			);
+			if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+				return $file->getLength() * 8 * (
+					self::$derivativeSettingsOGV_160P[$transcodeKey]['videoBitrate']
+					+
+					self::$derivativeSettingsOGV_160P[$transcodeKey]['audioBitrate']
+				);
+			}
 		}
 		// Else just return the size of the source video ( we have no idea how large the actual derivative size will be )
 		return $file->getLength() * $file->getHandler()->getBitrate( $file ) * 8;
@@ -888,33 +962,38 @@ class WebVideoTranscode {
 		$fileName = $file->getTitle()->getDbKey();
 
 		$src = self::getTranscodedUrlForFile( $file, $transcodeKey );
+		if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+			if( $file->getHandler()->isAudio( $file ) ){
+				$width = $height = 0;
+			} else {
+				list( $width, $height ) = WebVideoTranscode::getMaxSizeTransform(
+					$file,
+					self::$derivativeSettingsOGV_160P[$transcodeKey]['maxSize']
+				);
+			}
 
-		if( $file->getHandler()->isAudio( $file ) ){
-			$width = $height = 0;
-		} else {
-			list( $width, $height ) = WebVideoTranscode::getMaxSizeTransform(
-				$file,
-				self::$derivativeSettings[$transcodeKey]['maxSize']
-			);
+			$framerate = ( isset( self::$derivativeSettingsOGV_160P[$transcodeKey]['framerate'] ) )?
+							self::$derivativeSettingsOGV_160P[$transcodeKey]['framerate'] :
+							$file->getHandler()->getFramerate( $file );
 		}
 
-		$framerate = ( isset( self::$derivativeSettings[$transcodeKey]['framerate'] ) )?
-						self::$derivativeSettings[$transcodeKey]['framerate'] :
-						$file->getHandler()->getFramerate( $file );
-		// Setup the url src:
-		$src = in_array( 'fullurl', $options) ?  wfExpandUrl( $src ) : $src;
-		$fields = array(
-				'src' => $src,
-				'title' => wfMessage( 'timedmedia-derivative-desc-' . $transcodeKey )->text(),
-				'type' => self::$derivativeSettings[ $transcodeKey ][ 'type' ],
-				"shorttitle" => wfMessage( 'timedmedia-derivative-' . $transcodeKey )->text(),
-				"transcodekey" => $transcodeKey,
+			// Setup the url src:
+			$src = in_array( 'fullurl', $options) ?  wfExpandUrl( $src ) : $src;
+			if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+				$settingsOGV_160P = self::$derivativeSettingsOGV_160P[ $transcodeKey ][ 'type' ];
+			}
+			$fields = array(
+					'src' => $src,
+					'title' => wfMessage( 'timedmedia-derivative-desc-' . $transcodeKey )->text(),
+					'type' => $settingsOGV_160P,
+					"shorttitle" => wfMessage( 'timedmedia-derivative-' . $transcodeKey )->text(),
+					"transcodekey" => $transcodeKey,
 
-				// Add data attributes per emerging DASH / webTV adaptive streaming attributes
-				// eventually we will define a manifest xml entry point.
-				"width" => intval( $width ),
-				"height" => intval( $height ),
-			);
+					// Add data attributes per emerging DASH / webTV adaptive streaming attributes
+					// eventually we will define a manifest xml entry point.
+					"width" => intval( $width ),
+					"height" => intval( $height ),
+				);
 
 		// a "ready" transcode should have a bitrate:
 		if ( isset( self::$transcodeState[$fileName] ) ) {
@@ -935,7 +1014,7 @@ class WebVideoTranscode {
 	 */
 	public static function startJobQueue( File $file ) {
 		global $wgEnabledTranscodeSet, $wgEnabledAudioTranscodeSet;
-		$keys = array_merge( $wgEnabledTranscodeSet, $wgEnabledAudioTranscodeSet );
+		$keys = array( $wgEnabledTranscodeSet, $wgEnabledAudioTranscodeSet );
 
 		// 'Natural sort' puts the transcodes in ascending order by resolution,
 		// which roughly gives us fastest-to-slowest order.
@@ -1003,9 +1082,11 @@ class WebVideoTranscode {
 		} else {
 			$keys = $wgEnabledTranscodeSet;
 		}
-
 		if ( in_array( $transcodeKey, $keys ) ) {
-			$settings = self::$derivativeSettings[$transcodeKey];
+			if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+				$settingsTranscode = self::$derivativeSettingsOGV_160P[$transcodeKey];
+			}
+			$settings = $settingsTranscode;
 			if ( $audio ) {
 				$sourceCodecs = $file->getHandler()->getStreamTypes( $file );
 				$sourceCodec = $sourceCodecs ? strtolower( $sourceCodecs[0] ) : '';
@@ -1147,12 +1228,16 @@ class WebVideoTranscode {
 	public static function isSmallestTranscodeForCodec( $transcodeKey ) {
 		global $wgEnabledTranscodeSet;
 
-		$settings = self::$derivativeSettings[$transcodeKey];
+		if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+			$settings = self::$derivativeSettingsOGV_160P[$transcodeKey];
+		}
 		$vcodec = $settings['videoCodec'];
 		$maxSize = self::getMaxSize( $settings['maxSize'] );
 
 		foreach ( $wgEnabledTranscodeSet as $tKey ) {
-			$tsettings = self::$derivativeSettings[$tKey];
+			if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+				$tsettings = self::$derivativeSettingsOGV_160P[$tKey];
+			}
 			if ( $tsettings['videoCodec'] === $vcodec ) {
 				$tmaxSize = self::getMaxSize( $tsettings['maxSize'] );
 				if ( $tmaxSize['width'] < $maxSize['width'] ) {
