@@ -114,7 +114,7 @@ class WebVideoTranscodeJob extends Job {
 	 * @return boolean success
 	 */
 	public function run() {
-		global $wgVersion, $wgFFmpeg2theoraLocation;
+		global $wgVersion, $wgFFmpeg2theoraLocation, $wgEnabledTranscodeSet;
 		// get a local pointer to the file
 		$file = $this->getFile();
 
@@ -127,11 +127,13 @@ class WebVideoTranscodeJob extends Job {
 		// Validate the transcode key param:
 		$transcodeKey = $this->params['transcodeKey'];
 		// Build the destination target
-		if( ! isset(  WebVideoTranscode::$derivativeSettings[ $transcodeKey ] )){
-			$error = "Transcode key $transcodeKey not found, skipping";
-			$this->output( $error );
-			$this->setLastError( $error );
-			return false;
+		if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+			if( ! isset(  WebVideoTranscode::$derivativeSettingsOGV_160P[ $transcodeKey ] )){
+				$error = "Transcode key $transcodeKey not found, skipping";
+				$this->output( $error );
+				$this->setLastError( $error );
+				return false;
+			}
 		}
 
 		// Validate the source exists:
@@ -142,7 +144,9 @@ class WebVideoTranscodeJob extends Job {
 			return false;
 		}
 
-		$options = WebVideoTranscode::$derivativeSettings[ $transcodeKey ];
+		if ( $wgEnabledTranscodeSet = "OGV_160P" || $wgEnabledTranscodeSet = "WebVideoTranscode::ENC_OGV_160P" ) {
+			$options = WebVideoTranscode::$derivativeSettingsOGV_160P[ $transcodeKey ];
+		}
 
 		if ( isset( $options[ 'novideo' ] ) ) {
 			$this->output( "Encoding to audio codec: " . $options['audioCodec'] );
