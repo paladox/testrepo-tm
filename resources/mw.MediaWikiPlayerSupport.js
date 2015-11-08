@@ -13,7 +13,7 @@
 	// Add mediaWiki player support to target embedPlayer
 	$( mw ).bind( 'EmbedPlayerNewPlayer', function ( event, embedPlayer ) {
 		mw.addMediaWikiPlayerSupport( embedPlayer );
-	});
+	} );
 
 	/**
 	 * Closure function wraps mediaWiki embedPlayer bindings
@@ -21,32 +21,33 @@
 	mw.addMediaWikiPlayerSupport = function ( embedPlayer ) {
 		var apiTitleKey, apiProvider, $creditsCache = false;
 		// Set some local variables:
-		if ( !embedPlayer['data-mwtitle'] ) {
+		if ( !embedPlayer[ 'data-mwtitle' ] ) {
 			return false;
 		} else {
-			apiTitleKey = embedPlayer['data-mwtitle'];
+			apiTitleKey = embedPlayer[ 'data-mwtitle' ];
 			// legacy support ( set as attribute )
 			embedPlayer.apiTitleKey = apiTitleKey;
 		}
 		// Set local apiProvider via config if not defined
-		apiProvider = embedPlayer['data-mwprovider'];
+		apiProvider = embedPlayer[ 'data-mwprovider' ];
 		if ( !apiProvider ) {
 			apiProvider = mw.config.get( 'EmbedPlayer.ApiProvider' );
 		}
 
 		/**
 		 * Loads mediaWiki sources for a given embedPlayer
+		 *
 		 * @param {function} callback Function called once player sources have been added
 		 */
 		function loadPlayerSources( callback ) {
 			// Setup the request
 			var request = {
-				'prop': 'imageinfo',
+				prop: 'imageinfo',
 				// In case the user added File: or Image: to the apiKey:
-				'titles': 'File:' + decodeURIComponent( apiTitleKey ).replace( /^(File:|Image:)/, '' ),
-				'iiprop': 'url|size|dimensions|metadata',
-				'iiurlwidth': embedPlayer.getWidth(),
-				'redirects': true // automatically resolve redirects
+				titles: 'File:' + decodeURIComponent( apiTitleKey ).replace( /^(File:|Image:)/, '' ),
+				iiprop: 'url|size|dimensions|metadata',
+				iiurlwidth: embedPlayer.getWidth(),
+				redirects: true // automatically resolve redirects
 			};
 
 			// Run the request:
@@ -58,18 +59,18 @@
 							callback( false );
 							return ;
 						}
-						page = data.query.pages[i];
+						page = data.query.pages[ i ];
 					}
 				} else {
 					callback( false );
 					return ;
 				}
 				// Make sure we have imageinfo:
-				if ( !page.imageinfo || !page.imageinfo[0] ) {
+				if ( !page.imageinfo || !page.imageinfo[ 0 ] ) {
 					callback( false );
 					return ;
 				}
-				imageinfo = page.imageinfo[0];
+				imageinfo = page.imageinfo[ 0 ];
 
 				// TODO these should call public methods rather than update internals:
 
@@ -84,8 +85,8 @@
 				);
 
 				// Set the duration
-				if ( imageinfo.metadata[2].name === 'length' ) {
-					embedPlayer.duration = imageinfo.metadata[2].value;
+				if ( imageinfo.metadata[ 2 ].name === 'length' ) {
+					embedPlayer.duration = imageinfo.metadata[ 2 ].value;
 				}
 
 				// Set the width height
@@ -98,7 +99,7 @@
 				$( embedPlayer ).css( 'height', embedPlayer.height );
 
 				callback();
-			});
+			} );
 		}
 
 		/**
@@ -123,11 +124,11 @@
 						// get the link
 						$( '<div>' ).append(
 							$( '<a/>' ).attr( {
-								'href': articleUrl,
-								'title': titleStr
+								href: articleUrl,
+								title: titleStr
 							} )
 							.text( titleStr )
-						)[0].innerHTML
+						)[ 0 ].innerHTML
 					)
 				)
 			);
