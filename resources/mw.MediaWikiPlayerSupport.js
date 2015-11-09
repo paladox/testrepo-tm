@@ -212,15 +212,18 @@
 
 			// Get the image page ( cache for 1 hour )
 			request = {
-				action: 'parse',
-				page: fileTitle,
+				action: 'query',
+				prop: 'revisions',
+				rvprop: 'content',
+				titles: fileTitle,
+				formatversion: 2,
 				smaxage: 3600,
 				maxage: 3600
 			};
 			mw.getJSON( apiUrl, request, function ( data ) {
 				var descUrl = apiUrl.replace( 'api.php', 'index.php' );
 				descUrl += '?title=' + encodeURIComponent( fileTitle );
-				if ( data && data.parse && data.parse.text && data.parse.text[ '*' ] ) {
+				if ( data && data.query && data.query.pages.length > 0 && data.query.pages[0].revisions.length > 0 ) {
 					// TODO improve provider 'concept' to support page title link
 					$creditsCache = doCreditLine( data.parse.text[ '*' ], descUrl );
 				} else {
@@ -345,8 +348,8 @@
 			mw.getJSON( apiUrl, request, function ( data ) {
 				if ( data && data.parse && data.parse.text &&  data.parse.text[ '*' ] ) {
 					source.loaded = true;
-					source.mimeType = 'text/mw-srt';
-					source.captions = source.getCaptions(  data.parse.text[ '*' ] );
+					source.mimeType = 'text/x-srt';
+					source.captions = source.getCaptions(  data.query.pages[0].revisions[0].content );
 					callback();
 				} else {
 					mw.log( 'Error: MediaWiki api error in getting timed text:', data );
