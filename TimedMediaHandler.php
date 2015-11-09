@@ -206,6 +206,9 @@ $wgEnabledAudioTranscodeSet = array(
 // If mp4 source assets can be ingested:
 $wgTmhEnableMp4Uploads = false;
 
+// How long to wait for job to be run before retrying
+$wgTranscodeJobWaitTime = 3600 * 72;
+
 // Two-pass encoding for .ogv Theora transcodes is flaky as of October 2015.
 // Enable this only if testing with latest theora libraries!
 // See tracking bug: https://phabricator.wikimedia.org/T115883
