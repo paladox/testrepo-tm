@@ -1037,12 +1037,28 @@ class WebVideoTranscode {
 
 		$transcodeState = self::getTranscodeState( $file, $db );
 
+		// A check if the Job has been pending for way too long.
+		// If Job has been pending for 72 hours, but yet nothing is in
+		// the job queue, probably something bad happened and we should
+		// retry the job.
+		$tooOld = function ( $addDate ) {
+			global $wgTranscodeJobWaitTime;
+			if ( time() - wfTimestamp( TS_UNIX, $addDate ) > $wgTranscodeJobWaitTime ) {
+				$group = JobQueueGroup::singleton();
+				$queue = $group->get( 'webVideoTranscode' );
+				return $queue->isEmpty();
+			}
+			return false;
+		};
+
 		if ( !self::isTranscodeEnabled( $file, $transcodeKey ) ) {
 			return;
 		}
 
 		// If the job hasn't been added yet, attempt to do so
-		if ( !isset( $transcodeState[ $transcodeKey ] ) ) {
+		if ( !isset( $transcodeState[ $transcodeKey ] ) ||
+				$tooOld( $transcodeState[ $transcodeKey ]['time_addjob'] )
+		) {
 			$db->insert(
 				'transcode',
 				array(
