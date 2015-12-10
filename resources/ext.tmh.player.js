@@ -16,7 +16,8 @@
 		plugins: {
 			videoJsResolutionSwitcher: {
 				sourceOrder: true
-			}
+			},
+			responsiveLayout: {}
 		}
 	};
 
