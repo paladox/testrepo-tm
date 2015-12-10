@@ -16,5 +16,9 @@
     "jscs-preset-wikimedia": "~1.0.0",
     "video.js": "^5.3.0",
     "videojs-resolution-switcher": "^0.2.2"
+  },
+  "dependencies": {
+    "videojs-resolution-switcher": "^0.2.2",
+    "videojs-responsive-layout": "^1.1.0"
   }
 }
