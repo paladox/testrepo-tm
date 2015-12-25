@@ -93,7 +93,22 @@ class TimedMediaHandlerHooks {
 			),
 			'ext.tmh.TimedTextSelector' =>  $baseExtensionResource + array(
 				'scripts' => 'resources/ext.tmh.TimedTextSelector.js',
-			)
+			),
+			// Add OgvJs-related modules for Safari/IE/Edge Ogg playback
+				'ext.tmh.OgvJsSupport' => $baseExtensionResource + array(
+					'scripts' => array(
+						'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv-support.js',
+						'resources/ext.tmh.OgvJsSupport.js',
+					),
+					'targets' => array( 'mobile', 'desktop' ),
+				),
+				'ext.tmh.OgvJs' => $baseExtensionResource + array(
+					'scripts' => array(
+						'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv.js',
+					),
+					'dependencies' => 'ext.tmh.OgvJsSupport',
+					'targets' => array( 'mobile', 'desktop' ),
+				),
 		);
 
 		if ( $wgTmhWebPlayer === 'mwembed' ) {
@@ -144,23 +159,6 @@ class TimedMediaHandlerHooks {
 					'position' => 'top',
 				),
 			);
-			// Add OgvJs-related modules for Safari/IE/Edge Ogg playback
-			$wgResourceModules += array(
-				'ext.tmh.OgvJsSupport' => $baseExtensionResource + array(
-					'scripts' => array(
-						'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv-support.js',
-						'resources/ext.tmh.OgvJsSupport.js',
-					),
-					'targets' => array( 'mobile', 'desktop' ),
-				),
-				'ext.tmh.OgvJs' => $baseExtensionResource + array(
-					'scripts' => array(
-						'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv.js',
-					),
-					'dependencies' => 'ext.tmh.OgvJsSupport',
-					'targets' => array( 'mobile', 'desktop' ),
-				),
-			);
 		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
 			$wgResourceModules += array(
 				'ext.tmh.video-js' => $baseExtensionResource + array(
@@ -195,6 +193,14 @@ class TimedMediaHandlerHooks {
 						'zh-TW' => 'resources/videojs/lang/zh-TW.js',
 					),
 				),
+				'ext.tmh.videojs-ogvjs' => $baseExtensionResource + array(
+					'scripts' => 'resources/videojs-ogvjs/videojs-ogvjs.js',
+					'targets' => array( 'mobile', 'desktop' ),
+					'dependencies' => array(
+						'ext.tmh.video-js',
+						'ext.tmh.OgvJs',
+					),
+				),
 				// 'ext.tmh.videojs-offset' => $baseExtensionResource + array(
 					// 'scripts' => 'resources/videojs-offset/videojs-offset.js',
 					// 'targets' => array( 'mobile', 'desktop' ),
@@ -215,6 +221,7 @@ class TimedMediaHandlerHooks {
 					'targets' => array( 'mobile', 'desktop' ),
 					'dependencies' => array(
 						'ext.tmh.video-js',
+						'ext.tmh.videojs-ogvjs',
 						'ext.tmh.videojs-resolution-switcher',
 						// 'ext.tmh.videojs-offset',
 					),
