@@ -87,23 +87,6 @@ class TimedMediaHandlerHooks {
 						'position' => 'top',
 					),
 			);
-			// Add OgvJs-related modules for Safari/IE/Edge Ogg playback
-			$resourceModules += array(
-				'ext.tmh.OgvJsSupport' => $baseExtensionResource + array(
-						'scripts' => array(
-							'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv-support.js',
-							'resources/ext.tmh.OgvJsSupport.js',
-						),
-						'targets' => array( 'mobile', 'desktop' ),
-					),
-				'ext.tmh.OgvJs' => $baseExtensionResource + array(
-						'scripts' => array(
-							'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv.js',
-						),
-						'dependencies' => 'ext.tmh.OgvJsSupport',
-						'targets' => array( 'mobile', 'desktop' ),
-					),
-			);
 		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
 			$resourceModules = array(
 				'ext.tmh.video-js' => $baseExtensionResource + array(
@@ -263,7 +246,22 @@ class TimedMediaHandlerHooks {
 			),
 			'ext.tmh.TimedTextSelector' =>  $baseExtensionResource + array(
 				'scripts' => 'resources/ext.tmh.TimedTextSelector.js',
-			)
+			),
+			// Add OgvJs-related modules for Safari/IE/Edge Ogg playback
+			'ext.tmh.OgvJsSupport' => $baseExtensionResource + array(
+				'scripts' => array(
+					'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv-support.js',
+					'resources/ext.tmh.OgvJsSupport.js',
+				),
+				'targets' => array( 'mobile', 'desktop' ),
+			),
+			'ext.tmh.OgvJs' => $baseExtensionResource + array(
+				'scripts' => array(
+					'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv.js',
+				),
+				'dependencies' => 'ext.tmh.OgvJsSupport',
+				'targets' => array( 'mobile', 'desktop' ),
+			),
 		);
 
 		// Setup a hook for iframe embed handling:
