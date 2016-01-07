@@ -321,13 +321,6 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			}
 		}
 
-		$width = $sizeOverride ? $sizeOverride[0] : $this->getPlayerWidth();
-		if ( $this->fillwindow ) {
-			$width = '100%';
-		} else {
-			$width .= 'px';
-		}
-
 		if ( $wgTmhWebPlayer === 'videojs' ) {
 			// Build the video tag output:
 			$s = Html::rawElement( $this->getTagName(), $this->getMediaAttr( $sizeOverride, $autoPlay ),
@@ -344,6 +337,13 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			);
 			return $s;
 		} // else mwEmbed player
+
+		$width = $sizeOverride ? $sizeOverride[0] : $this->getPlayerWidth();
+		if ( $this->fillwindow ) {
+			$width = '100%';
+		} else {
+			$width .= 'px';
+		}
 
 		// Build the video tag output:
 		$s = Xml::tags( 'div', array(
@@ -404,14 +404,6 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 		// The poster url:
 		$posterUrl = $this->getUrl( $sizeOverride );
 
-		if ( $this->fillwindow ) {
-			$width = '100%';
-			$height = '100%';
-		} else {
-			$width .= 'px';
-			$height .= 'px';
-		}
-
 		$mediaAttr = array(
 			'id' => self::PLAYER_ID_PREFIX . TimedMediaTransformOutput::$serial++,
 			// Get the correct size:
@@ -423,6 +415,9 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			// Since we will reload the item with javascript,
 			// tell browser to not load the video before
 			'preload'=>'none',
+
+			'width' => intval( $width ),
+			'height' => intval( $height ),
 		);
 
 		if ( $autoPlay === true ) {
@@ -431,10 +426,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 
 		if ( $wgTmhWebPlayer === 'videojs' ) {
 			$mediaAttr['class'] = 'video-js ' . $wgVideoPlayerSkin;
-			$mediaAttr['width'] = $width;
-			if ( $this->isVideo ) {
-				$mediaAttr['height'] = $height;
-			} else {
+			if ( !$this->isVideo ) {
 				unset( $mediaAttr['height'] );
 				unset( $mediaAttr['poster'] );
 			}
@@ -443,10 +435,18 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 				$mediaAttr[ 'controls' ] = false;
 			}
 		} else {
-			$mediaAttr['style'] = "width:{$width}";
+			if ( $this->fillwindow ) {
+				$width = '100%';
+				$height = '100%';
+			} else {
+				$width .= 'px';
+				$height .= 'px';
+			}
 
+			// Yuck inline styles.. but fixing the script is too much work
+			$mediaAttr['style'] = "width:{$width};";
 			if ( $this->isVideo ) {
-				$mediaAttr['style'] .= ";height:{$height}";
+				$mediaAttr['style'] .= ";height:{$height};";
 			}
 
 			// MediaWiki uses the kSkin class
