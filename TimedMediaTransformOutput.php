@@ -328,13 +328,6 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			}
 		}
 
-		$width = $sizeOverride ? $sizeOverride[0] : $this->getPlayerWidth();
-		if ( $this->fillwindow ) {
-			$width = '100%';
-		} else {
-			$width .= 'px';
-		}
-
 		// Build the video tag output:
 		$s = Html::rawElement( $this->getTagName(), $this->getMediaAttr( $sizeOverride, $autoPlay ),
 			// The set of media sources:
@@ -352,6 +345,13 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 		if ( $wgTmhWebPlayer === 'videojs' ) {
 			return $s;
 		} // else mwEmbed player
+
+		$width = $sizeOverride ? $sizeOverride[0] : $this->getPlayerWidth();
+		if ( $this->fillwindow ) {
+			$width = '100%';
+		} else {
+			$width .= 'px';
+		}
 
 		// Build the video tag output:
 		return Xml::tags( 'div', [
@@ -423,13 +423,17 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			$mediaAttr['autoplay'] = 'true';
 		}
 
+		if ( $this->isVideo ) {
+			// Only <video> has width and height attribs
+			$mediaAttr['width'] = intval( $width );
+			$mediaAttr['height'] = intval( $height );
+		}
+
 		if ( $wgTmhWebPlayer === 'videojs' ) {
 			$mediaAttr['class'] = 'video-js ' . $wgVideoPlayerSkin;
-			$mediaAttr['width'] = intval( $width );
-			if ( $this->isVideo ) {
-				$mediaAttr['height'] = intval( $height );
-			} else {
-				unset( $mediaAttr['height'] );
+			if ( !$this->isVideo ) {
+				// Yuck inline styles.. But can't build a stylesheet here: T60478
+				$mediaAttr['style'] = "width:{$width};";
 				unset( $mediaAttr['poster'] );
 			}
 
@@ -437,10 +441,10 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 				$mediaAttr[ 'controls' ] = false;
 			}
 		} else {
-			$mediaAttr['style'] = "width:{$width}";
-
+			// Yuck inline styles.. but fixing the script is too much work
+			$mediaAttr['style'] = "width:{$width};";
 			if ( $this->isVideo ) {
-				$mediaAttr['style'] .= ";height:{$height}";
+				$mediaAttr['style'] .= "height:{$height};";
 			}
 
 			// MediaWiki uses the kSkin class
