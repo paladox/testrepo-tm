@@ -15,7 +15,12 @@ class TimedMediaHandlerHooks {
 		$wgResourceModules, $wgExcludeFromThumbnailPurge, $wgExtraNamespaces, $wgParserOutputHooks,
 		$wgTimedTextNS, $wgFileExtensions, $wgTmhEnableMp4Uploads, $wgExtensionAssetsPath,
 		$wgMwEmbedModuleConfig, $wgEnableLocalTimedText, $wgTmhFileExtensions,
-		$wgTmhTheoraTwoPassEncoding, $wgTmhWebPlayer;
+		$wgTmhTheoraTwoPassEncoding, $wgTmhWebPlayer, $wgEnableTranscode, $wgWikimediaJenkinsCI;
+
+		// set config for parser tests
+		if ( isset( $wgWikimediaJenkinsCI ) && $wgWikimediaJenkinsCI  === true ) {
+			$wgEnableTranscode = false;			
+		}
 
 		// Remove mp4 if not enabled:
 		if ( $wgTmhEnableMp4Uploads === false ) {
