@@ -42,11 +42,11 @@
 					'mediawiki.client',
 					'mediawiki.UtilitiesTime',
 					'mediawiki.Uri',
-					'mediawiki.absoluteUrl',
+					'mediawiki.UtilitiesUrl',
 					'mediawiki.jqueryMsg',
 
 					// Browser fullscreen api support:
-					'fullScreenApi',
+					'screenfull',
 
 					// Kinda need this
 					'mw.MwEmbedSupport',
