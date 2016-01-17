@@ -1,6 +1,6 @@
 /**
  * @license
- * Video.js 5.3.0 <http://videojs.com/>
+ * Video.js 5.5.3 <http://videojs.com/>
  * Copyright Brightcove, Inc. <https://www.brightcove.com/>
  * Available under Apache License Version 2.0
  * <https://github.com/videojs/video.js/blob/master/LICENSE>
@@ -2879,7 +2879,7 @@ _component2['default'].registerComponent('Button', Button);
 exports['default'] = Button;
 module.exports = exports['default'];
 
-},{"./component":65,"./utils/dom.js":126,"./utils/events.js":127,"./utils/fn.js":128,"global/document":1,"object.assign":45}],64:[function(_dereq_,module,exports){
+},{"./component":65,"./utils/dom.js":128,"./utils/events.js":129,"./utils/fn.js":130,"global/document":1,"object.assign":45}],64:[function(_dereq_,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -4435,7 +4435,7 @@ Component.registerComponent('Component', Component);
 exports['default'] = Component;
 module.exports = exports['default'];
 
-},{"./utils/dom.js":126,"./utils/events.js":127,"./utils/fn.js":128,"./utils/guid.js":130,"./utils/log.js":131,"./utils/merge-options.js":132,"./utils/to-title-case.js":135,"global/window":2,"object.assign":45}],66:[function(_dereq_,module,exports){
+},{"./utils/dom.js":128,"./utils/events.js":129,"./utils/fn.js":130,"./utils/guid.js":132,"./utils/log.js":133,"./utils/merge-options.js":134,"./utils/to-title-case.js":137,"global/window":2,"object.assign":45}],66:[function(_dereq_,module,exports){
 /**
  * @file control-bar.js
  */
@@ -4716,7 +4716,7 @@ _component2['default'].registerComponent('LiveDisplay', LiveDisplay);
 exports['default'] = LiveDisplay;
 module.exports = exports['default'];
 
-},{"../component":65,"../utils/dom.js":126}],69:[function(_dereq_,module,exports){
+},{"../component":65,"../utils/dom.js":128}],69:[function(_dereq_,module,exports){
 /**
  * @file mute-toggle.js
  */
@@ -4843,7 +4843,7 @@ _component2['default'].registerComponent('MuteToggle', MuteToggle);
 exports['default'] = MuteToggle;
 module.exports = exports['default'];
 
-},{"../button":63,"../component":65,"../utils/dom.js":126}],70:[function(_dereq_,module,exports){
+},{"../button":63,"../component":65,"../utils/dom.js":128}],70:[function(_dereq_,module,exports){
 /**
  * @file play-toggle.js
  */
@@ -5145,7 +5145,7 @@ _componentJs2['default'].registerComponent('PlaybackRateMenuButton', PlaybackRat
 exports['default'] = PlaybackRateMenuButton;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../menu/menu-button.js":102,"../../menu/menu.js":104,"../../utils/dom.js":126,"./playback-rate-menu-item.js":72}],72:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../menu/menu-button.js":102,"../../menu/menu.js":104,"../../utils/dom.js":128,"./playback-rate-menu-item.js":72}],72:[function(_dereq_,module,exports){
 /**
  * @file playback-rate-menu-item.js
  */
@@ -5332,7 +5332,7 @@ _componentJs2['default'].registerComponent('LoadProgressBar', LoadProgressBar);
 exports['default'] = LoadProgressBar;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../utils/dom.js":126}],74:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../utils/dom.js":128}],74:[function(_dereq_,module,exports){
 /**
  * @file mouse-time-display.js
  */
@@ -5434,7 +5434,7 @@ _componentJs2['default'].registerComponent('MouseTimeDisplay', MouseTimeDisplay)
 exports['default'] = MouseTimeDisplay;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../utils/dom.js":126,"../../utils/fn.js":128,"../../utils/format-time.js":129,"lodash-compat/function/throttle":7}],75:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../utils/dom.js":128,"../../utils/fn.js":130,"../../utils/format-time.js":131,"lodash-compat/function/throttle":7}],75:[function(_dereq_,module,exports){
 /**
  * @file play-progress-bar.js
  */
@@ -5509,7 +5509,7 @@ _componentJs2['default'].registerComponent('PlayProgressBar', PlayProgressBar);
 exports['default'] = PlayProgressBar;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../utils/fn.js":128,"../../utils/format-time.js":129}],76:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../utils/fn.js":130,"../../utils/format-time.js":131}],76:[function(_dereq_,module,exports){
 /**
  * @file progress-control.js
  */
@@ -5764,7 +5764,7 @@ _componentJs2['default'].registerComponent('SeekBar', SeekBar);
 exports['default'] = SeekBar;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../slider/slider.js":110,"../../utils/fn.js":128,"../../utils/format-time.js":129,"./load-progress-bar.js":73,"./play-progress-bar.js":75,"object.assign":45}],78:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../slider/slider.js":110,"../../utils/fn.js":130,"../../utils/format-time.js":131,"./load-progress-bar.js":73,"./play-progress-bar.js":75,"object.assign":45}],78:[function(_dereq_,module,exports){
 /**
  * @file custom-control-spacer.js
  */
@@ -6198,25 +6198,19 @@ var ChaptersButton = (function (_TextTrackButton) {
    */
 
   ChaptersButton.prototype.createMenu = function createMenu() {
+    var _this = this;
+
     var tracks = this.player_.textTracks() || [];
     var chaptersTrack = undefined;
     var items = this.items = [];
 
-    for (var i = 0, l = tracks.length; i < l; i++) {
+    for (var i = 0, _length = tracks.length; i < _length; i++) {
       var track = tracks[i];
+
       if (track['kind'] === this.kind_) {
-        if (!track.cues) {
-          track['mode'] = 'hidden';
-          /* jshint loopfunc:true */
-          // TODO see if we can figure out a better way of doing this https://github.com/videojs/video.js/issues/1864
-          _globalWindow2['default'].setTimeout(Fn.bind(this, function () {
-            this.createMenu();
-          }), 100);
-          /* jshint loopfunc:false */
-        } else {
-            chaptersTrack = track;
-            break;
-          }
+        chaptersTrack = track;
+
+        break;
       }
     }
 
@@ -6230,7 +6224,19 @@ var ChaptersButton = (function (_TextTrackButton) {
       }));
     }
 
-    if (chaptersTrack) {
+    if (chaptersTrack && chaptersTrack.cues == null) {
+      chaptersTrack['mode'] = 'hidden';
+
+      var remoteTextTrackEl = this.player_.remoteTextTrackEls().getTrackElementByTrack_(chaptersTrack);
+
+      if (remoteTextTrackEl) {
+        remoteTextTrackEl.addEventListener('load', function (event) {
+          return _this.update();
+        });
+      }
+    }
+
+    if (chaptersTrack && chaptersTrack.cues && chaptersTrack.cues.length > 0) {
       var cues = chaptersTrack['cues'],
           cue = undefined;
 
@@ -6246,6 +6252,7 @@ var ChaptersButton = (function (_TextTrackButton) {
 
         menu.addChild(mi);
       }
+
       this.addChild(menu);
     }
 
@@ -6266,7 +6273,7 @@ _componentJs2['default'].registerComponent('ChaptersButton', ChaptersButton);
 exports['default'] = ChaptersButton;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../menu/menu.js":104,"../../utils/dom.js":126,"../../utils/fn.js":128,"../../utils/to-title-case.js":135,"./chapters-track-menu-item.js":83,"./text-track-button.js":86,"./text-track-menu-item.js":87,"global/window":2}],83:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../menu/menu.js":104,"../../utils/dom.js":128,"../../utils/fn.js":130,"../../utils/to-title-case.js":137,"./chapters-track-menu-item.js":83,"./text-track-button.js":86,"./text-track-menu-item.js":87,"global/window":2}],83:[function(_dereq_,module,exports){
 /**
  * @file chapters-track-menu-item.js
  */
@@ -6356,7 +6363,7 @@ _componentJs2['default'].registerComponent('ChaptersTrackMenuItem', ChaptersTrac
 exports['default'] = ChaptersTrackMenuItem;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../menu/menu-item.js":103,"../../utils/fn.js":128}],84:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../menu/menu-item.js":103,"../../utils/fn.js":130}],84:[function(_dereq_,module,exports){
 /**
  * @file off-text-track-menu-item.js
  */
@@ -6607,7 +6614,7 @@ _componentJs2['default'].registerComponent('TextTrackButton', TextTrackButton);
 exports['default'] = TextTrackButton;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../menu/menu-button.js":102,"../../utils/fn.js":128,"./off-text-track-menu-item.js":84,"./text-track-menu-item.js":87}],87:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../menu/menu-button.js":102,"../../utils/fn.js":130,"./off-text-track-menu-item.js":84,"./text-track-menu-item.js":87}],87:[function(_dereq_,module,exports){
 /**
  * @file text-track-menu-item.js
  */
@@ -6756,7 +6763,7 @@ _componentJs2['default'].registerComponent('TextTrackMenuItem', TextTrackMenuIte
 exports['default'] = TextTrackMenuItem;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../menu/menu-item.js":103,"../../utils/fn.js":128,"global/document":1,"global/window":2}],88:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../menu/menu-item.js":103,"../../utils/fn.js":130,"global/document":1,"global/window":2}],88:[function(_dereq_,module,exports){
 /**
  * @file current-time-display.js
  */
@@ -6850,7 +6857,7 @@ _componentJs2['default'].registerComponent('CurrentTimeDisplay', CurrentTimeDisp
 exports['default'] = CurrentTimeDisplay;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../utils/dom.js":126,"../../utils/format-time.js":129}],89:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../utils/dom.js":128,"../../utils/format-time.js":131}],89:[function(_dereq_,module,exports){
 /**
  * @file duration-display.js
  */
@@ -6951,7 +6958,7 @@ _componentJs2['default'].registerComponent('DurationDisplay', DurationDisplay);
 exports['default'] = DurationDisplay;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../utils/dom.js":126,"../../utils/format-time.js":129}],90:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../utils/dom.js":128,"../../utils/format-time.js":131}],90:[function(_dereq_,module,exports){
 /**
  * @file remaining-time-display.js
  */
@@ -7049,7 +7056,7 @@ _componentJs2['default'].registerComponent('RemainingTimeDisplay', RemainingTime
 exports['default'] = RemainingTimeDisplay;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../utils/dom.js":126,"../../utils/format-time.js":129}],91:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../utils/dom.js":128,"../../utils/format-time.js":131}],91:[function(_dereq_,module,exports){
 /**
  * @file time-divider.js
  */
@@ -7252,7 +7259,7 @@ _componentJs2['default'].registerComponent('VolumeBar', VolumeBar);
 exports['default'] = VolumeBar;
 module.exports = exports['default'];
 
-},{"../../component.js":65,"../../slider/slider.js":110,"../../utils/fn.js":128,"./volume-level.js":94}],93:[function(_dereq_,module,exports){
+},{"../../component.js":65,"../../slider/slider.js":110,"../../utils/fn.js":130,"./volume-level.js":94}],93:[function(_dereq_,module,exports){
 /**
  * @file volume-control.js
  */
@@ -7395,6 +7402,8 @@ module.exports = exports['default'];
 
 exports.__esModule = true;
 
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
@@ -7404,6 +7413,10 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 var _buttonJs = _dereq_('../button.js');
 
 var _buttonJs2 = _interopRequireDefault(_buttonJs);
+
+var _utilsFnJs = _dereq_('../utils/fn.js');
+
+var Fn = _interopRequireWildcard(_utilsFnJs);
 
 var _componentJs = _dereq_('../component.js');
 
@@ -7424,6 +7437,10 @@ var _muteToggleJs2 = _interopRequireDefault(_muteToggleJs);
 var _volumeControlVolumeBarJs = _dereq_('./volume-control/volume-bar.js');
 
 var _volumeControlVolumeBarJs2 = _interopRequireDefault(_volumeControlVolumeBarJs);
+
+var _globalDocument = _dereq_('global/document');
+
+var _globalDocument2 = _interopRequireDefault(_globalDocument);
 
 /**
  * Button for volume menu
@@ -7525,6 +7542,9 @@ var VolumeMenuButton = (function (_MenuButton) {
     menu.addChild(vb);
 
     this.volumeBar = vb;
+
+    this.attachVolumeBarEvents();
+
     return menu;
   };
 
@@ -7539,6 +7559,19 @@ var VolumeMenuButton = (function (_MenuButton) {
     _MenuButton.prototype.handleClick.call(this);
   };
 
+  VolumeMenuButton.prototype.attachVolumeBarEvents = function attachVolumeBarEvents() {
+    this.on(['mousedown', 'touchdown'], this.handleMouseDown);
+  };
+
+  VolumeMenuButton.prototype.handleMouseDown = function handleMouseDown(event) {
+    this.on(['mousemove', 'touchmove'], Fn.bind(this.volumeBar, this.volumeBar.handleMouseMove));
+    this.on(_globalDocument2['default'], ['mouseup', 'touchend'], this.handleMouseUp);
+  };
+
+  VolumeMenuButton.prototype.handleMouseUp = function handleMouseUp(event) {
+    this.off(['mousemove', 'touchmove'], Fn.bind(this.volumeBar, this.volumeBar.handleMouseMove));
+  };
+
   return VolumeMenuButton;
 })(_menuMenuButtonJs2['default']);
 
@@ -7549,7 +7582,7 @@ _componentJs2['default'].registerComponent('VolumeMenuButton', VolumeMenuButton)
 exports['default'] = VolumeMenuButton;
 module.exports = exports['default'];
 
-},{"../button.js":63,"../component.js":65,"../menu/menu-button.js":102,"../menu/menu.js":104,"./mute-toggle.js":69,"./volume-control/volume-bar.js":92}],96:[function(_dereq_,module,exports){
+},{"../button.js":63,"../component.js":65,"../menu/menu-button.js":102,"../menu/menu.js":104,"../utils/fn.js":130,"./mute-toggle.js":69,"./volume-control/volume-bar.js":92,"global/document":1}],96:[function(_dereq_,module,exports){
 /**
  * @file error-display.js
  */
@@ -7635,6 +7668,7 @@ var ErrorDisplay = (function (_ModalDialog) {
 
 ErrorDisplay.prototype.options_ = _utilsMergeOptions2['default'](_modalDialog2['default'].prototype.options_, {
   fillAlways: true,
+  temporary: false,
   uncloseable: true
 });
 
@@ -7642,7 +7676,7 @@ _component2['default'].registerComponent('ErrorDisplay', ErrorDisplay);
 exports['default'] = ErrorDisplay;
 module.exports = exports['default'];
 
-},{"./component":65,"./modal-dialog":105,"./utils/dom":126,"./utils/merge-options":132}],97:[function(_dereq_,module,exports){
+},{"./component":65,"./modal-dialog":105,"./utils/dom":128,"./utils/merge-options":134}],97:[function(_dereq_,module,exports){
 /**
  * @file event-target.js
  */
@@ -7701,7 +7735,7 @@ EventTarget.prototype.dispatchEvent = EventTarget.prototype.trigger;
 exports['default'] = EventTarget;
 module.exports = exports['default'];
 
-},{"./utils/events.js":127}],98:[function(_dereq_,module,exports){
+},{"./utils/events.js":129}],98:[function(_dereq_,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -7792,7 +7826,7 @@ var extendFn = function extendFn(superClass) {
 exports['default'] = extendFn;
 module.exports = exports['default'];
 
-},{"./utils/log":131}],99:[function(_dereq_,module,exports){
+},{"./utils/log":133}],99:[function(_dereq_,module,exports){
 /**
  * @file fullscreen-api.js
  */
@@ -8269,7 +8303,7 @@ _componentJs2['default'].registerComponent('MenuButton', MenuButton);
 exports['default'] = MenuButton;
 module.exports = exports['default'];
 
-},{"../button.js":63,"../component.js":65,"../utils/dom.js":126,"../utils/fn.js":128,"../utils/to-title-case.js":135,"./menu.js":104}],103:[function(_dereq_,module,exports){
+},{"../button.js":63,"../component.js":65,"../utils/dom.js":128,"../utils/fn.js":130,"../utils/to-title-case.js":137,"./menu.js":104}],103:[function(_dereq_,module,exports){
 /**
  * @file menu-item.js
  */
@@ -8462,7 +8496,7 @@ _componentJs2['default'].registerComponent('Menu', Menu);
 exports['default'] = Menu;
 module.exports = exports['default'];
 
-},{"../component.js":65,"../utils/dom.js":126,"../utils/events.js":127,"../utils/fn.js":128}],105:[function(_dereq_,module,exports){
+},{"../component.js":65,"../utils/dom.js":128,"../utils/events.js":129,"../utils/fn.js":130}],105:[function(_dereq_,module,exports){
 /**
  * @file modal-dialog.js
  */
@@ -8885,7 +8919,7 @@ _component2['default'].registerComponent('ModalDialog', ModalDialog);
 exports['default'] = ModalDialog;
 module.exports = exports['default'];
 
-},{"./close-button":64,"./component":65,"./utils/dom":126,"./utils/fn":128,"./utils/log":131,"global/document":1}],106:[function(_dereq_,module,exports){
+},{"./close-button":64,"./component":65,"./utils/dom":128,"./utils/fn":130,"./utils/log":133,"global/document":1}],106:[function(_dereq_,module,exports){
 /**
  * @file player.js
  */
@@ -9222,7 +9256,7 @@ var Player = (function (_Component) {
     // prevent dispose from being called twice
     this.off('dispose');
 
-    if (this.styleEl_) {
+    if (this.styleEl_ && this.styleEl_.parentNode) {
       this.styleEl_.parentNode.removeChild(this.styleEl_);
     }
 
@@ -9274,6 +9308,7 @@ var Player = (function (_Component) {
     // Update tag id/class for use as HTML5 playback tech
     // Might think we should do this after embedding in container so .vjs-tech class
     // doesn't flash 100% width/height, but class only applies with .video-js parent
+    tag.playerId = tag.id;
     tag.id += '_html5_api';
     tag.className = 'vjs-tech';
 
@@ -9617,6 +9652,26 @@ var Player = (function (_Component) {
   };
 
   /**
+   * Return a reference to the current tech.
+   * It will only return a reference to the tech if given an object with the
+   * `IWillNotUseThisInPlugins` property on it. This is try and prevent misuse
+   * of techs by plugins.
+   *
+   * @param {Object}
+   * @return {Object} The Tech
+   * @method tech
+   */
+
+  Player.prototype.tech = function tech(safety) {
+    if (safety && safety.IWillNotUseThisInPlugins) {
+      return this.tech_;
+    }
+    var errorText = '\n      Please make sure that you are not using this inside of a plugin.\n      To disable this alert and error, please pass in an object with\n      `IWillNotUseThisInPlugins` to the `tech` method. See\n      https://github.com/videojs/video.js/issues/2617 for more info.\n    ';
+    _globalWindow2['default'].alert(errorText);
+    throw new Error(errorText);
+  };
+
+  /**
    * Set up click and touch listeners for the playback element
    *
    * On desktops, a click on the video itself will toggle playback,
@@ -9703,7 +9758,7 @@ var Player = (function (_Component) {
     // In Safari (5.1.1), when we move the video element into the container div, autoplay doesn't work.
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
     // This fixes both issues. Need to wait for API, so it updates displays correctly
-    if (this.tag && this.options_.autoplay && this.paused()) {
+    if (this.src() && this.tag && this.options_.autoplay && this.paused()) {
       delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
       this.play();
     }
@@ -10971,6 +11026,20 @@ var Player = (function (_Component) {
   };
 
   /**
+   * Reset the player. Loads the first tech in the techOrder,
+   * and calls `reset` on the tech`.
+   *
+   * @return {Player} Returns the player
+   * @method reset
+   */
+
+  Player.prototype.reset = function reset() {
+    this.loadTech_(_utilsToTitleCaseJs2['default'](this.options_.techOrder[0]), null);
+    this.techCall_('reset');
+    return this;
+  };
+
+  /**
    * Returns the fully qualified URL of the current source value e.g. http://mysite.com/video.mp4
    * Can be used in conjuction with `currentType` to assist in rebuilding the current source object.
    *
@@ -11016,7 +11085,7 @@ var Player = (function (_Component) {
   /**
    * Get or set the autoplay attribute.
    *
-   * @param {Boolean} value Boolean to determine if preload should be used
+   * @param {Boolean} value Boolean to determine if video should autoplay
    * @return {String} The autoplay attribute value when getting
    * @return {Player} Returns the player when setting
    * @method autoplay
@@ -11034,7 +11103,7 @@ var Player = (function (_Component) {
   /**
    * Get or set the loop attribute on the video element.
    *
-   * @param {Boolean} value Boolean to determine if preload should be used
+   * @param {Boolean} value Boolean to determine if video should loop
    * @return {String} The loop attribute value when getting
    * @return {Player} Returns the player when setting
    * @method loop
@@ -11557,6 +11626,17 @@ var Player = (function (_Component) {
   };
 
   /**
+   * Get an array of remote html track elements
+   *
+   * @return {HTMLTrackElement[]}
+   * @method remoteTextTrackEls
+   */
+
+  Player.prototype.remoteTextTrackEls = function remoteTextTrackEls() {
+    return this.tech_ && this.tech_['remoteTextTrackEls']();
+  };
+
+  /**
    * Add a text track
    * In addition to the W3C settings we allow adding additional info through options.
    * http://www.w3.org/html/wg/drafts/html/master/embedded-content-0.html#dom-media-addtexttrack
@@ -11886,7 +11966,7 @@ exports['default'] = Player;
 module.exports = exports['default'];
 // If empty string, make it a parsable json object.
 
-},{"./big-play-button.js":62,"./component.js":65,"./control-bar/control-bar.js":66,"./error-display.js":96,"./fullscreen-api.js":99,"./loading-spinner.js":100,"./media-error.js":101,"./modal-dialog":105,"./poster-image.js":108,"./tech/html5.js":113,"./tech/loader.js":114,"./tech/tech.js":115,"./tracks/text-track-display.js":117,"./tracks/text-track-list-converter.js":119,"./tracks/text-track-settings.js":121,"./utils/browser.js":123,"./utils/buffer.js":124,"./utils/dom.js":126,"./utils/events.js":127,"./utils/fn.js":128,"./utils/guid.js":130,"./utils/log.js":131,"./utils/merge-options.js":132,"./utils/stylesheet.js":133,"./utils/time-ranges.js":134,"./utils/to-title-case.js":135,"global/document":1,"global/window":2,"object.assign":45,"safe-json-parse/tuple":53}],107:[function(_dereq_,module,exports){
+},{"./big-play-button.js":62,"./component.js":65,"./control-bar/control-bar.js":66,"./error-display.js":96,"./fullscreen-api.js":99,"./loading-spinner.js":100,"./media-error.js":101,"./modal-dialog":105,"./poster-image.js":108,"./tech/html5.js":113,"./tech/loader.js":114,"./tech/tech.js":115,"./tracks/text-track-display.js":119,"./tracks/text-track-list-converter.js":121,"./tracks/text-track-settings.js":123,"./utils/browser.js":125,"./utils/buffer.js":126,"./utils/dom.js":128,"./utils/events.js":129,"./utils/fn.js":130,"./utils/guid.js":132,"./utils/log.js":133,"./utils/merge-options.js":134,"./utils/stylesheet.js":135,"./utils/time-ranges.js":136,"./utils/to-title-case.js":137,"global/document":1,"global/window":2,"object.assign":45,"safe-json-parse/tuple":53}],107:[function(_dereq_,module,exports){
 /**
  * @file plugins.js
  */
@@ -12074,7 +12154,7 @@ _componentJs2['default'].registerComponent('PosterImage', PosterImage);
 exports['default'] = PosterImage;
 module.exports = exports['default'];
 
-},{"./button.js":63,"./component.js":65,"./utils/browser.js":123,"./utils/dom.js":126,"./utils/fn.js":128}],109:[function(_dereq_,module,exports){
+},{"./button.js":63,"./component.js":65,"./utils/browser.js":125,"./utils/dom.js":128,"./utils/fn.js":130}],109:[function(_dereq_,module,exports){
 /**
  * @file setup.js
  *
@@ -12184,7 +12264,7 @@ exports.autoSetup = autoSetup;
 exports.autoSetupTimeout = autoSetupTimeout;
 exports.hasLoaded = hasLoaded;
 
-},{"./utils/events.js":127,"global/document":1,"global/window":2}],110:[function(_dereq_,module,exports){
+},{"./utils/events.js":129,"global/document":1,"global/window":2}],110:[function(_dereq_,module,exports){
 /**
  * @file slider.js
  */
@@ -12463,7 +12543,7 @@ _componentJs2['default'].registerComponent('Slider', Slider);
 exports['default'] = Slider;
 module.exports = exports['default'];
 
-},{"../component.js":65,"../utils/dom.js":126,"global/document":1,"object.assign":45}],111:[function(_dereq_,module,exports){
+},{"../component.js":65,"../utils/dom.js":128,"global/document":1,"object.assign":45}],111:[function(_dereq_,module,exports){
 /**
  * @file flash-rtmp.js
  */
@@ -13197,7 +13277,7 @@ _tech2['default'].registerTech('Flash', Flash);
 exports['default'] = Flash;
 module.exports = exports['default'];
 
-},{"../component":65,"../utils/dom.js":126,"../utils/time-ranges.js":134,"../utils/url.js":136,"./flash-rtmp":111,"./tech":115,"global/window":2,"object.assign":45}],113:[function(_dereq_,module,exports){
+},{"../component":65,"../utils/dom.js":128,"../utils/time-ranges.js":136,"../utils/url.js":138,"./flash-rtmp":111,"./tech":115,"global/window":2,"object.assign":45}],113:[function(_dereq_,module,exports){
 /**
  * @file html5.js
  * HTML5 Media Controller - Wrapper for HTML5 Media API
@@ -13297,6 +13377,7 @@ var Html5 = (function (_Tech) {
       while (nodesLength--) {
         var node = nodes[nodesLength];
         var nodeName = node.nodeName.toLowerCase();
+
         if (nodeName === 'track') {
           if (!this.featuresNativeTextTracks) {
             // Empty video tag tracks so the built-in player doesn't use them also.
@@ -13305,6 +13386,8 @@ var Html5 = (function (_Tech) {
             // captions and subtitles. videoElement.textTracks
             removeNodes.push(node);
           } else {
+            // store HTMLTrackElement and TextTrack to remote list
+            this.remoteTextTrackEls().addTrackElement_(node);
             this.remoteTextTracks().addTrack_(node.track);
           }
         }
@@ -13794,6 +13877,16 @@ var Html5 = (function (_Tech) {
   };
 
   /**
+   * Reset the tech. Removes all sources and calls `load`.
+   *
+   * @method reset
+   */
+
+  Html5.prototype.reset = function reset() {
+    Html5.resetMediaElement(this.el_);
+  };
+
+  /**
    * Get current source
    *
    * @return {Object}
@@ -14098,11 +14191,11 @@ var Html5 = (function (_Tech) {
   };
 
   /**
-   * Creates and returns a remote text track object
+   * Creates a remote text track object and returns a html track element
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @return {TextTrackObject}
+   * @return {HTMLTrackElement}
    * @method addRemoteTextTrack
    */
 
@@ -14113,32 +14206,34 @@ var Html5 = (function (_Tech) {
       return _Tech.prototype.addRemoteTextTrack.call(this, options);
     }
 
-    var track = _globalDocument2['default'].createElement('track');
+    var htmlTrackElement = _globalDocument2['default'].createElement('track');
 
-    if (options['kind']) {
-      track['kind'] = options['kind'];
+    if (options.kind) {
+      htmlTrackElement.kind = options.kind;
     }
-    if (options['label']) {
-      track['label'] = options['label'];
+    if (options.label) {
+      htmlTrackElement.label = options.label;
     }
-    if (options['language'] || options['srclang']) {
-      track['srclang'] = options['language'] || options['srclang'];
+    if (options.language || options.srclang) {
+      htmlTrackElement.srclang = options.language || options.srclang;
     }
     if (options['default']) {
-      track['default'] = options['default'];
+      htmlTrackElement['default'] = options['default'];
     }
-    if (options['id']) {
-      track['id'] = options['id'];
+    if (options.id) {
+      htmlTrackElement.id = options.id;
     }
-    if (options['src']) {
-      track['src'] = options['src'];
+    if (options.src) {
+      htmlTrackElement.src = options.src;
     }
 
-    this.el().appendChild(track);
+    this.el().appendChild(htmlTrackElement);
 
-    this.remoteTextTracks().addTrack_(track.track);
+    // store HTMLTrackElement and TextTrack to remote list
+    this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
+    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
 
-    return track;
+    return htmlTrackElement;
   };
 
   /**
@@ -14153,8 +14248,13 @@ var Html5 = (function (_Tech) {
       return _Tech.prototype.removeRemoteTextTrack.call(this, track);
     }
 
-    var tracks, i;
+    var tracks = undefined,
+        i = undefined;
 
+    var trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
+
+    // remove HTMLTrackElement and TextTrack from remote list
+    this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
 
     tracks = this.$$('track');
@@ -14442,12 +14542,37 @@ Html5.disposeMediaElement = function (el) {
   }
 };
 
+Html5.resetMediaElement = function (el) {
+  if (!el) {
+    return;
+  }
+
+  var sources = el.querySelectorAll('source');
+  var i = sources.length;
+  while (i--) {
+    el.removeChild(sources[i]);
+  }
+
+  // remove any src reference.
+  // not setting `src=''` because that throws an error
+  el.removeAttribute('src');
+
+  if (typeof el.load === 'function') {
+    // wrapping in an iife so it's not deoptimized (#1060#discussion_r10324473)
+    (function () {
+      try {
+        el.load();
+      } catch (e) {}
+    })();
+  }
+};
+
 _component2['default'].registerComponent('Html5', Html5);
 _techJs2['default'].registerTech('Html5', Html5);
 exports['default'] = Html5;
 module.exports = exports['default'];
 
-},{"../component":65,"../utils/browser.js":123,"../utils/dom.js":126,"../utils/fn.js":128,"../utils/log.js":131,"../utils/merge-options.js":132,"../utils/url.js":136,"./tech.js":115,"global/document":1,"global/window":2,"object.assign":45}],114:[function(_dereq_,module,exports){
+},{"../component":65,"../utils/browser.js":125,"../utils/dom.js":128,"../utils/fn.js":130,"../utils/log.js":133,"../utils/merge-options.js":134,"../utils/url.js":138,"./tech.js":115,"global/document":1,"global/window":2,"object.assign":45}],114:[function(_dereq_,module,exports){
 /**
  * @file loader.js
  */
@@ -14531,7 +14656,7 @@ _componentJs2['default'].registerComponent('MediaLoader', MediaLoader);
 exports['default'] = MediaLoader;
 module.exports = exports['default'];
 
-},{"../component.js":65,"../utils/to-title-case.js":135,"./tech.js":115,"global/window":2}],115:[function(_dereq_,module,exports){
+},{"../component.js":65,"../utils/to-title-case.js":137,"./tech.js":115,"global/window":2}],115:[function(_dereq_,module,exports){
 /**
  * @file tech.js
  * Media Technology Controller - Base class for media playback
@@ -14553,6 +14678,18 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 var _component = _dereq_('../component');
 
 var _component2 = _interopRequireDefault(_component);
+
+var _tracksHtmlTrackElement = _dereq_('../tracks/html-track-element');
+
+var _tracksHtmlTrackElement2 = _interopRequireDefault(_tracksHtmlTrackElement);
+
+var _tracksHtmlTrackElementList = _dereq_('../tracks/html-track-element-list');
+
+var _tracksHtmlTrackElementList2 = _interopRequireDefault(_tracksHtmlTrackElementList);
+
+var _utilsMergeOptionsJs = _dereq_('../utils/merge-options.js');
+
+var _utilsMergeOptionsJs2 = _interopRequireDefault(_utilsMergeOptionsJs);
 
 var _tracksTextTrack = _dereq_('../tracks/text-track');
 
@@ -14837,6 +14974,14 @@ var Tech = (function (_Component) {
   };
 
   /**
+   * Reset the tech. Removes all sources and resets readyState.
+   *
+   * @method reset
+   */
+
+  Tech.prototype.reset = function reset() {};
+
+  /**
    * When invoked without an argument, returns a MediaError object
    * representing the current error state of the player or null if
    * there is no error. When invoked with an argument, set the current
@@ -14987,6 +15132,18 @@ var Tech = (function (_Component) {
   };
 
   /**
+   * Get remote htmltrackelements
+   *
+   * @returns {HTMLTrackElementList}
+   * @method remoteTextTrackEls
+   */
+
+  Tech.prototype.remoteTextTrackEls = function remoteTextTrackEls() {
+    this.remoteTextTrackEls_ = this.remoteTextTrackEls_ || new _tracksHtmlTrackElementList2['default']();
+    return this.remoteTextTrackEls_;
+  };
+
+  /**
    * Creates and returns a remote text track object
    *
    * @param {String} kind Text track kind (subtitles, captions, descriptions
@@ -15006,20 +15163,29 @@ var Tech = (function (_Component) {
   };
 
   /**
-   * Creates and returns a remote text track object
+   * Creates a remote text track object and returns a emulated html track element
    *
    * @param {Object} options The object should contain values for
    * kind, language, label and src (location of the WebVTT file)
-   * @return {TextTrackObject}
+   * @return {HTMLTrackElement}
    * @method addRemoteTextTrack
    */
 
   Tech.prototype.addRemoteTextTrack = function addRemoteTextTrack(options) {
-    var track = createTrackHelper(this, options.kind, options.label, options.language, options);
-    this.remoteTextTracks().addTrack_(track);
-    return {
-      track: track
-    };
+    var track = _utilsMergeOptionsJs2['default'](options, {
+      tech: this
+    });
+
+    var htmlTrackElement = new _tracksHtmlTrackElement2['default'](track);
+
+    // store HTMLTrackElement and TextTrack to remote list
+    this.remoteTextTrackEls().addTrackElement_(htmlTrackElement);
+    this.remoteTextTracks().addTrack_(htmlTrackElement.track);
+
+    // must come after remoteTextTracks()
+    this.textTracks().addTrack_(htmlTrackElement.track);
+
+    return htmlTrackElement;
   };
 
   /**
@@ -15031,6 +15197,11 @@ var Tech = (function (_Component) {
 
   Tech.prototype.removeRemoteTextTrack = function removeRemoteTextTrack(track) {
     this.textTracks().removeTrack_(track);
+
+    var trackElement = this.remoteTextTrackEls().getTrackElementByTrack_(track);
+
+    // remove HTMLTrackElement and TextTrack from remote list
+    this.remoteTextTrackEls().removeTrackElement_(trackElement);
     this.remoteTextTracks().removeTrack_(track);
   };
 
@@ -15061,7 +15232,7 @@ var Tech = (function (_Component) {
   /*
    * Return whether the argument is a Tech or not.
    * Can be passed either a Class like `Html5` or a instance like `player.tech_`
-   * 
+   *
    * @param {Object} component An item to check
    * @return {Boolean}         Whether it is a tech or not
    */
@@ -15309,7 +15480,234 @@ Tech.registerTech('Tech', Tech);
 exports['default'] = Tech;
 module.exports = exports['default'];
 
-},{"../component":65,"../media-error.js":101,"../tracks/text-track":122,"../tracks/text-track-list":120,"../utils/buffer.js":124,"../utils/fn.js":128,"../utils/log.js":131,"../utils/time-ranges.js":134,"global/document":1,"global/window":2}],116:[function(_dereq_,module,exports){
+},{"../component":65,"../media-error.js":101,"../tracks/html-track-element":117,"../tracks/html-track-element-list":116,"../tracks/text-track":124,"../tracks/text-track-list":122,"../utils/buffer.js":126,"../utils/fn.js":130,"../utils/log.js":133,"../utils/merge-options.js":134,"../utils/time-ranges.js":136,"global/document":1,"global/window":2}],116:[function(_dereq_,module,exports){
+/**
+ * @file html-track-element-list.js
+ */
+
+'use strict';
+
+exports.__esModule = true;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+var _utilsBrowserJs = _dereq_('../utils/browser.js');
+
+var browser = _interopRequireWildcard(_utilsBrowserJs);
+
+var _globalDocument = _dereq_('global/document');
+
+var _globalDocument2 = _interopRequireDefault(_globalDocument);
+
+var HtmlTrackElementList = (function () {
+  function HtmlTrackElementList() {
+    var trackElements = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+
+    _classCallCheck(this, HtmlTrackElementList);
+
+    var list = this;
+
+    if (browser.IS_IE8) {
+      list = _globalDocument2['default'].createElement('custom');
+
+      for (var prop in HtmlTrackElementList.prototype) {
+        if (prop !== 'constructor') {
+          list[prop] = HtmlTrackElementList.prototype[prop];
+        }
+      }
+    }
+
+    list.trackElements_ = [];
+
+    Object.defineProperty(list, 'length', {
+      get: function get() {
+        return this.trackElements_.length;
+      }
+    });
+
+    for (var i = 0, _length = trackElements.length; i < _length; i++) {
+      list.addTrackElement_(trackElements[i]);
+    }
+
+    if (browser.IS_IE8) {
+      return list;
+    }
+  }
+
+  HtmlTrackElementList.prototype.addTrackElement_ = function addTrackElement_(trackElement) {
+    this.trackElements_.push(trackElement);
+  };
+
+  HtmlTrackElementList.prototype.getTrackElementByTrack_ = function getTrackElementByTrack_(track) {
+    var trackElement_ = undefined;
+
+    for (var i = 0, _length2 = this.trackElements_.length; i < _length2; i++) {
+      if (track === this.trackElements_[i].track) {
+        trackElement_ = this.trackElements_[i];
+
+        break;
+      }
+    }
+
+    return trackElement_;
+  };
+
+  HtmlTrackElementList.prototype.removeTrackElement_ = function removeTrackElement_(trackElement) {
+    for (var i = 0, _length3 = this.trackElements_.length; i < _length3; i++) {
+      if (trackElement === this.trackElements_[i]) {
+        this.trackElements_.splice(i, 1);
+
+        break;
+      }
+    }
+  };
+
+  return HtmlTrackElementList;
+})();
+
+exports['default'] = HtmlTrackElementList;
+module.exports = exports['default'];
+
+},{"../utils/browser.js":125,"global/document":1}],117:[function(_dereq_,module,exports){
+/**
+ * @file html-track-element.js
+ */
+
+'use strict';
+
+exports.__esModule = true;
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _utilsBrowserJs = _dereq_('../utils/browser.js');
+
+var browser = _interopRequireWildcard(_utilsBrowserJs);
+
+var _globalDocument = _dereq_('global/document');
+
+var _globalDocument2 = _interopRequireDefault(_globalDocument);
+
+var _eventTarget = _dereq_('../event-target');
+
+var _eventTarget2 = _interopRequireDefault(_eventTarget);
+
+var _tracksTextTrack = _dereq_('../tracks/text-track');
+
+var _tracksTextTrack2 = _interopRequireDefault(_tracksTextTrack);
+
+var NONE = 0;
+var LOADING = 1;
+var LOADED = 2;
+var ERROR = 3;
+
+/**
+ * https://html.spec.whatwg.org/multipage/embedded-content.html#htmltrackelement
+ *
+ * interface HTMLTrackElement : HTMLElement {
+ *   attribute DOMString kind;
+ *   attribute DOMString src;
+ *   attribute DOMString srclang;
+ *   attribute DOMString label;
+ *   attribute boolean default;
+ *
+ *   const unsigned short NONE = 0;
+ *   const unsigned short LOADING = 1;
+ *   const unsigned short LOADED = 2;
+ *   const unsigned short ERROR = 3;
+ *   readonly attribute unsigned short readyState;
+ *
+ *   readonly attribute TextTrack track;
+ * };
+ *
+ * @param {Object} options TextTrack configuration
+ * @class HTMLTrackElement
+ */
+
+var HTMLTrackElement = (function (_EventTarget) {
+  _inherits(HTMLTrackElement, _EventTarget);
+
+  function HTMLTrackElement() {
+    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+    _classCallCheck(this, HTMLTrackElement);
+
+    _EventTarget.call(this);
+
+    var readyState = undefined,
+        trackElement = this;
+
+    if (browser.IS_IE8) {
+      trackElement = _globalDocument2['default'].createElement('custom');
+
+      for (var prop in HTMLTrackElement.prototype) {
+        if (prop !== 'constructor') {
+          trackElement[prop] = HTMLTrackElement.prototype[prop];
+        }
+      }
+    }
+
+    var track = new _tracksTextTrack2['default'](options);
+
+    trackElement.kind = track.kind;
+    trackElement.src = track.src;
+    trackElement.srclang = track.language;
+    trackElement.label = track.label;
+    trackElement['default'] = track['default'];
+
+    Object.defineProperty(trackElement, 'readyState', {
+      get: function get() {
+        return readyState;
+      }
+    });
+
+    Object.defineProperty(trackElement, 'track', {
+      get: function get() {
+        return track;
+      }
+    });
+
+    readyState = NONE;
+
+    track.addEventListener('loadeddata', function () {
+      readyState = LOADED;
+
+      trackElement.trigger({
+        type: 'load',
+        target: trackElement
+      });
+    });
+
+    if (browser.IS_IE8) {
+      return trackElement;
+    }
+  }
+
+  return HTMLTrackElement;
+})(_eventTarget2['default']);
+
+HTMLTrackElement.prototype.allowedEvents_ = {
+  load: 'load'
+};
+
+HTMLTrackElement.NONE = NONE;
+HTMLTrackElement.LOADING = LOADING;
+HTMLTrackElement.LOADED = LOADED;
+HTMLTrackElement.ERROR = ERROR;
+
+exports['default'] = HTMLTrackElement;
+module.exports = exports['default'];
+
+},{"../event-target":97,"../tracks/text-track":124,"../utils/browser.js":125,"global/document":1}],118:[function(_dereq_,module,exports){
 /**
  * @file text-track-cue-list.js
  */
@@ -15408,7 +15806,7 @@ TextTrackCueList.prototype.getCueById = function (id) {
 exports['default'] = TextTrackCueList;
 module.exports = exports['default'];
 
-},{"../utils/browser.js":123,"global/document":1}],117:[function(_dereq_,module,exports){
+},{"../utils/browser.js":125,"global/document":1}],119:[function(_dereq_,module,exports){
 /**
  * @file text-track-display.js
  */
@@ -15602,7 +16000,12 @@ var TextTrackDisplay = (function (_Component) {
 
     var i = cues.length;
     while (i--) {
-      var cueDiv = cues[i].displayState;
+      var cue = cues[i];
+      if (!cue) {
+        continue;
+      }
+
+      var cueDiv = cue.displayState;
       if (overrides.color) {
         cueDiv.firstChild.style.color = overrides.color;
       }
@@ -15679,7 +16082,7 @@ _component2['default'].registerComponent('TextTrackDisplay', TextTrackDisplay);
 exports['default'] = TextTrackDisplay;
 module.exports = exports['default'];
 
-},{"../component":65,"../menu/menu-button.js":102,"../menu/menu-item.js":103,"../menu/menu.js":104,"../utils/fn.js":128,"global/document":1,"global/window":2}],118:[function(_dereq_,module,exports){
+},{"../component":65,"../menu/menu-button.js":102,"../menu/menu-item.js":103,"../menu/menu.js":104,"../utils/fn.js":130,"global/document":1,"global/window":2}],120:[function(_dereq_,module,exports){
 /**
  * @file text-track-enums.js
  *
@@ -15712,7 +16115,7 @@ var TextTrackKind = {
 exports.TextTrackMode = TextTrackMode;
 exports.TextTrackKind = TextTrackKind;
 
-},{}],119:[function(_dereq_,module,exports){
+},{}],121:[function(_dereq_,module,exports){
 /**
  * Utilities for capturing text track state and re-creating tracks
  * based on a capture.
@@ -15803,7 +16206,7 @@ var jsonToTextTracks = function jsonToTextTracks(json, tech) {
 exports['default'] = { textTracksToJson: textTracksToJson, jsonToTextTracks: jsonToTextTracks, trackToJson_: trackToJson_ };
 module.exports = exports['default'];
 
-},{}],120:[function(_dereq_,module,exports){
+},{}],122:[function(_dereq_,module,exports){
 /**
  * @file text-track-list.js
  */
@@ -15894,6 +16297,13 @@ for (var _event in TextTrackList.prototype.allowedEvents_) {
   TextTrackList.prototype['on' + _event] = null;
 }
 
+/**
+ * Add TextTrack from TextTrackList
+ *
+ * @param {TextTrack} track
+ * @method addTrack_
+ * @private
+ */
 TextTrackList.prototype.addTrack_ = function (track) {
   var index = this.tracks_.length;
   if (!('' + index in this)) {
@@ -15915,16 +16325,29 @@ TextTrackList.prototype.addTrack_ = function (track) {
   });
 };
 
+/**
+ * Remove TextTrack from TextTrackList
+ * NOTE: Be mindful of what is passed in as it may be a HTMLTrackElement
+ *
+ * @param {TextTrack} rtrack
+ * @method removeTrack_
+ * @private
+ */
 TextTrackList.prototype.removeTrack_ = function (rtrack) {
-  var result = null;
   var track = undefined;
 
   for (var i = 0, l = this.length; i < l; i++) {
-    track = this[i];
-    if (track === rtrack) {
+    if (this[i] === rtrack) {
+      track = this[i];
+
       this.tracks_.splice(i, 1);
+
       break;
     }
+  }
+
+  if (!track) {
+    return;
   }
 
   this.trigger({
@@ -15950,7 +16373,7 @@ TextTrackList.prototype.getTrackById = function (id) {
 exports['default'] = TextTrackList;
 module.exports = exports['default'];
 
-},{"../event-target":97,"../utils/browser.js":123,"../utils/fn.js":128,"global/document":1}],121:[function(_dereq_,module,exports){
+},{"../event-target":97,"../utils/browser.js":125,"../utils/fn.js":130,"global/document":1}],123:[function(_dereq_,module,exports){
 /**
  * @file text-track-settings.js
  */
@@ -16238,7 +16661,7 @@ function captionOptionsMenuTemplate() {
 exports['default'] = TextTrackSettings;
 module.exports = exports['default'];
 
-},{"../component":65,"../utils/events.js":127,"../utils/fn.js":128,"../utils/log.js":131,"global/window":2,"safe-json-parse/tuple":53}],122:[function(_dereq_,module,exports){
+},{"../component":65,"../utils/events.js":129,"../utils/fn.js":130,"../utils/log.js":133,"global/window":2,"safe-json-parse/tuple":53}],124:[function(_dereq_,module,exports){
 /**
  * @file text-track.js
  */
@@ -16326,7 +16749,9 @@ var TextTrack = function TextTrack() {
     tt = _globalDocument2['default'].createElement('custom');
 
     for (var prop in TextTrack.prototype) {
-      tt[prop] = TextTrack.prototype[prop];
+      if (prop !== 'constructor') {
+        tt[prop] = TextTrack.prototype[prop];
+      }
     }
   }
 
@@ -16514,24 +16939,25 @@ TextTrack.prototype.removeCue = function (removeCue) {
 * Downloading stuff happens below this point
 */
 var parseCues = function parseCues(srcContent, track) {
-  if (typeof _globalWindow2['default']['WebVTT'] !== 'function') {
-    //try again a bit later
-    return _globalWindow2['default'].setTimeout(function () {
-      parseCues(srcContent, track);
-    }, 25);
-  }
+  var parser = new _globalWindow2['default'].WebVTT.Parser(_globalWindow2['default'], _globalWindow2['default'].vttjs, _globalWindow2['default'].WebVTT.StringDecoder());
 
-  var parser = new _globalWindow2['default']['WebVTT']['Parser'](_globalWindow2['default'], _globalWindow2['default']['vttjs'], _globalWindow2['default']['WebVTT']['StringDecoder']());
-
-  parser['oncue'] = function (cue) {
+  parser.oncue = function (cue) {
     track.addCue(cue);
   };
-  parser['onparsingerror'] = function (error) {
+
+  parser.onparsingerror = function (error) {
     _utilsLogJs2['default'].error(error);
   };
 
-  parser['parse'](srcContent);
-  parser['flush']();
+  parser.onflush = function () {
+    track.trigger({
+      type: 'loadeddata',
+      target: track
+    });
+  };
+
+  parser.parse(srcContent);
+  parser.flush();
 };
 
 var loadTrack = function loadTrack(src, track) {
@@ -16550,7 +16976,15 @@ var loadTrack = function loadTrack(src, track) {
     }
 
     track.loaded_ = true;
-    parseCues(responseBody, track);
+
+    // NOTE: this is only used for the alt/video.novtt.js build
+    if (typeof _globalWindow2['default'].WebVTT !== 'function') {
+      _globalWindow2['default'].setTimeout(function () {
+        parseCues(responseBody, track);
+      }, 100);
+    } else {
+      parseCues(responseBody, track);
+    }
   }));
 };
 
@@ -16591,7 +17025,7 @@ var indexOf = function indexOf(searchElement, fromIndex) {
 exports['default'] = TextTrack;
 module.exports = exports['default'];
 
-},{"../event-target":97,"../utils/browser.js":123,"../utils/fn.js":128,"../utils/guid.js":130,"../utils/log.js":131,"../utils/url.js":136,"./text-track-cue-list":116,"./text-track-enums":118,"global/document":1,"global/window":2,"xhr":55}],123:[function(_dereq_,module,exports){
+},{"../event-target":97,"../utils/browser.js":125,"../utils/fn.js":130,"../utils/guid.js":132,"../utils/log.js":133,"../utils/url.js":138,"./text-track-cue-list":118,"./text-track-enums":120,"global/document":1,"global/window":2,"xhr":55}],125:[function(_dereq_,module,exports){
 /**
  * @file browser.js
  */
@@ -16680,7 +17114,7 @@ exports.TOUCH_ENABLED = TOUCH_ENABLED;
 var BACKGROUND_SIZE_SUPPORTED = ('backgroundSize' in _globalDocument2['default'].createElement('video').style);
 exports.BACKGROUND_SIZE_SUPPORTED = BACKGROUND_SIZE_SUPPORTED;
 
-},{"global/document":1,"global/window":2}],124:[function(_dereq_,module,exports){
+},{"global/document":1,"global/window":2}],126:[function(_dereq_,module,exports){
 /**
  * @file buffer.js
  */
@@ -16729,7 +17163,7 @@ function bufferedPercent(buffered, duration) {
   return bufferedDuration / duration;
 }
 
-},{"./time-ranges.js":134}],125:[function(_dereq_,module,exports){
+},{"./time-ranges.js":136}],127:[function(_dereq_,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -16800,7 +17234,7 @@ exports['default'] = function (target) {
 
 module.exports = exports['default'];
 
-},{"./log.js":131}],126:[function(_dereq_,module,exports){
+},{"./log.js":133}],128:[function(_dereq_,module,exports){
 /**
  * @file dom.js
  */
@@ -16932,8 +17366,9 @@ function getEl(id) {
 /**
  * Creates an element and applies properties.
  *
- * @param  {String=} tagName    Name of tag to be created.
- * @param  {Object=} properties Element properties to be applied.
+ * @param  {String} [tagName='div'] Name of tag to be created.
+ * @param  {Object} [properties={}] Element properties to be applied.
+ * @param  {Object} [attributes={}] Element attributes to be applied.
  * @return {Element}
  * @function createEl
  */
@@ -17529,7 +17964,7 @@ exports.$ = $;
 var $$ = createQuerier('querySelectorAll');
 exports.$$ = $$;
 
-},{"./guid.js":130,"./log.js":131,"global/document":1,"global/window":2,"tsml":54}],127:[function(_dereq_,module,exports){
+},{"./guid.js":132,"./log.js":133,"global/document":1,"global/window":2,"tsml":54}],129:[function(_dereq_,module,exports){
 /**
  * @file events.js
  *
@@ -17937,7 +18372,7 @@ function _handleMultipleEvents(fn, elem, types, callback) {
   });
 }
 
-},{"./dom.js":126,"./guid.js":130,"global/document":1,"global/window":2}],128:[function(_dereq_,module,exports){
+},{"./dom.js":128,"./guid.js":132,"global/document":1,"global/window":2}],130:[function(_dereq_,module,exports){
 /**
  * @file fn.js
  */
@@ -17981,7 +18416,7 @@ var bind = function bind(context, fn, uid) {
 };
 exports.bind = bind;
 
-},{"./guid.js":130}],129:[function(_dereq_,module,exports){
+},{"./guid.js":132}],131:[function(_dereq_,module,exports){
 /**
  * @file format-time.js
  *
@@ -18032,7 +18467,7 @@ function formatTime(seconds) {
 exports['default'] = formatTime;
 module.exports = exports['default'];
 
-},{}],130:[function(_dereq_,module,exports){
+},{}],132:[function(_dereq_,module,exports){
 /**
  * @file guid.js
  *
@@ -18057,7 +18492,7 @@ function newGUID() {
   return _guid++;
 }
 
-},{}],131:[function(_dereq_,module,exports){
+},{}],133:[function(_dereq_,module,exports){
 /**
  * @file log.js
  */
@@ -18147,7 +18582,7 @@ function _logType(type, args) {
 exports['default'] = log;
 module.exports = exports['default'];
 
-},{"global/window":2}],132:[function(_dereq_,module,exports){
+},{"global/window":2}],134:[function(_dereq_,module,exports){
 /**
  * @file merge-options.js
  */
@@ -18218,7 +18653,7 @@ function mergeOptions() {
 
 module.exports = exports['default'];
 
-},{"lodash-compat/object/merge":40}],133:[function(_dereq_,module,exports){
+},{"lodash-compat/object/merge":40}],135:[function(_dereq_,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -18246,7 +18681,7 @@ var setTextContent = function setTextContent(el, content) {
 };
 exports.setTextContent = setTextContent;
 
-},{"global/document":1}],134:[function(_dereq_,module,exports){
+},{"global/document":1}],136:[function(_dereq_,module,exports){
 'use strict';
 
 exports.__esModule = true;
@@ -18317,7 +18752,7 @@ function rangeCheck(fnName, index, maxIndex) {
   }
 }
 
-},{"./log.js":131}],135:[function(_dereq_,module,exports){
+},{"./log.js":133}],137:[function(_dereq_,module,exports){
 /**
  * @file to-title-case.js
  *
@@ -18338,7 +18773,7 @@ function toTitleCase(string) {
 exports["default"] = toTitleCase;
 module.exports = exports["default"];
 
-},{}],136:[function(_dereq_,module,exports){
+},{}],138:[function(_dereq_,module,exports){
 /**
  * @file url.js
  */
@@ -18474,7 +18909,7 @@ var isCrossOrigin = function isCrossOrigin(url) {
 };
 exports.isCrossOrigin = isCrossOrigin;
 
-},{"global/document":1,"global/window":2}],137:[function(_dereq_,module,exports){
+},{"global/document":1,"global/window":2}],139:[function(_dereq_,module,exports){
 /**
  * @file video.js
  */
@@ -18609,7 +19044,7 @@ if (typeof HTMLVideoElement === 'undefined') {
  * @method videojs
  */
 var videojs = function videojs(id, options, ready) {
-  var tag; // Element of ID
+  var tag = undefined; // Element of ID
 
   // Allow for element or ID to be passed in
   // String ID
@@ -18652,8 +19087,17 @@ var videojs = function videojs(id, options, ready) {
 
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
-  return tag['player'] || new _player2['default'](tag, options, ready);
+  return tag['player'] || _player2['default'].players[tag.playerId] || new _player2['default'](tag, options, ready);
 };
+
+// Add default styles
+var style = Dom.$('.vjs-styles-defaults');
+if (!style) {
+  style = stylesheet.createStyleElement('vjs-styles-defaults');
+  var head = Dom.$('head');
+  head.insertBefore(style, head.firstChild);
+  stylesheet.setTextContent(style, '\n    .video-js {\n      width: 300px;\n      height: 150px;\n    }\n\n    .vjs-fluid {\n      padding-top: 56.25%\n    }\n  ');
+}
 
 // Run Auto-load players
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
@@ -18664,7 +19108,7 @@ setup.autoSetupTimeout(1, videojs);
  *
  * @type {String}
  */
-videojs.VERSION = '5.3.0';
+videojs.VERSION = '5.5.3';
 
 /**
  * The global options object. These are the settings that take effect
@@ -19105,6 +19549,17 @@ videojs.isEl = Dom.isEl;
 videojs.isTextNode = Dom.isTextNode;
 
 /**
+ * Creates an element and applies properties.
+ *
+ * @method createEl
+ * @param  {String} [tagName='div'] Name of tag to be created.
+ * @param  {Object} [properties={}] Element properties to be applied.
+ * @param  {Object} [attributes={}] Element attributes to be applied.
+ * @return {Element}
+ */
+videojs.createEl = Dom.createEl;
+
+/**
  * Check if an element has a CSS class
  *
  * @method hasClass
@@ -19250,7 +19705,7 @@ if (typeof define === 'function' && define['amd']) {
 exports['default'] = videojs;
 module.exports = exports['default'];
 
-},{"../../src/js/utils/merge-options.js":132,"./component":65,"./event-target":97,"./extend.js":98,"./player":106,"./plugins.js":107,"./setup":109,"./tech/flash.js":112,"./tech/html5.js":113,"./tech/tech.js":115,"./tracks/text-track.js":122,"./utils/browser.js":123,"./utils/create-deprecation-proxy.js":125,"./utils/dom.js":126,"./utils/events.js":127,"./utils/fn.js":128,"./utils/format-time.js":129,"./utils/log.js":131,"./utils/stylesheet.js":133,"./utils/time-ranges.js":134,"./utils/url.js":136,"global/document":1,"lodash-compat/object/merge":40,"object.assign":45,"xhr":55}]},{},[137])(137)
+},{"../../src/js/utils/merge-options.js":134,"./component":65,"./event-target":97,"./extend.js":98,"./player":106,"./plugins.js":107,"./setup":109,"./tech/flash.js":112,"./tech/html5.js":113,"./tech/tech.js":115,"./tracks/text-track.js":124,"./utils/browser.js":125,"./utils/create-deprecation-proxy.js":127,"./utils/dom.js":128,"./utils/events.js":129,"./utils/fn.js":130,"./utils/format-time.js":131,"./utils/log.js":133,"./utils/stylesheet.js":135,"./utils/time-ranges.js":136,"./utils/url.js":138,"global/document":1,"lodash-compat/object/merge":40,"object.assign":45,"xhr":55}]},{},[139])(139)
 });
 
 
