@@ -312,6 +312,9 @@ $wgHooks['CanonicalNamespaces'][] = 'TimedMediaHandlerHooks::addCanonicalNamespa
 // Register remaining Timed Media Handler hooks right after initial setup
 $wgExtensionFunctions[] = 'TimedMediaHandlerHooks::register';
 
+$wgHooks['ResourceLoaderRegisterModules'][] =
+	'TimedMediaHandlerHooks::onResourceLoaderRegisterModules';
+
 # add Special pages
 $wgSpecialPages['OrphanedTimedText'] = 'SpecialOrphanedTimedText';
 $wgSpecialPages['TimedMediaHandler'] = 'SpecialTimedMediaHandler';
