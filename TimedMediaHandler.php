@@ -195,6 +195,7 @@ $wgEnabledAudioTranscodeSet = array(
 	WebVideoTranscode::ENC_OGG_VORBIS,
 
 	// opus support must be available in avconv
+	// Don't enable this if you also need Ogg Vorbis output.
 	// WebVideoTranscode::ENC_OGG_OPUS,
 
 	// avconv needs libmp3lame support
