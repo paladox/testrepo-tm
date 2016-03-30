@@ -1,6 +1,6 @@
 /**
  * @license
- * Video.js 5.8.6 <http://videojs.com/>
+ * Video.js 5.8.7 <http://videojs.com/>
  * Copyright Brightcove, Inc. <https://www.brightcove.com/>
  * Available under Apache License Version 2.0
  * <https://github.com/videojs/video.js/blob/master/LICENSE>
@@ -4740,7 +4740,8 @@ var ControlBar = (function (_Component) {
 
   ControlBar.prototype.createEl = function createEl() {
     return _Component.prototype.createEl.call(this, 'div', {
-      className: 'vjs-control-bar'
+      className: 'vjs-control-bar',
+      dir: 'ltr'
     }, {
       'role': 'group' // The control bar is a group, so it can contain menuitems
     });
@@ -8154,7 +8155,8 @@ var LoadingSpinner = (function (_Component) {
 
   LoadingSpinner.prototype.createEl = function createEl() {
     return _Component.prototype.createEl.call(this, 'div', {
-      className: 'vjs-loading-spinner'
+      className: 'vjs-loading-spinner',
+      dir: 'ltr'
     });
   };
 
@@ -8806,7 +8808,7 @@ var Menu = (function (_Component) {
     var item = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
 
     var children = this.children().slice();
-    var haveTitle = children[0].className && /vjs-menu-title/.test(children[0].className);
+    var haveTitle = children.length && children[0].className && /vjs-menu-title/.test(children[0].className);
 
     if (haveTitle) {
       children.shift();
@@ -12243,7 +12245,7 @@ Player.prototype.options_ = {
   languages: {},
 
   // Default message to show when a video cannot be played.
-  notSupportedMessage: 'No compatible source was found for this video.'
+  notSupportedMessage: 'No compatible source was found for this media.'
 };
 
 /**
@@ -14183,10 +14185,18 @@ var Html5 = (function (_Tech) {
   Html5.prototype.proxyNativeTextTracks_ = function proxyNativeTextTracks_() {
     var tt = this.el().textTracks;
 
-    if (tt && tt.addEventListener) {
-      tt.addEventListener('change', this.handleTextTrackChange_);
-      tt.addEventListener('addtrack', this.handleTextTrackAdd_);
-      tt.addEventListener('removetrack', this.handleTextTrackRemove_);
+    if (tt) {
+      // Add tracks - if player is initialised after DOM loaded, textTracks
+      // will not trigger addtrack
+      for (var i = 0; i < tt.length; i++) {
+        this.textTracks().addTrack_(tt[i]);
+      }
+
+      if (tt.addEventListener) {
+        tt.addEventListener('change', this.handleTextTrackChange_);
+        tt.addEventListener('addtrack', this.handleTextTrackAdd_);
+        tt.addEventListener('removetrack', this.handleTextTrackRemove_);
+      }
     }
   };
 
@@ -16960,12 +16970,15 @@ var TextTrackList = (function (_EventTarget) {
     track.addEventListener('modechange', Fn.bind(this, function () {
       this.trigger('change');
     }));
-    this.tracks_.push(track);
 
-    this.trigger({
-      track: track,
-      type: 'addtrack'
-    });
+    // Do not add duplicate tracks
+    if (this.tracks_.indexOf(track) === -1) {
+      this.tracks_.push(track);
+      this.trigger({
+        track: track,
+        type: 'addtrack'
+      });
+    }
   };
 
   /**
@@ -19794,6 +19807,15 @@ var videojs = function videojs(id, options, ready) {
   return tag['player'] || _player2['default'].players[tag.playerId] || new _player2['default'](tag, options, ready);
 };
 
+// Add default styles
+var style = Dom.$('.vjs-styles-defaults');
+if (!style) {
+  style = stylesheet.createStyleElement('vjs-styles-defaults');
+  var head = Dom.$('head');
+  head.insertBefore(style, head.firstChild);
+  stylesheet.setTextContent(style, '\n    .video-js {\n      width: 300px;\n      height: 150px;\n    }\n\n    .vjs-fluid {\n      padding-top: 56.25%\n    }\n  ');
+}
+
 // Run Auto-load players
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
 setup.autoSetupTimeout(1, videojs);
@@ -19803,7 +19825,7 @@ setup.autoSetupTimeout(1, videojs);
  *
  * @type {String}
  */
-videojs.VERSION = '5.8.6';
+videojs.VERSION = '5.8.7';
 
 /**
  * The global options object. These are the settings that take effect
