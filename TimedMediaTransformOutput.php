@@ -501,10 +501,8 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			// At a minimum this should return the source video file.
 			$this->sources = WebVideoTranscode::getSources( $this->file );
 			// Check if we have "start or end" times and append the temporal url fragment hash
-			if ( $wgTmhWebPlayer !== 'videojs' ) {
-				foreach ( $this->sources as &$source ) {
-					$source['src'] .= $this->getTemporalUrlHash();
-				}
+			foreach ( $this->sources as &$source ) {
+				$source['src'] .= $this->getTemporalUrlHash();
 			}
 		}
 		return $this->sources;
