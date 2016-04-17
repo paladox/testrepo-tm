@@ -151,8 +151,11 @@ $wgEnabledTranscodeSet = array(
 	// A full-HD high quality WebM stream
 	WebVideoTranscode::ENC_WEBM_1080P,
 
-	// A 4K full high quality WebM stream
+	// A full 4K high quality WebM stream
 	// WebVideoTranscode::ENC_WEBM_2160P,
+
+	// A full 8K high quality WebM stream
+	// WebVideoTranscode::ENC_WEBM_4320P,
 
 
 	// Ogg Theora/Vorbis
@@ -200,6 +203,9 @@ $wgEnabledTranscodeSet = array(
 
 	// A 4K high quality stream; higher end phones, tablets, smart tvs
 	WebVideoTranscode::ENC_H264_2160P,
+
+	// A 8K high quality stream; higher end phones, tablets, smart tvs
+	WebVideoTranscode::ENC_H264_4320P,
 */
 );
 
