@@ -42,6 +42,7 @@ class WebVideoTranscode {
 	const ENC_WEBM_1080P = '1080p.webm';
 	const ENC_WEBM_1440P = '1440p.webm';
 	const ENC_WEBM_2160P = '2160p.webm';
+	const ENC_WEBM_4320P = '4320p.webm';
 
 	// WebM VP9/Opus profiles:
 	const ENC_VP9_160P = '160p.vp9.webm';
@@ -52,6 +53,7 @@ class WebVideoTranscode {
 	const ENC_VP9_1080P = '1080p.vp9.webm';
 	const ENC_VP9_1440P = '1440p.vp9.webm';
 	const ENC_VP9_2160P = '2160p.vp9.webm';
+	const ENC_VP9_4320P = '4320p.vp9.webm';
 
 	// mp4 profiles:
 	const ENC_H264_160P = '160p.mp4';
@@ -63,6 +65,7 @@ class WebVideoTranscode {
 	const ENC_H264_1080P = '1080p.mp4';
 	const ENC_H264_1440P = '1440p.mp4';
 	const ENC_H264_2160P = '2160p.mp4';
+	const ENC_H264_4320P = '4320p.mp4';
 
 	const ENC_OGG_VORBIS = 'ogg';
 	const ENC_OGG_OPUS = 'opus';
@@ -273,6 +276,15 @@ class WebVideoTranscode {
 				'videoCodec'                 => 'vp8',
 				'type'                       => 'video/webm; codecs="vp8, vorbis"',
 			),
+		WebVideoTranscode::ENC_WEBM_4320P =>
+			 array(
+				'maxSize'                    => '47680x4320',
+				'videoBitrate'               => '16384',
+				'audioQuality'               => 3,
+				'noUpscaling'                => 'true',
+				'videoCodec'                 => 'vp8',
+				'type'                       => 'video/webm; codecs="vp8, vorbis"',
+			),
 
 		// WebM VP9 transcode:
 		WebVideoTranscode::ENC_VP9_160P =>
@@ -383,6 +395,20 @@ class WebVideoTranscode {
 				'tileColumns'                => '4',
 				'type'                       => 'video/webm; codecs="vp9, opus"',
 			),
+		WebVideoTranscode::ENC_VP9_4320P =>
+			 array(
+				'maxSize'                    => '7680x4320',
+				'videoBitrate'               => '8192',
+				'samplerate'                 => '48000',
+				'noUpscaling'                => 'true',
+				'twopass'                    => 'true',
+				'keyframeInterval'           => '128',
+				'bufDelay'                   => '256',
+				'videoCodec'                 => 'vp9',
+				'audioCodec'                 => 'opus',
+				'tileColumns'                => '4',
+				'type'                       => 'video/webm; codecs="vp9, opus"',
+			),
 
 		// @codingStandardsIgnoreStart
 		// Losly defined per PCF guide to mp4 profiles:
@@ -478,6 +504,16 @@ class WebVideoTranscode {
 		WebVideoTranscode::ENC_H264_2160P =>
 			array(
 				'maxSize' => '4096x2160',
+				'videoCodec' => 'h264',
+				'videoBitrate' => '16384k',
+				'audioCodec' => 'aac',
+				'channels' => '2',
+				'audioBitrate' => '128k',
+				'type' => 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"',
+			),
+		WebVideoTranscode::ENC_H264_4320P =>
+			array(
+				'maxSize' => '7680x4320',
 				'videoCodec' => 'h264',
 				'videoBitrate' => '16384k',
 				'audioCodec' => 'aac',
