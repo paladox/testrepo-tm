@@ -7,6 +7,12 @@ Based around libogg, libvorbis, libtheora, libopus, libvpx, and libnestegg compi
 
 ## Updates
 
+* 1.1.0alpha - 2016-04-??
+ * refactored parts of build using webpack
+ * reduction in unnecessary global symbols
+ * added many properties from standard media elements
+ * volume property now works
+ * (many bug fixes in the works)
 * 1.0 - 2015-09-04
  * initial stable release, as used on Wikipedia
 
@@ -60,6 +66,39 @@ Testing browsers (these support .ogv natively):
 * Chrome 44
 
 
+## Package installation
+
+Pre-built releases of ogv.js are available as [.zip downloads from the GitHub releases page](https://github.com/brion/ogv.js/releases) and (soon) through the npm package manager.
+
+You can load the ogv.js main entry point directly in a script tag, or bundle it through whatever build process you like. The other .js files and the .swf file (for audio in IE) must be made available for runtime loading, together in the same directory.
+
+ogv.js will try to auto-detect the path to its resources based on the script element that loads ogv.js or ogv-support.js. If you load ogv.js through another bundler (such as browserify or MediaWiki's ResourceLoader) you may need to override this manually before instantiating players:
+
+```
+  // Path to ogv-demuxer-ogg.js, ogv-worker-audio.js, dynamicaudio.swf etc
+  OGVLoader.base = '/path/to/resources';
+```
+
+To fetch from npm:
+
+```
+npm install ogv
+```
+
+The same files from the zip releases will appear in 'node_modules/ogv/dist'.
+
+```
+var ogv = require('ogv'),
+  player = new ogv.OGVPlayer();
+```
+
+For webpack projects, there is an experimental 'ogv/webpack-bundle' submodule that bundles the dist files into an 'ogv.js' subdirectory alongside your output, using the 'file-loader' module. Try:
+
+```
+var ogv = require('ogv/webpack-bundle'),
+  player = new ogv.OGVPlayer();
+```
+
 ## Usage
 
 The `OGVPlayer` class implements a player, and supports a subset of the events, properties and methods from [HTMLMediaElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement) and [HTMLVideoElement](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement).
@@ -100,13 +139,6 @@ If you need a URL versioning/cache-buster parameter for dynamic loading of `ogv.
   document.querySelector('head').appendChild(script);
 ```
 
-Usually, ogv.js will auto-detect the path to its resources based on the script element that loads ogv.js or ogv-support.js. If you load ogv.js through a non-customary bundler (such as MediaWiki's ResourceLoader) you may need to override this manually before instantiating players:
-
-```
-  // Path to ogv-demuxer-ogg.js, ogv-worker-audio.js, dynamicaudio.swf etc
-  OGVLoader.base = '/path/to/resources';
-```
-
 
 ## Performance
 
@@ -120,7 +152,7 @@ I've gotten acceptable performance for Vorbis audio and 160p/15fps Theora files 
 
 Meanwhile, newer 64-bit iPhones and iPads are comparable to low-end laptops, and videos at 360p and often 480p play acceptably. Since 32-bit and 64-bit iOS devices have the same user-agent, a benchmark must be used to approximately test minimum CPU speed.
 
-(On iOS 8, Safari performs significantly better than Chrome or other alternative browsers that are unable to enable the JIT due to iOS limitations on third-party developers. Again, a benchmark must be used to detect slow performance, as the browser remains otherwise compatible.)
+(On iOS, Safari performs significantly better than some alternative browsers that are unable to enable the JIT due to use of the old UIWebView API. Chrome 49 and Firefox for iOS are known to work using the newer WKWebView API internally. Again, a benchmark must be used to detect slow performance, as the browser remains otherwise compatible.)
 
 
 Windows on 32-bit ARM platforms is similar... IE 11 on Windows RT 8.1 on a Surface tablet (NVidia Tegra 3), and Edge on Windows 10 Mobile build 10166 on a Lumia 635, perform acceptably with audio and with 160p/15fps videos but have trouble starting around 240p.
@@ -178,6 +210,8 @@ As with chunked streaming, cross-site playback requires CORS support for the Ran
 
 *Audio output*
 
+Audio output is handled through the [AudioFeeder](https://github.com/brion/audio-feeder) library, which encapsulates use of Web Audio API or Flash depending on browser support:
+
 Firefox, Safari, Chrome, and Edge support the W3C Web Audio API.
 
 IE doesn't support Web Audio, but does bundle the Flash player in Windows 8/8.1/RT. A small Flash shim is included here and used as a fallback -- thanks to Maik Merten for hacking some pieces together and getting this working!
@@ -208,19 +242,11 @@ The Ogg Skeleton library (libskeleton) is a bit ... unfinished and is slightly m
 
 Building ogv.js is known to work on Mac OS X and Linux (tested Ubuntu 15.04).
 
-1. You will need autoconf, automake, libtool, and pkg-config. These can be installed through Homebrew on Mac OS X, or through distribution-specific methods on Linux.
+1. You will need autoconf, automake, libtool, pkg-config, and node (nodejs). These can be installed through Homebrew on Mac OS X, or through distribution-specific methods on Linux.
 2. Install [Emscripten](http://kripken.github.io/emscripten-site/docs/getting_started/Tutorial.html); currently using the 1.34.1 SDK release for distribution builds.
 3. `git submodule update --init`
-4. Run `make js` to configure and build the libraries and the C wrapper
-
-
-## Building Flash components
-
-Rebuilding dynamicaudio.swf shim for IE 10/11:
-
-1. Install [Apache Flex SDK](http://flex.apache.org/), and put it into PATH
-2. `make swf` to rebuild src/dynamicaudio.swf
-3. `make` to rebuild the demo and update its .swf
+4. Run `npm install` to install build utilities
+5. Run `make js` to configure and build the libraries and the C wrapper
 
 
 ## Building the demo
@@ -234,4 +260,4 @@ libogg, libvorbis, libtheora, libopus, nestegg, and libvpx are available under t
 
 Based on build scripts from https://github.com/devongovett/ogg.js
 
-dynamicaudio.as and other Flash-related bits are based on code under BSD license, (c) 2010 Ben Firshman (see src/AudioFeeder.js flash fallback section).
+[AudioFeeder](https://github.com/brion/audio-feeder)'s dynamicaudio.as and other Flash-related bits are based on code under BSD license, (c) 2010 Ben Firshman.

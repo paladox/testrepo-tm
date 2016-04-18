@@ -15,7 +15,7 @@ mw.EmbedPlayerOgvJs = {
 		'fullscreen' : true,
 		'sourceSwitch': true,
 		'timeDisplay' : true,
-		'volumeControl' : false,
+		'volumeControl' : true,
 		'overlays': true,
 		'timedText': true
 	},
@@ -175,17 +175,7 @@ mw.EmbedPlayerOgvJs = {
 	 * For simplicity we just replace the player here.
 	 */
 	playerSwitchSource: function( source, switchCallback, doneCallback ){
-		var _this = this;
-		var src = source.getSrc();
-		var vid = this.getPlayerElement();
-		if ( typeof vid.stop !== 'undefined' ) {
-			vid.stop();
-		}
 
-		switchCallback();
-
-		// Currently have to tear down the player and make a new one
-		this.embedPlayerHTML( doneCallback );
 	},
 
 	/**
@@ -216,7 +206,54 @@ mw.EmbedPlayerOgvJs = {
 		if ( $.isFunction( callback ) ) {
 			callback();
 		}
-	}
+	},
+
+	/**
+	 * Toggle the Mute
+	 * calls parent_toggleMute to update the interface
+	 */
+	toggleMute: function() {
+		this.parent_toggleMute();
+		this.getPlayerElement();
+		if ( this.playerElement )
+			this.playerElement.muted = this.muted;
+	},
+
+	/**
+	 * Update Volume
+	 *
+	 * @param {Float} percent Value between 0 and 1 to set audio volume
+	 */
+	setPlayerElementVolume : function( percent ) {
+		if ( this.getPlayerElement() ) {
+			// Disable mute if positive volume
+			if( percent != 0 ) {
+				this.playerElement.muted = false;
+			}
+			this.playerElement.volume = percent;
+		}
+	},
+
+	/**
+	 * get Volume
+	 *
+	 * @return {Float}
+	 * 	Audio volume between 0 and 1.
+	 */
+	getPlayerElementVolume: function() {
+		if ( this.getPlayerElement() ) {
+			return this.playerElement.volume;
+		}
+	},
+	/**
+	 * get the native muted state
+	 */
+	getPlayerElementMuted: function(){
+		if ( this.getPlayerElement() ) {
+			return this.playerElement.muted;
+		}
+	},
+
 };
 
 } )( mediaWiki, jQuery );
