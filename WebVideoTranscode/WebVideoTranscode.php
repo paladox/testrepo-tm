@@ -773,6 +773,11 @@ class WebVideoTranscode {
 		if ( !isset( $transcodeState[ $transcodeKey ] ) ) {
 			return false;
 		}
+		// If transcode was never added to jobqueue yet, do that now (T104061)
+		if ( is_null( $transcodeState[ $transcodeKey ]['time_addjob'] ) ) {
+			self::updateJobQueue( $file, $transcodeKey );
+			return false;
+		}
 		// Else return boolean ready state ( if not null, then ready ):
 		return !is_null( $transcodeState[ $transcodeKey ]['time_success'] );
 	}
