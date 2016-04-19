@@ -796,7 +796,8 @@ class WebVideoTranscode {
 	 * @param {Object} File object
 	 */
 	public static function getTranscodeState( $file, $db = false ) {
-		global $wgTranscodeBackgroundTimeLimit;
+		global $wgTranscodeBackgroundTimeLimit, $wgEnabledTranscodeSet, $wgEnabledAudioTranscodeSet;
+		$enabledTranscodeSet = array_merge( $wgEnabledTranscodeSet, $wgEnabledAudioTranscodeSet );
 		$fileName = $file->getName();
 		if ( !isset( self::$transcodeState[$fileName] ) ) {
 			if ( $db === false ) {
@@ -810,10 +811,16 @@ class WebVideoTranscode {
 					__METHOD__,
 					array( 'LIMIT' => 100 )
 			);
+			$toRemove = [];
 			$overTimeout = array();
 			$over = $db->timestamp( time() - ( 2 * $wgTranscodeBackgroundTimeLimit ) );
 			// Populate the per transcode state cache
 			foreach ( $res as $row ) {
+				// Remove any transcode derivatives that are no longer in the enabled transcode set
+				if ( !in_array( $row->transcode_key, $enabledTranscodeSet ) ) {
+					$toRemove[] = $row->transcode_key;
+					continue;
+				}
 				// strip the out the "transcode_" from keys
 				$transcodeState = array();
 				foreach ( $row as $k => $v ) {
@@ -826,6 +833,9 @@ class WebVideoTranscode {
 					&& $row->transcode_time_error == null ) {
 					$overTimeout[] = $row->transcode_key;
 				}
+			}
+			if ( count( $toRemove ) ) {
+				self::removeTranscodes( $file, $toRemove );
 			}
 			if ( $overTimeout ) {
 				$dbw = wfGetDB( DB_MASTER );
@@ -856,12 +866,15 @@ class WebVideoTranscode {
 	 *
 	 * also remove the transcode files:
 	 * @param $file File Object
-	 * @param $transcodeKey String Optional transcode key to remove only this key
+	 * @param $transcodeKey String|array Optional transcode key to remove only this key
 	 */
 	public static function removeTranscodes( &$file, $transcodeKey = false ) {
 
 		// if transcode key is non-false, non-null:
-		if ( $transcodeKey ) {
+		if ( $transcodeKey && is_array( $transcodeKey ) ) {
+			// remove only the set of requested transcodeKey
+			$removeKeys = $transcodeKey;
+		} elseif ( $transcodeKey ) {
 			// only remove the requested $transcodeKey
 			$removeKeys = array( $transcodeKey );
 		} else {
