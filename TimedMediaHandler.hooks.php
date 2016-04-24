@@ -163,6 +163,8 @@ class TimedMediaHandlerHooks {
 							'ext.tmh.videojs-resolution-switcher',
 							'ext.tmh.videojs-ogvjs',
 							'ext.tmh.videojs-responsive-layout',
+							'oojs-ui-core',
+							'oojs-ui-windows',
 							// 'ext.tmh.videojs-offset',
 						],
 					],
