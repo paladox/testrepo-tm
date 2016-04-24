@@ -436,6 +436,9 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			if ( $this->disablecontrols ) {
 				$mediaAttr[ 'controls' ] = false;
 			}
+			if ( $this->useImagePopUp() ) {
+				$mediaAttr[ 'data-player' ] = 'popup';
+			}
 		} else {
 			$mediaAttr['style'] = "width:{$width}";
 
