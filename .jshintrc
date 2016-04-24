@@ -33,8 +33,9 @@
 	"nomen": true,
 
 	"globals": {
-		"mediaWiki": false,
+		"mediaWiki": true,
 		"jQuery": false,
+		"OO": true,
 		"OGVVersion": false,
 		"OGVSupport": false,
 		"OGVPlayer": false,

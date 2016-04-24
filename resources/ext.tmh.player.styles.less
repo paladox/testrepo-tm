@@ -6,13 +6,65 @@
 	}
 
 	/* We hide the native controls, before we load the custom controls  */
-	audio.video-js::-webkit-media-controls,
-	video.video-js::-webkit-media-controls {
+	audio.video-js::-webkit-media-controls-panel,
+	video.video-js::-webkit-media-controls-panel {
 		display: none;
+	}
+	/* big play button on top of the popup version
+	 * when we import the video.js style sheet as our own, then move this into the vjs.big-play-button
+	 */
+	.mediaContainer {
+		position:relative;
+		cursor:pointer;
+		font-size: 10px;
+	}
+	.mediaContainer::after {
+		color: #fff;
+		/* .video-js .vjs-big-play-button:before */
+		content: "\f101";
+		text-align: center;
+		/* .video-js .vjs-big-play-button */
+		font-size: 3em;
+		line-height: 1.5em;
+		height: 1.5em;
+		width: 3em;
+		display: block;
+		position: absolute;
+		top: 10px;
+		left: 10px;
+		padding: 0;
+		cursor: pointer;
+		opacity: 1;
+		border: 0.06666em solid #fff;
+		background-color: #2B333F;
+		background-color: rgba(43,51,63,0.7);
+		-webkit-border-radius: 0.3em;
+		-moz-border-radius: 0.3em;
+		border-radius: 0.3em;
+		-webkit-transition: all 0.4s;
+		-moz-transition: all 0.4s;
+		-o-transition: all 0.4s;
+		transition: all 0.4s;
+		/* .video-js .vjs-big-play-button */
+		font-family: VideoJS;
+		font-weight: normal;
+		font-style: normal;
+	}
+	.mediaContainer:hover::after {
+		/* .vjs-big-play-button:before */
+		outline: 0;
+		border-color: #fff;
+		background-color: #73859f;
+		background-color: rgba(115,133,159,0.5);
+		-webkit-transition: all 0s;
+		-moz-transition: all 0s;
+		-o-transition: all 0s;
+		transition: all 0s;
 	}
 }
 
 /* Make video-js behave like standard <video><audio> elements */
+.mediaContainer,
 .video-js.video-js:not( .vjs-fullscreen ) {
 	display: inline-block;
 	vertical-align: initial;
@@ -67,4 +119,13 @@
 	100% {
 		background-position: 28px 0;
 	}
+}
+
+.oo-ui-videoJsDialog .oo-ui-dialog-content > .oo-ui-window-body.oo-ui-window-body {
+	top: 2em;
+	overflow: hidden;
+}
+
+.oo-ui-videoJsDialog .oo-ui-dialog-content .oo-ui-videoJsDialog-closeButton {
+	float: right;
 }
