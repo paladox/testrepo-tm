@@ -1,6 +1,5 @@
-
-( function ( $, mw, videojs ) {
-	var globalConfig, audioConfig, playerConfig, $source;
+( function ( $, mw, videojs, OO ) {
+	var globalConfig, audioConfig, playerConfig, $source, windowManager;
 
 	globalConfig = {
 		language: mw.config.get( 'wgUserLanguage' ),
@@ -36,55 +35,6 @@
 		}
 	};
 
-	/*
-	function growPlayer() {
-		// FIXME: fancy transform stuff should be added here :)
-		// Possibly only do this when content renderer sets a certain class ?
-		var targetWidth = 600,
-			player = this,
-			$playerDiv = $( player.el() );
-
-		var width = player.width();
-		var enlargeRatio = targetWidth / width;
-		if ( width < targetWidth ) {
-			$playerDiv
-			.addClass( 'vjs-expanded' )
-			.data( {
-				'original-height': player.height(),
-				'original-width': width,
-				style: $playerDiv.attr( 'style' )
-			} );
-			player.height( Math.ceil( player.height() * enlargeRatio ) );
-			player.width( targetWidth );
-			var parentThumb = $playerDiv.closest( '.thumb' );
-			if ( parentThumb.length ) {
-				parentThumb.data( {
-					style: parentThumb.attr( 'style' ),
-					'class': parentThumb.attr( 'class' )
-				} );
-				parentThumb.removeClass( 'thumb tright tleft tnone' ).addClass( 'removedThumb' ).css( { clear: 'both' } );
-				parentThumb.children( '.thumbinner' ).removeClass( 'thumbinner' ).addClass( 'removedInner' ).css( { width: 'auto', height: 'auto', 'margin-left': 'auto', 'margin-right': 'auto' } );
-			}
-			$playerDiv.css( { clear: 'both', 'margin-left': 'auto', 'margin-right': 'auto' } );
-		}
-
-	}
-
-	function shrinkPlayer() {
-		var player = this,
-			$playerDiv = $( player.el() );
-		if ( $playerDiv.hasClass( 'vjs-expanded' ) ) {
-			player.width( $playerDiv.data( 'original-width' ) );
-			player.height( $playerDiv.data( 'original-height' ) );
-			$playerDiv.removeClass( 'vjs-expanded' ).attr( { style: $playerDiv.data( 'style' ) } );
-			var parentThumb = $playerDiv.closest( '.removedThumb' );
-			if ( parentThumb.length ) {
-				parentThumb.attr( { style: parentThumb.data( 'style' ), 'class': parentThumb.data( 'class' ) } );
-				parentThumb.children( '.removedInner' ).attr( 'class', 'thumbinner' );
-			}
-		}
-	}
-	*/
 
 	/**
 	 * Load video players for a jQuery collection
@@ -101,7 +51,7 @@
 				// We remove the fullscreen button
 				playerConfig = $.extend( true, {}, playerConfig, audioConfig );
 			}
-			$( videoplayer ).attr( {
+			$videoplayer.attr( {
 				/* Don't preload on pages with many videos, like Category pages */
 				preload: ( index < 10 ) ? 'auto' : 'metadata'
 			} ).find( 'source' ).each( function () {
@@ -113,13 +63,86 @@
 
 			// Launch the player
 			videojs( videoplayer, playerConfig ).ready( function () {
-				// TODO disabled the 'enlarging' for now. reconsidering alternative presentation modes
-				// this.on( 'play', growPlayer );
-				// this.on( 'ended', shrinkPlayer );
-				/* More custom stuff goes here */
+				var $placeholder,
+					player = this,
+					$playerElement = $( player.el() );
+
+				if ( $playerElement.hasClass( 'vjs-audio' )
+					|| $playerElement.data( 'player' ) !== 'popup'
+				) {
+					return;
+				}
+
+				// Setup a popup window for the player
+				player.el().addEventListener( 'click', function( event ) {
+					if ( $playerElement.closest( '.oo-ui-window-body').length ) {
+						/* Don't do anything if we are already inside a popup */
+						return;
+					}
+					event.preventDefault();
+					event.stopPropagation();
+					if( !$placeholder ) {
+						$placeholder = $playerElement.clone(false);
+						$placeholder.attr('id', null)
+							.insertBefore( $playerElement );
+					}
+					$placeholder.show();
+
+					// Make the window, can't reuse the previous one, since content is dynamic
+					// Have to figure something out for this.
+					var videoDialog = new VideoDialog({
+						size: 'larger',
+						data: player
+					});
+					// We are not removing this...
+					windowManager.addWindows( [ videoDialog ] );
+
+					// Open the window!
+					windowManager.openWindow( videoDialog ).then( function ( opened ) {
+						player.fluid( true );
+						player.play();
+						player.one( 'ended', function() {
+							videoDialog.close();
+						});
+						return opened.then( function ( closing ) {
+							player.pause();
+							return closing.then( function () {
+								player.fluid( false )
+								$playerElement.insertBefore( $placeholder );
+								$placeholder.hide();
+							});
+						})
+					});
+				},
+				true /* Capture the click so we do not start playback yet */);
 			} );
 		} );
 	}
+
+	// Subclass Dialog class. Note that the OOjs inheritClass() method extends the parent constructor's
+	// prototype and static methods and properties to the child constructor.
+	function VideoDialog( config ) {
+		VideoDialog.super.call( this, config );
+	}
+	OO.inheritClass( VideoDialog, OO.ui.Dialog );
+
+	// Specify a title statically (or, alternatively, with data passed to the opening() method).
+	VideoDialog.static.title = 'Simple dialog';
+
+	// Customize the initialize() function: This is where to add content to the dialog body and set up event handlers.
+	VideoDialog.prototype.initialize = function () {
+		// Call the parent method
+		VideoDialog.super.prototype.initialize.call( this );
+		this.$body.append( this.data.el() );
+	};
+
+	// Override the getBodyHeight() method to specify a custom height (or don't to use the automatically generated height)
+	VideoDialog.prototype.getBodyHeight = function () {
+		// Base our initial height on the Aspectratio of the original player
+		// Account for the 1px border on the dialog.
+		return ( ( this.data.dimension( 'height' ) / this.data.dimension( 'width' ) )
+			* ( OO.ui.WindowManager.static.sizes["larger"].width) );
+	};
 
 	$.fn.loadVideoPlayer = loadVideoPlayer;
 
@@ -127,4 +150,9 @@
 		$content.find( '.video-js' ).loadVideoPlayer();
 	} );
 
-} )( jQuery, mediaWiki, videojs );
+	$( function() {
+		// Create and append a window manager, which will open and close the window.
+		windowManager = new OO.ui.WindowManager();
+		$( 'body' ).append( windowManager.$element );
+	} );
+} )( jQuery, mediaWiki, videojs, OO );
