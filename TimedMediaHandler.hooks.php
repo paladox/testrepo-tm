@@ -149,13 +149,18 @@ class TimedMediaHandlerHooks {
 						],
 					],
 				'ext.tmh.player' => $baseExtensionResource + [
-						'scripts' => 'resources/ext.tmh.player.js',
+						'scripts' => [
+							'resources/ext.tmh.VideoJsDialog.js',
+							'resources/ext.tmh.player.js',
+						],
 						'targets' => [ 'mobile', 'desktop' ],
 						'dependencies' => [
 							'ext.tmh.video-js',
 							'ext.tmh.videojs-resolution-switcher',
 							'ext.tmh.videojs-ogvjs',
 							'ext.tmh.videojs-responsive-layout',
+							'oojs-ui-core',
+							'oojs-ui-windows',
 						],
 					],
 				'ext.tmh.player.styles' => $baseExtensionResource + [
