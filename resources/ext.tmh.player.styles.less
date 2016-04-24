@@ -6,8 +6,8 @@
 	}
 
 	/* We hide the native controls, before we load the custom controls  */
-	audio.video-js::-webkit-media-controls,
-	video.video-js::-webkit-media-controls {
+	audio.video-js::-webkit-media-controls-panel,
+	video.video-js::-webkit-media-controls-panel {
 		display: none;
 	}
 }
@@ -67,4 +67,16 @@
 	100% {
 		background-position: 28px 0;
 	}
+}
+
+.oo-ui-videoJsDialog .oo-ui-dialog-content > .oo-ui-window-body.oo-ui-window-body {
+	top: 2em;
+}
+
+.oo-ui-videoJsDialog .oo-ui-dialog-content .oo-ui-videoJsDialog-closeButton {
+	float: right;
+}
+
+.client-js video[data-player="popup"] {
+	cursor: pointer;
 }
