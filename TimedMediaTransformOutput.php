@@ -453,6 +453,9 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 				$mediaAttr[ 'class' ] .= ' vjs-fluid';
 				$mediaAttr[ 'data-player' ] = 'fillwindow';
 			}
+			if ( $this->useImagePopUp() ) {
+				$mediaAttr[ 'data-player' ] = 'popup';
+			}
 		} else {
 			$mediaAttr['style'] = "width:{$width}";
 

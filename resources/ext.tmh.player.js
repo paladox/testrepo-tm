@@ -1,6 +1,5 @@
-
-( function ( $, mw, videojs ) {
-	var globalConfig, audioConfig, playerConfig;
+( function ( $, mw, videojs, OO ) {
+	var globalConfig, audioConfig, playerConfig, windowManager;
 
 	globalConfig = {
 		language: mw.config.get( 'wgUserLanguage' ),
@@ -43,113 +42,114 @@
 		}
 	};
 
+	function loadSingleVideoPlayer( mediaElement, readyCallback ) {
+		var $mediaElement = $( mediaElement );
+
+		playerConfig = $.extend( {}, globalConfig );
+		if ( mediaElement.tagName.toLowerCase() === 'audio' ) {
+			// We hide the big play button, show the controlbar with CSS
+			// We remove the fullscreen button
+			playerConfig = $.extend( true, {}, playerConfig, audioConfig );
+		}
+		$mediaElement.find( 'source' ).each( function () {
+			// FIXME would be better if we can configure the plugin to make use of our preferred attributes
+			$source = $( this );
+			$source.attr( 'res', $source.data( 'height' ) );
+			$source.attr( 'label', $source.data( 'shorttitle' ) );
+		} );
+
+		// Launch the player
+		videojs( mediaElement, playerConfig ).ready( function () {
+			if ( readyCallback ) {
+				readyCallback( this );
+			}
+		} );
+	}
+
 	/**
 	 * Load video players for a jQuery collection
 	 */
 	function loadVideoPlayer() {
-		var videoplayer, $videoplayer, $collection = this;
+		this.each( function ( index ) {
+			$( this ).attr( {
+				/* Don't preload on pages with many videos, like Category pages */
+				preload: ( index < 10 ) ? 'auto' : 'metadata'
+			} );
+			loadSingleVideoPlayer( this );
+		} );
 
-		function loadSinglePlayer( index ) {
-			videoplayer = this;
-			$videoplayer = $( this );
-			if ( $videoplayer.closest( '.video-js' ).size() ) {
-				// This player has already been transformed.
+		// Chainable
+		return this;
+	}
+
+	/**
+	 * Load video players for a jQuery collection
+     */
+	function loadPopupVideoPlayer() {
+		this.wrap( $( '<div class="mediaContainer" />' ) ).each( function () {
+			var $video = $( this );
+			if ( this.tagName === 'audio'
+				|| $video.data( 'player' ) !== 'popup'
+			) {
 				return;
 			}
-			playerConfig = $.extend( {}, globalConfig );
-			if ( videoplayer.tagName.toLowerCase() === 'audio' ) {
-				// We hide the big play button, show the controlbar with CSS
-				// We remove the fullscreen button
-				playerConfig = $.extend( true, {}, playerConfig, audioConfig );
-			}
-			// Future interactions go faster if we've preloaded a little
-			var preload = 'metadata';
-			if ( !mw.OgvJsSupport.canPlayNatively() ) {
-				// ogv.js currently is expensive to start up:
-				// https://github.com/brion/ogv.js/issues/438
-				preload = 'none';
-			}
-			if ( index >= 10 ) {
-				// On pages with many videos, like Category pages, don't preload em all
-				preload = 'none';
-			}
+			var $newVideo = $video.clone();
+			$newVideo.attr( 'id', null );
 
-			var resolutions = [];
+			$video.parent().on( 'click', function ( event ) {
+				event.preventDefault();
+				event.stopPropagation();
 
-			$( videoplayer ).attr( {
-				preload: preload
-			} ).find( 'source' ).each( function () {
-				// FIXME would be better if we can configure the plugin to make use of our preferred attributes
-				var $source = $( this ),
-					transcodeKey = $source.data( 'transcodekey' ),
-					res = parseInt( $source.data( 'height' ), 10 ),
-					label = $source.data( 'shorttitle' );
+				// Make the window, can't reuse the previous one, since content is dynamic
+				// Have to figure something out for this.
+				var videoJsDialog = new mw.VideoJsDialog( {
+					size: 'larger',
+					$mediaElement: $newVideo
+				} );
+				// We are not removing this...
+				windowManager.addWindows( [ videoJsDialog ] );
 
-				if ( transcodeKey ) {
-					var matches = transcodeKey.match( /^(\d+)p\./ );
-					if ( matches ) {
-						// Video derivative of fixed size.
-						res = parseInt( matches[ 1 ], 10 );
-						label = mw.message( 'timedmedia-resolution-' + res ).text();
-					}
-				} else {
-					// Original source; sort to top and never auto-select.
-					res = 99999;
-					label = $source.data( 'shorttitle' );
-				}
-				$source.attr( 'res', res );
-				$source.attr( 'label', label );
-				resolutions.push( res );
+				var loadedPlayer;
+				loadSingleVideoPlayer( $( videoJsDialog.$body ).find( '.video-js' )[ 0 ], function ( player ) {
+					loadedPlayer = player;
+					videoJsDialog.setPlayer( player );
+
+					player.fluid( true );
+					player.play();
+					player.one( 'ended', function () {
+						videoJsDialog.close();
+					} );
+				} );
+
+				// Open the window!
+				windowManager.openWindow( videoJsDialog ).then( function ( opened ) {
+
+					return opened.then( function ( closing ) {
+						loadedPlayer.pause();
+						return closing.then( function () {
+							loadedPlayer.dispose();
+							setTimeout( function () {
+								windowManager.removeWindows( [ 'videoJsDialog' ] );
+							}, 0 );
+						} );
+					} );
+				} );
 			} );
-
-			// Pick the first resolution at least the size of the player,
-			// unless they're all too small.
-			var playerHeight = $( videoplayer ).height();
-			resolutions.sort( function ( a, b ) {
-				return a - b;
-			} );
-			var defaultRes;
-			for ( var i = 0; i < resolutions.length; i++ ) {
-				defaultRes = resolutions[ i ];
-				if ( defaultRes >= playerHeight ) {
-					break;
-				}
-			}
-			if ( defaultRes ) {
-				playerConfig.plugins.videoJsResolutionSwitcher[ 'default' ] = defaultRes;
-			}
-
-			$videoplayer.parent( '.thumbinner' ).addClass( 'mw-overflow' );
-
-			// Launch the player
-			$videoplayer.addClass( 'video-js' );
-			videojs( videoplayer, playerConfig ).ready( function () {
-				/* More custom stuff goes here */
-			} );
-		}
-
-		if ( !mw.OgvJsSupport.canPlayNatively() ) {
-			globalConfig.ogvjs = {
-				base: mw.OgvJsSupport.basePath()
-			};
-			globalConfig.techOrder.push( 'ogvjs' );
-		}
-		mw.OgvJsSupport.loadIfNeeded( 'ext.tmh.videojs-ogvjs' ).then( function () {
-			$collection.each( loadSinglePlayer );
 		} );
 	}
 
-	// Preload the ogv.js module if we're going to need it...
-	mw.OgvJsSupport.loadIfNeeded( 'ext.tmh.videojs-ogvjs' );
-
 	$.fn.loadVideoPlayer = loadVideoPlayer;
+	$.fn.loadPopupVideoPlayer = loadPopupVideoPlayer;
 
 	mw.hook( 'wikipage.content' ).add( function ( $content ) {
-		$content.find( 'video,audio' ).loadVideoPlayer();
-	} );
-	$( function () {
-		// The iframe mode
-		$( '#videoContainer video,#videoContainer audio' ).loadVideoPlayer();
+		$content.find( '.video-js:not([data-player="popup"])' ).loadVideoPlayer();
+	} ).add( function ( $content ) {
+		$content.find( '.video-js[data-player="popup"]' ).loadPopupVideoPlayer();
 	} );
 
-} )( jQuery, mediaWiki, videojs );
+	$( function () {
+		// Create and append a window manager, which will open and close the window.
+		windowManager = new OO.ui.WindowManager();
+		$( 'body' ).append( windowManager.$element );
+	} );
+} )( jQuery, mediaWiki, videojs, OO );

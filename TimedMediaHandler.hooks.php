@@ -168,7 +168,10 @@ class TimedMediaHandlerHooks {
 				],
 			],
 			'ext.tmh.player' => $baseExtensionResource + [
-				'scripts' => 'resources/ext.tmh.player.js',
+				'scripts' => [
+					'resources/ext.tmh.VideoJsDialog.js',
+					'resources/ext.tmh.player.js',
+				],
 				'targets' => [ 'mobile', 'desktop' ],
 				'dependencies' => [
 					'ext.tmh.video-js',
@@ -177,6 +180,8 @@ class TimedMediaHandlerHooks {
 					'ext.tmh.videojs-replay',
 					'ext.tmh.mw-info-button',
 					'ext.tmh.OgvJsSupport',
+					'oojs-ui-core',
+					'oojs-ui-windows',
 				],
 				'messages' => [
 					'timedmedia-resolution-160',
