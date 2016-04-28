@@ -1,5 +1,7 @@
 <?php
 
+// Im testing, do not merge please.
+
 if ( !defined( 'MEDIAWIKI' ) ) {
 	// @codingStandardsIgnoreStart
 	echo "This is the TimedMediaHandler extension. Please see the README file for installation instructions.\n";
@@ -22,6 +24,8 @@ $wgTmhWebPlayer = 'mwembed';
 
 /*** MwEmbed module configuration: *********************************/
 
+// Im testing, do not merge please.
+
 // Show a warning to the user if they are not using an html5 browser with high quality ogg support
 $wgMwEmbedModuleConfig['EmbedPlayer.DirectFileLinkWarning'] = true;
 
@@ -36,6 +40,8 @@ $wgMwEmbedModuleConfig['TimedText.ShowInterface'] = 'always';
 
 // Show the add text link:
 $wgMwEmbedModuleConfig['TimedText.ShowAddTextLink'] = true;
+
+// Im testing, do not merge please.
 
 /*** Timed Media Handler configuration ****************************/
 
