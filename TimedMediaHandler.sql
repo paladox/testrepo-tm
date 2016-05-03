@@ -10,7 +10,8 @@ CREATE TABLE /*_*/transcode (
 	transcode_time_startwork VARCHAR(14) NULL,
 	transcode_time_success VARCHAR(14) NULL,
 	transcode_time_error VARCHAR(14) NULL,
-	transcode_final_bitrate INT NOT NULL
+	transcode_final_bitrate INT NOT NULL,
+	transcode_size INT unsigned NOT NULL default 0
 ) /*$wgDBTableOptions*/;
 
 CREATE INDEX /*i*/transcode_time_inx ON /*_*/transcode( transcode_time_addjob ,transcode_time_startwork , transcode_time_success, transcode_time_error );

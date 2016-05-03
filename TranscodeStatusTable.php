@@ -102,6 +102,7 @@ class TranscodeStatusTable {
 
 		$o .= '<th>' . wfMessage( 'timedmedia-status' )->escaped() . '</th>';
 		$o .= '<th>' . wfMessage( 'timedmedia-transcodeduration' )->escaped() . '</th>';
+		$o .= '<th>' . wfMessage( 'timedmedia-transcodesize' )->escaped() . '</th>';
 		$o .= "</tr>\n";
 
 		foreach ( $transcodeRows as $transcodeKey => $state ) {
@@ -130,6 +131,7 @@ class TranscodeStatusTable {
 			// Status:
 			$o .= '<td>' . self::getStatusMsg( $file, $state ) . '</td>';
 			$o .= '<td>' . self::getTranscodeDuration( $file, $state ) . '</td>';
+			$o .= '<td>' . self::getTranscodeFilesize( $file, $state ) . '</td>';
 
 			$o .= '</tr>';
 		}
@@ -174,6 +176,24 @@ class TranscodeStatusTable {
 		global $wgLang;
 		if ( !is_null( $state['time_success'] ) ) {
 			return $wgLang->formatBitrate( $state['final_bitrate'] );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * @param $file File
+	 * @param $state
+	 * @return string
+	 */
+	public static function getTranscodeFilesize( $file, $state ) {
+		global $wgLang;
+		if ( !is_null( $state['success'] ) ) {
+			if ( $state['size'] == 0 ) {
+				return $wgLang->formatSize( $state['size'] );
+			} else {
+				return $wgLang->formatSize( filesize( $this->getTargetEncodePath() ) );
+			}
 		} else {
 			return '';
 		}

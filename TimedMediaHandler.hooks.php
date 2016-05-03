@@ -695,6 +695,8 @@ class TimedMediaHandlerHooks {
 			$updater->addExtensionTable( 'transcode', "$base/TimedMediaHandler.sql" );
 			$updater->addExtensionUpdate( [ 'addIndex', 'transcode', 'transcode_name_key',
 				"$base/archives/transcode_name_key.sql", true ] );
+			$updater->addExtensionField(
+				'transcode', 'transcode_size', "$base/archives/transcode_size.sql" );
 			break;
 		case 'postgres':
 			// TODO
