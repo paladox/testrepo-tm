@@ -1046,6 +1046,9 @@ class WebVideoTranscode {
 			$fields["bandwidth"] = intval(
 				self::$transcodeState[$fileName][ $transcodeKey ]['final_bitrate']
 			);
+			$fields["size"] = intval(
+				self::$transcodeState[$fileName][ $transcodeKey ]['size']
+			);
 		}
 
 		if ( !$file->getHandler()->isAudio( $file ) ) {
@@ -1103,7 +1106,8 @@ class WebVideoTranscode {
 						'transcode_key' => $transcodeKey,
 						'transcode_time_addjob' => null,
 						'transcode_error' => "",
-						'transcode_final_bitrate' => 0
+						'transcode_final_bitrate' => 0,
+						'transcode_size' => 0
 					],
 					__METHOD__,
 					[ 'IGNORE' ]
@@ -1172,7 +1176,8 @@ class WebVideoTranscode {
 					'transcode_key' => $transcodeKey,
 					'transcode_time_addjob' => $db->timestamp(),
 					'transcode_error' => "",
-					'transcode_final_bitrate' => 0
+					'transcode_final_bitrate' => 0,
+					'transcode_size' => 0
 				],
 				__METHOD__,
 				[ 'IGNORE' ]

@@ -268,6 +268,7 @@ class WebVideoTranscodeJob extends Job {
 				$this->setTranscodeError( $transcodeKey, $result->getWikiText() );
 				$status = false;
 			} else {
+				$fileSize = filesize( $this->getTargetEncodePath();
 				$bitrate = round(
 					intval( filesize( $this->getTargetEncodePath() ) /  $file->getLength() ) * 8
 				);
@@ -278,7 +279,8 @@ class WebVideoTranscodeJob extends Job {
 					[
 						'transcode_error' => '',
 						'transcode_time_success' => $dbw->timestamp(),
-						'transcode_final_bitrate' => $bitrate
+						'transcode_final_bitrate' => $bitrate,
+						'transcode_size' => $fileSize
 					],
 					[
 						'transcode_image_name' => $this->getFile()->getName(),
