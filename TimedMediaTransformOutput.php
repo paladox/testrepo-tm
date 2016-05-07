@@ -327,6 +327,18 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 				}
 			}
 		}
+		$mediaTracks = $this->getTextHandler()->getTracks();
+		foreach ( $mediaTracks as &$track ) {
+			foreach ( $track as $attr => $val ) {
+				if ( $attr === 'title' || $attr === 'provider' ) {
+					$source[ 'data-mw' . $attr ] = $val;
+					unset( $source[ $attr ] );
+				} elseif ( $attr === 'dir' ) {
+					$source[ 'data-' . $attr ] = $val;
+					unset( $source[ $attr ] );
+				}
+			}
+		}
 
 		$width = $sizeOverride ? $sizeOverride[0] : $this->getPlayerWidth();
 		if ( $this->fillwindow ) {
@@ -341,8 +353,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			self::htmlTagSet( 'source', $mediaSources ) .
 
 			// Timed text:
-			self::htmlTagSet( 'track',
-				$this->file ? $this->getTextHandler()->getTracks() : null ) .
+			self::htmlTagSet( 'track', $mediaTracks ) .
 
 			// Fallback text displayed for browsers without js and without video tag support:
 			/// XXX note we may want to replace this with an image and download link play button
