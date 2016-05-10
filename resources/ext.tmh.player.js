@@ -112,7 +112,7 @@
 			} );
 
 			// Launch the player
-			videojs( videoplayer, playerConfig ).ready( function () {
+			videojs( videoplayer, playerConfig ).infoButton().ready( function () {
 				// TODO disabled the 'enlarging' for now. reconsidering alternative presentation modes
 				// this.on( 'play', growPlayer );
 				// this.on( 'ended', shrinkPlayer );
