@@ -64,7 +64,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		OGVLoader = __webpack_require__(3),
 		OGVMediaType = __webpack_require__(7),
 		OGVPlayer = __webpack_require__(8),
-		OGVVersion = ("1.1.0-20160511164402-3888a9b");
+		OGVVersion = ("1.1.1-alpha.2-20160514111443-854fce5");
 
 	// Version 1.0's web-facing and test-facing interfaces
 	if (window) {
@@ -287,7 +287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var OGVVersion = ("1.1.0-20160511164402-3888a9b");
+	var OGVVersion = ("1.1.1-alpha.2-20160514111443-854fce5");
 
 	(function() {
 		var global = this;
@@ -778,6 +778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			INITIAL: 'INITIAL',
 			SEEKING_END: 'SEEKING_END',
 			LOADED: 'LOADED',
+			PRELOAD: 'PRELOAD',
 			READY: 'READY',
 			PLAYING: 'PLAYING',
 			SEEKING: 'SEEKING',
@@ -904,6 +905,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			// audioFeeder will call us when buffers need refilling,
 			// without any throttling.
 			audioFeeder.onbufferlow = function audioCallback() {
+				log('onbufferlow');
 				if (isProcessing()) {
 					// We're waiting on input or other async processing;
 					// we'll get triggered later.
@@ -918,6 +920,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			// the very beginning of playback when we haven't buffered any data yet.
 			// @todo pre-buffer a little data to avoid needing this
 			audioFeeder.onstarved = function () {
+				log('onstarved');
 				if (isProcessing()) {
 					// We're waiting on input or other async processing;
 					// we'll get triggered later.
@@ -944,9 +947,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		function stopPlayback() {
 			if (audioFeeder) {
-				audioFeeder.stop();
+				audioFeeder.close();
+				audioFeeder = null;
+				initialPlaybackOffset = audioEndTimestamp;
+			} else {
+				initialPlaybackOffset = getPlaybackTime();
 			}
-			initialPlaybackOffset = getPlaybackTime();
 			log('pausing at ' + initialPlaybackOffset);
 		}
 
@@ -1025,12 +1031,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (codec) {
 				codec.close();
 				codec = null;
+				pendingFrame = 0;
+				pendingAudio = 0;
 			}
 			videoInfo = null;
 			audioInfo = null;
 			if (audioFeeder) {
 				audioFeeder.close();
-				audioFeeder = undefined;
+				audioFeeder = null;
 			}
 			if (nextProcessingTimer) {
 				clearTimeout(nextProcessingTimer);
@@ -1044,6 +1052,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				yCbCrBuffer = null;
 			}
 			// @todo set playback position, may need to fire timeupdate if wasnt previously 0
+			initialPlaybackPosition = 0;
+			initialPlaybackOffset = 0;
 			duration = null; // do not fire durationchange
 			// timeline offset to 0?
 		}
@@ -1498,19 +1508,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 			} else if (state == State.LOADED) {
 
-				state = State.READY;
-				if (paused) {
-					// Paused? stop here.
-					log('pausing stopping at loaded');
-				} else {
-					// Not paused? Continue on to play processing.
-					log('not paused so continuing');
-					pingProcessing(0);
-				}
+				state = State.PRELOAD;
 				fireEvent('loadedmetadata');
 				fireEvent('durationchange');
 				if (codec.hasVideo) {
 					fireEvent('resize');
+				}
+				pingProcessing(0);
+
+			} else if (state == State.PRELOAD) {
+
+				if ((codec.frameReady || !codec.hasVideo) &&
+				    (codec.audioReady || !codec.hasAudio)) {
+
+					state = State.READY;
+					fireEvent('loadeddata');
+					pingProcessing(0);
+				} else {
+					codec.process(function doProcessPreload(more) {
+						if (more) {
+							pingProcessing();
+						} else if (streamEnded) {
+							// Ran out of data before data available...?
+							ended = true;
+						} else {
+							readBytesAndWait();
+						}
+					});
 				}
 
 			} else if (state == State.READY) {
@@ -1575,28 +1599,27 @@ return /******/ (function(modules) { // webpackBootstrap
 						} else if (pendingAudio || pendingFrame) {
 							// Still more to decode
 							// We'll be pinged when they come back
+						} else if (ended) {
+							log('Unexpectedly processing after ended');
 						} else {
 							// Ran out of stream!
 							log('Ran out of stream!');
 							var finalDelay = 0;
 							if (codec.hasAudio) {
-								audioState = audioFeeder.getPlaybackState();
-								audioBufferedDuration = (audioState.samplesQueued / audioFeeder.targetRate);
-								finalDelay = audioBufferedDuration * 1000;
+								finalDelay = audioFeeder.durationBuffered * 1000;
 							}
 							if (finalDelay > 0) {
 								log('ending pending ' + finalDelay + ' ms');
 								pingProcessing(Math.max(0, finalDelay));
 							} else {
 								log("ENDING NOW");
-								if (audioFeeder) {
-									audioFeeder.stop();
-								}
+								stopPlayback();
 								initialPlaybackOffset = Math.max(audioEndTimestamp, frameEndTimestamp);
 								ended = true;
 								// @todo implement loop behavior
 								paused = true;
-								fireEvent('ended');
+								fireEventAsync('pause');
+								fireEventAsync('ended');
 							}
 						}
 					} else if (paused) {
@@ -1762,7 +1785,9 @@ return /******/ (function(modules) { // webpackBootstrap
 											// Keep track of how much time we spend queueing audio as well
 											// This is slow when using the Flash shim on IE 10/11
 											bufferTime += time(function() {
-												audioFeeder.bufferData(buffer);
+												if (audioFeeder) {
+													audioFeeder.bufferData(buffer);
+												}
 											});
 											audioBufferedDuration += (buffer[0].length / audioInfo.rate) * 1000;
 											if (!codec.hasVideo) {
@@ -2005,7 +2030,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 				paused = false;
 
-				if (started || loading) {
+				if (started) {
 
 					if (ended && stream && byteLength) {
 
@@ -2016,17 +2041,16 @@ return /******/ (function(modules) { // webpackBootstrap
 						log('.play() while already started');
 					}
 
-					actionQueue.push(function() {
-						startPlayback();
-						fireEvent('play');
-						fireEvent('playing');
-						pingProcessing(0);
-					});
+					state = State.READY;
 					if (isProcessing()) {
 						// waiting on the codec already
 					} else {
 						pingProcessing();
 					}
+
+				} else if (loading) {
+
+					log('.play() while loading');
 
 				} else {
 
@@ -2088,6 +2112,9 @@ return /******/ (function(modules) { // webpackBootstrap
 				clearTimeout(nextProcessingTimer);
 				nextProcessingTimer = null;
 				stopPlayback();
+				if (codec.hasAudio) {
+					initialPlaybackOffset = audioEndTimestamp;
+				}
 				paused = true;
 				fireEvent('pause');
 			}
@@ -5758,7 +5785,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var OGVWrapperCodec = (function(options) {
 		options = options || {};
 		var self = this,
-			suffix = '?version=' + encodeURIComponent(("1.1.0-20160511164402-3888a9b")),
+			suffix = '?version=' + encodeURIComponent(("1.1.1-alpha.2-20160514111443-854fce5")),
 			base = (typeof options.base === 'string') ? (options.base + '/') : '',
 			type = (typeof options.type === 'string') ? options.type : 'video/ogg',
 			processing = false,
