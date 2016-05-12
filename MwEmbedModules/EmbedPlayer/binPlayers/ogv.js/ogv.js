@@ -64,7 +64,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		OGVLoader = __webpack_require__(3),
 		OGVMediaType = __webpack_require__(7),
 		OGVPlayer = __webpack_require__(8),
-		OGVVersion = ("1.1.0-20160511164402-3888a9b");
+		OGVVersion = ("1.1.1-alpha.0-20160512042807-17a616b");
 
 	// Version 1.0's web-facing and test-facing interfaces
 	if (window) {
@@ -287,7 +287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var OGVVersion = ("1.1.0-20160511164402-3888a9b");
+	var OGVVersion = ("1.1.1-alpha.0-20160512042807-17a616b");
 
 	(function() {
 		var global = this;
@@ -778,6 +778,7 @@ return /******/ (function(modules) { // webpackBootstrap
 			INITIAL: 'INITIAL',
 			SEEKING_END: 'SEEKING_END',
 			LOADED: 'LOADED',
+			PRELOAD: 'PRELOAD',
 			READY: 'READY',
 			PLAYING: 'PLAYING',
 			SEEKING: 'SEEKING',
@@ -1025,6 +1026,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (codec) {
 				codec.close();
 				codec = null;
+				pendingFrame = 0;
+				pendingAudio = 0;
 			}
 			videoInfo = null;
 			audioInfo = null;
@@ -1044,6 +1047,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				yCbCrBuffer = null;
 			}
 			// @todo set playback position, may need to fire timeupdate if wasnt previously 0
+			initialPlaybackPosition = 0;
+			initialPlaybackOffset = 0;
 			duration = null; // do not fire durationchange
 			// timeline offset to 0?
 		}
@@ -1498,19 +1503,33 @@ return /******/ (function(modules) { // webpackBootstrap
 
 			} else if (state == State.LOADED) {
 
-				state = State.READY;
-				if (paused) {
-					// Paused? stop here.
-					log('pausing stopping at loaded');
-				} else {
-					// Not paused? Continue on to play processing.
-					log('not paused so continuing');
-					pingProcessing(0);
-				}
+				state = State.PRELOAD;
 				fireEvent('loadedmetadata');
 				fireEvent('durationchange');
 				if (codec.hasVideo) {
 					fireEvent('resize');
+				}
+				pingProcessing(0);
+
+			} else if (state == State.PRELOAD) {
+
+				if ((codec.frameReady || !codec.hasVideo) &&
+				    (codec.audioReady || !codec.hasAudio)) {
+
+					state = State.READY;
+					fireEvent('loadeddata');
+					pingProcessing(0);
+				} else {
+					codec.process(function doProcessPreload(more) {
+						if (more) {
+							pingProcessing();
+						} else if (streamEnded) {
+							// Ran out of data before data available...?
+							ended = true;
+						} else {
+							readBytesAndWait();
+						}
+					});
 				}
 
 			} else if (state == State.READY) {
@@ -5758,7 +5777,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var OGVWrapperCodec = (function(options) {
 		options = options || {};
 		var self = this,
-			suffix = '?version=' + encodeURIComponent(("1.1.0-20160511164402-3888a9b")),
+			suffix = '?version=' + encodeURIComponent(("1.1.1-alpha.0-20160512042807-17a616b")),
 			base = (typeof options.base === 'string') ? (options.base + '/') : '',
 			type = (typeof options.type === 'string') ? options.type : 'video/ogg',
 			processing = false,
