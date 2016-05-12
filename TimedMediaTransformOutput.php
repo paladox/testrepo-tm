@@ -410,10 +410,9 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			'id' => self::PLAYER_ID_PREFIX . TimedMediaTransformOutput::$serial++,
 			// Get the correct size:
 			'poster' => $posterUrl,
+			// We don't set controls, to prevent flash of native controls
+			// In no-js mode the user-agent is required to always present controls
 
-			// Note we set controls to true ( for no-js players ) when mwEmbed rewrites the interface
-			// it updates the controls attribute of the embed video
-			'controls'=> 'true',
 			// Since we will reload the item with javascript,
 			// tell browser to not load the video before
 			'preload'=>'none',
@@ -432,10 +431,6 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 				unset( $mediaAttr['height'] );
 				unset( $mediaAttr['poster'] );
 			}
-
-			if ( $this->disablecontrols ) {
-				$mediaAttr[ 'controls' ] = false;
-			}
 		} else {
 			$mediaAttr['style'] = "width:{$width}";
 
@@ -446,6 +441,8 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			// MediaWiki uses the kSkin class
 			$mediaAttr['class'] = 'kskin';
 
+			// Used by Score extension to modify the layout of the toolbar...
+			// FIXME with a class
 			if ( $this->disablecontrols ) {
 				$mediaAttr[ 'data-disablecontrols' ] = $this->disablecontrols;
 			}

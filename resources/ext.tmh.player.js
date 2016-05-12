@@ -4,6 +4,7 @@
 
 	globalConfig = {
 		language: mw.config.get( 'wgUserLanguage' ),
+		controls: true,
 		controlBar: {
 			liveDisplay: false,
 			volumeMenuButton: {
@@ -102,7 +103,7 @@
 				// We remove the fullscreen button
 				playerConfig = $.extend( true, {}, playerConfig, audioConfig );
 			}
-			$( videoplayer ).attr( {
+			$videoplayer.attr( {
 				/* Don't preload on pages with many videos, like Category pages */
 				preload: ( index < 10 ) ? 'auto' : 'metadata'
 			} ).find( 'source' ).each( function () {
