@@ -17,6 +17,16 @@
 	display: inline-block;
 	vertical-align: initial;
 }
+/*
+ * Workaround for Minerva mobile skin style setting width to auto
+ * on surrounding div resulting in 0-width when using inline-block.
+ * In the thumbnail case we're already in a block so no need for
+ * the inline-block behavior.
+ */
+.thumbinner > .video-js.video-js:not( .vjs-fullscreen ) {
+	display: block;
+}
+
 /* Resets styling on the resolution button. Our content linewraps */
 .vjs-resolution-button ul.vjs-menu-content.vjs-menu-content {
 	margin-left: -6em;
