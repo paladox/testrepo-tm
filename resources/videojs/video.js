@@ -1,6 +1,6 @@
 /**
  * @license
- * Video.js 5.10.1 <http://videojs.com/>
+ * Video.js 5.10.4 <http://videojs.com/>
  * Copyright Brightcove, Inc. <https://www.brightcove.com/>
  * Available under Apache License Version 2.0
  * <https://github.com/videojs/video.js/blob/master/LICENSE>
@@ -17100,6 +17100,8 @@ Tech.withSourceHandlers = function (_Tech) {
     // than clear all of our current tracks
     if (this.currentSource_) {
       this.clearTracks(['audio', 'video']);
+
+      this.currentSource_ = null;
     }
 
     if (sh !== _Tech.nativeSourceHandler) {
@@ -17139,6 +17141,7 @@ Tech.withSourceHandlers = function (_Tech) {
       this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
       this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
       this.sourceHandler_.dispose();
+      this.sourceHandler_ = null;
     }
   };
 };
@@ -21692,6 +21695,18 @@ var videojs = function videojs(id, options, ready) {
   return tag['player'] || _player2['default'].players[tag.playerId] || new _player2['default'](tag, options, ready);
 };
 
+// Add default styles
+if (_globalWindow2['default'].VIDEOJS_NO_DYNAMIC_STYLE !== true) {
+  var style = Dom.$('.vjs-styles-defaults');
+
+  if (!style) {
+    style = stylesheet.createStyleElement('vjs-styles-defaults');
+    var head = Dom.$('head');
+    head.insertBefore(style, head.firstChild);
+    stylesheet.setTextContent(style, '\n      .video-js {\n        width: 300px;\n        height: 150px;\n      }\n\n      .vjs-fluid {\n        padding-top: 56.25%\n      }\n    ');
+  }
+}
+
 // Run Auto-load players
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
 setup.autoSetupTimeout(1, videojs);
@@ -21701,7 +21716,7 @@ setup.autoSetupTimeout(1, videojs);
  *
  * @type {String}
  */
-videojs.VERSION = '5.10.1';
+videojs.VERSION = '5.10.4';
 
 /**
  * The global options object. These are the settings that take effect
