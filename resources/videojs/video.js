@@ -1,6 +1,6 @@
 /**
  * @license
- * Video.js 5.10.1 <http://videojs.com/>
+ * Video.js 5.10.7 <http://videojs.com/>
  * Copyright Brightcove, Inc. <https://www.brightcove.com/>
  * Available under Apache License Version 2.0
  * <https://github.com/videojs/video.js/blob/master/LICENSE>
@@ -5067,7 +5067,6 @@ var ControlBar = (function (_Component) {
 })(_componentJs2['default']);
 
 ControlBar.prototype.options_ = {
-  loadEvent: 'play',
   children: ['playToggle', 'volumeMenuButton', 'currentTimeDisplay', 'timeDivider', 'durationDisplay', 'progressControl', 'liveDisplay', 'remainingTimeDisplay', 'customControlSpacer', 'playbackRateMenuButton', 'chaptersButton', 'descriptionsButton', 'subtitlesButton', 'captionsButton', 'audioTrackButton', 'fullscreenToggle']
 };
 
@@ -6907,9 +6906,11 @@ var ChaptersButton = (function (_TextTrackButton) {
 
     var tracks = this.player_.textTracks() || [];
     var chaptersTrack = undefined;
-    var items = this.items = [];
+    var items = this.items || [];
 
-    for (var i = 0, _length = tracks.length; i < _length; i++) {
+    for (var i = tracks.length - 1; i >= 0; i--) {
+
+      // We will always choose the last track as our chaptersTrack
       var track = tracks[i];
 
       if (track['kind'] === this.kind_) {
@@ -6929,6 +6930,14 @@ var ChaptersButton = (function (_TextTrackButton) {
       });
       menu.children_.unshift(title);
       Dom.insertElFirst(title, menu.contentEl());
+    } else {
+      // We will empty out the menu children each time because we want a
+      // fresh new menu child list each time
+      items.forEach(function (item) {
+        return menu.removeChild(item);
+      });
+      // Empty out the ChaptersButton menu items because we no longer need them
+      items = [];
     }
 
     if (chaptersTrack && chaptersTrack.cues == null) {
@@ -6959,14 +6968,13 @@ var ChaptersButton = (function (_TextTrackButton) {
 
         menu.addChild(mi);
       }
-
-      this.addChild(menu);
     }
 
-    if (this.items.length > 0) {
+    if (items.length > 0) {
       this.show();
     }
-
+    // Assigning the value of items back to this.items for next iteration
+    this.items = items;
     return menu;
   };
 
@@ -10863,7 +10871,11 @@ var Player = (function (_Component) {
     // In Chrome (15), if you have autoplay + a poster + no controls, the video gets hidden (but audio plays)
     // This fixes both issues. Need to wait for API, so it updates displays correctly
     if (this.src() && this.tag && this.options_.autoplay && this.paused()) {
-      delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
+      try {
+        delete this.tag.poster; // Chrome Fix. Fixed in Chrome v16.
+      } catch (e) {
+        _utilsLogJs2['default']('deleting tag.poster throws in some browsers', e);
+      }
       this.play();
     }
   };
@@ -15847,9 +15859,14 @@ Html5.registerSourceHandler(Html5.nativeSourceHandler);
  * @return {Boolean}
  */
 Html5.canControlVolume = function () {
-  var volume = Html5.TEST_VID.volume;
-  Html5.TEST_VID.volume = volume / 2 + 0.1;
-  return volume !== Html5.TEST_VID.volume;
+  // IE will error if Windows Media Player not installed #3315
+  try {
+    var volume = Html5.TEST_VID.volume;
+    Html5.TEST_VID.volume = volume / 2 + 0.1;
+    return volume !== Html5.TEST_VID.volume;
+  } catch (e) {
+    return false;
+  }
 };
 
 /*
@@ -15863,9 +15880,14 @@ Html5.canControlPlaybackRate = function () {
   if (browser.IS_ANDROID && browser.IS_CHROME) {
     return false;
   }
-  var playbackRate = Html5.TEST_VID.playbackRate;
-  Html5.TEST_VID.playbackRate = playbackRate / 2 + 0.1;
-  return playbackRate !== Html5.TEST_VID.playbackRate;
+  // IE will error if Windows Media Player not installed #3315
+  try {
+    var playbackRate = Html5.TEST_VID.playbackRate;
+    Html5.TEST_VID.playbackRate = playbackRate / 2 + 0.1;
+    return playbackRate !== Html5.TEST_VID.playbackRate;
+  } catch (e) {
+    return false;
+  }
 };
 
 /*
@@ -17100,6 +17122,8 @@ Tech.withSourceHandlers = function (_Tech) {
     // than clear all of our current tracks
     if (this.currentSource_) {
       this.clearTracks(['audio', 'video']);
+
+      this.currentSource_ = null;
     }
 
     if (sh !== _Tech.nativeSourceHandler) {
@@ -17139,6 +17163,7 @@ Tech.withSourceHandlers = function (_Tech) {
       this.off(this.el_, 'loadstart', _Tech.prototype.firstLoadStartListener_);
       this.off(this.el_, 'loadstart', _Tech.prototype.successiveLoadStartListener_);
       this.sourceHandler_.dispose();
+      this.sourceHandler_ = null;
     }
   };
 };
@@ -21645,7 +21670,7 @@ if (typeof HTMLVideoElement === 'undefined') {
  * @mixes videojs
  * @method videojs
  */
-var videojs = function videojs(id, options, ready) {
+function videojs(id, options, ready) {
   var tag = undefined; // Element of ID
 
   // Allow for element or ID to be passed in
@@ -21690,7 +21715,19 @@ var videojs = function videojs(id, options, ready) {
   // Element may have a player attr referring to an already created player instance.
   // If not, set up a new player and return the instance.
   return tag['player'] || _player2['default'].players[tag.playerId] || new _player2['default'](tag, options, ready);
-};
+}
+
+// Add default styles
+if (_globalWindow2['default'].VIDEOJS_NO_DYNAMIC_STYLE !== true) {
+  var style = Dom.$('.vjs-styles-defaults');
+
+  if (!style) {
+    style = stylesheet.createStyleElement('vjs-styles-defaults');
+    var head = Dom.$('head');
+    head.insertBefore(style, head.firstChild);
+    stylesheet.setTextContent(style, '\n      .video-js {\n        width: 300px;\n        height: 150px;\n      }\n\n      .vjs-fluid {\n        padding-top: 56.25%\n      }\n    ');
+  }
+}
 
 // Run Auto-load players
 // You have to wait at least once in case this script is loaded after your video in the DOM (weird behavior only with minified version)
@@ -21701,7 +21738,7 @@ setup.autoSetupTimeout(1, videojs);
  *
  * @type {String}
  */
-videojs.VERSION = '5.10.1';
+videojs.VERSION = '5.10.7';
 
 /**
  * The global options object. These are the settings that take effect
