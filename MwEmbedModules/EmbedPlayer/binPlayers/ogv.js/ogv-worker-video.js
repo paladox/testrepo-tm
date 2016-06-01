@@ -55,7 +55,8 @@
 	var proxy = new OGVWorkerSupport([
 		'loadedMetadata',
 		'videoFormat',
-		'frameBuffer'
+		'frameBuffer',
+		'cpuTime'
 	], {
 		init: function(args, callback) {
 			this.target.init(callback);
@@ -245,7 +246,7 @@
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var OGVVersion = ("1.1.1-20160518171756-f2fe5bd");
+	var OGVVersion = ("1.1.2-alpha.6-20160606155429-79e601f");
 
 	(function() {
 		var global = this;
@@ -407,7 +408,8 @@
 	var OGVDecoderAudioProxy = OGVProxyClass({
 		loadedMetadata: false,
 		audioFormat: null,
-		audioBuffer: null
+		audioBuffer: null,
+		cpuTime: 0
 	}, {
 		init: function(callback) {
 			this.proxy('init', [], callback);
@@ -573,7 +575,8 @@
 	var OGVDecoderVideoProxy = OGVProxyClass({
 		loadedMetadata: false,
 		videoFormat: null,
-		frameBuffer: null
+		frameBuffer: null,
+		cpuTime: 0
 	}, {
 		init: function(callback) {
 			this.proxy('init', [], callback);

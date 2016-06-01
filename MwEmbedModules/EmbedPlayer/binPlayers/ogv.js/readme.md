@@ -7,6 +7,51 @@ Based around libogg, libvorbis, libtheora, libopus, libvpx, and libnestegg compi
 
 ## Updates
 
+* 1.1.2-alpha.6 - 2016-06-06
+ * smoothed out CPU spikes from demuxer on slow machines (iPad 3)
+ * use XHR progress events to avoid hitting xhr.responseText early
+ * stream chunking fixes
+ * fixes for end of file
+ * pre-decode 1s of audio to smooth out beginning of playback a bit
+ * IE/Edge now uses Range-based chunking instead of MSStream for better proxy compatibility
+ * Fix for start of file when returned buffers are small
+ * Fix ended event for reals
+ * Fix end state when using muted audio
+* 1.1.2-alpha.5 - 2016-06-04
+ * updated audio-feeder to 0.4.2 with IE and Web Audio fixes
+ * fix for hanging playback in certain threading conditions
+ * allow video decode and audio decode to be in parallel as well as drawing and decode
+ * pipeline multiple audio packet decodes for better slow IE perf
+ * fixes to late-frame a/v resynchronization
+ * new demo perf graph
+ * framecallback reports more per-frame info
+* 1.1.2-alpha.4 - 2016-06-01
+ * use smaller streaming read chunk size on IE for smoother perf
+ * demux less aggressively
+ * lazy-extract buffers from strings on Safari for smoother demuxing perf on slow iOS
+ * tweak to liboggz to reduce ogg demux overhead on slow iOS
+ * retooled playback loop for better threading parallelism
+ * increased audio buffer sizes for smoother playback on slow machines
+ * recover from streaming timeouts in IE/Edge
+ * fix some streaming chunk-boundary bugs in Safari/Chrome/Firefox
+ * restore a/v sync much faster after late frames by pausing audio
+ * fixes for duplicate frame handling and "1000fps" Theora files
+* 1.1.2-alpha.3 - 2016-05-28
+ * partial error handling of failure to load initial data
+* 1.1.2-alpha.2 - 2016-05-28
+ * default video memory limit back to 32MB
+ * 'memoryLimit' option key to override video decoder memory limit
+* 1.1.2-alpha.1 - 2016-05-28
+ * more seek fixes
+ * fixed bug in StreamFile buffering that broke some seeks
+ * retooled loop to avoid recursion crashes in Chrome
+ * enabled WebGL on more devices (no longer using failIfMajorPerformanceCaveat: true)
+ * fixed inflated CPU time reporting when using worker threads
+ * bumped up video codec memory limits to 64MB to aid with 4K testing
+* 1.1.2-alpha.0 - 2016-05-22
+ * fix memory leak in WebM demuxer
+ * allow WebM files to play all the way to end
+ * implement seeking in WebM
 * 1.1.1 - 2016-05-18
  * fix for regression when hitting 'play' during loading
  * fix for Theora streams with pathologically high frequency of dupe frames
@@ -43,7 +88,7 @@ Since August 2015, ogv.js can be seen in action [on Wikipedia and Wikimedia Comm
 See also a standalone demo with performance metrics at https://brionv.com/misc/ogv.js/demo/
 
 * streaming: yes (with Range header)
-* seeking: yes for Ogg (with Range header), no for WebM
+* seeking: yes for Ogg and WebM (with Range header)
 * color: yes
 * audio: yes, with a/v sync (requires Web Audio or Flash)
 * background threading: yes (video, audio decoders in Workers)
@@ -244,7 +289,7 @@ Seeking is implemented via the HTTP Range: header.
 
 For Ogg files with keyframe indices in a skeleton index, seeking is very fast. Otherwise,  a bisection search is used to locate the target frame or audio position, which is very slow over the internet as it creates a lot of short-lived HTTP requests.
 
-For WebM files, seeking is not yet supported; this will require refactoring the demuxer modules to present a synchronous i/o abstraction to the demuxer library.
+For WebM files with cues, efficient seeking is supported as well as of 1.1.2.
 
 As with chunked streaming, cross-site playback requires CORS support for the Range header.
 
@@ -276,9 +321,7 @@ You can then unmute the video in response to a touch or click handler. Alternate
 
 *WebM*
 
-WebM support was added in June 2015, and is currently very experimental. Not everything works yet, and performance is pretty bad. See [issue tracker for WebM milestone](https://github.com/brion/ogv.js/milestones/WebM%20playback) on the GitHub page.
-
-The i/o model of the nestegg WebM container demuxing library is a bit different from what ogv.js was designed around so seeking is not yet supported and it may sometimes cut off partway through a file. Needs more work.
+WebM support was added in June 2015, with some major issues finally worked out in May 2016. It remains experimental, but should be fully enabled in the future once a few more bugs are worked out. Beware that performance of WebM VP8 decoding is much slower than Ogg Theora.
 
 To enable, set `enableWebM: true` in your `options` array.
 
