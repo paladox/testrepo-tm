@@ -64,7 +64,7 @@ return /******/ (function(modules) { // webpackBootstrap
 		OGVLoader = __webpack_require__(3),
 		OGVMediaType = __webpack_require__(7),
 		OGVPlayer = __webpack_require__(8),
-		OGVVersion = ("1.1.1-20160518171756-f2fe5bd");
+		OGVVersion = ("1.1.2-alpha.3-20160528230519-29d3e14");
 
 	// Version 1.0's web-facing and test-facing interfaces
 	if (window) {
@@ -287,7 +287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var OGVVersion = ("1.1.1-20160518171756-f2fe5bd");
+	var OGVVersion = ("1.1.2-alpha.3-20160528230519-29d3e14");
 
 	(function() {
 		var global = this;
@@ -449,7 +449,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var OGVDecoderAudioProxy = OGVProxyClass({
 		loadedMetadata: false,
 		audioFormat: null,
-		audioBuffer: null
+		audioBuffer: null,
+		cpuTime: 0
 	}, {
 		init: function(callback) {
 			this.proxy('init', [], callback);
@@ -615,7 +616,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var OGVDecoderVideoProxy = OGVProxyClass({
 		loadedMetadata: false,
 		videoFormat: null,
-		frameBuffer: null
+		frameBuffer: null,
+		cpuTime: 0
 	}, {
 		init: function(callback) {
 			this.proxy('init', [], callback);
@@ -689,27 +691,27 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(setImmediate) {var WebGLFrameSink = __webpack_require__(11);
-	var FrameSink = __webpack_require__(15);
+	var WebGLFrameSink = __webpack_require__(9);
+	var FrameSink = __webpack_require__(13);
 
 	// -- OGVLoader.js
 	var OGVLoader = __webpack_require__(3);
 
 	// -- StreamFile.js
-	var StreamFile = __webpack_require__(17);
+	var StreamFile = __webpack_require__(15);
 
 	// -- AudioFeeder.js
-	var AudioFeeder = __webpack_require__(18),
-		dynamicaudio_swf = __webpack_require__(19);
+	var AudioFeeder = __webpack_require__(16),
+		dynamicaudio_swf = __webpack_require__(17);
 
 	// -- Bisector.js
-	var Bisector = __webpack_require__(20);
+	var Bisector = __webpack_require__(18);
 
 	// -- OGVMediaType.js
 	var OGVMediaType = __webpack_require__(7);
 
 	// -- OGVWrapperCodec.js
-	var OGVWrapperCodec = __webpack_require__(21);
+	var OGVWrapperCodec = __webpack_require__(19);
 
 	// -- OGVDecoderAudioProxy.js
 	var OGVDecoderAudioProxy = __webpack_require__(4);
@@ -782,7 +784,8 @@ return /******/ (function(modules) { // webpackBootstrap
 			READY: 'READY',
 			PLAYING: 'PLAYING',
 			SEEKING: 'SEEKING',
-			ENDED: 'ENDED'
+			ENDED: 'ENDED',
+			ERROR: 'ERROR'
 		}, state = State.INITIAL;
 
 		var SeekState = {
@@ -807,6 +810,9 @@ return /******/ (function(modules) { // webpackBootstrap
 			audioOptions.audioContext = options.audioContext;
 		}
 		codecOptions.worker = enableWorker;
+		if (typeof options.memoryLimit === 'number') {
+			codecOptions.memoryLimit = options.memoryLimit;
+		}
 
 		var canvas = document.createElement('canvas');
 		var frameSink;
@@ -990,9 +996,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			totalFrameTime = 0, // ms
 			totalFrameCount = 0, // frames
 			playTime = 0, // ms
-			demuxingTime = 0, // ms
-			videoDecodingTime = 0, // ms
-			audioDecodingTime = 0, // ms
 			bufferTime = 0, // ms
 			drawingTime = 0, // ms
 			totalJitter = 0; // sum of ms we're off from expected frame delivery time
@@ -1059,7 +1062,13 @@ return /******/ (function(modules) { // webpackBootstrap
 			frameEndTimestamp = 0.0,
 			audioEndTimestamp = 0.0,
 			yCbCrBuffer = null;
-		var lastFrameDecodeTime = 0.0;
+		var lastFrameDecodeTime = 0.0,
+			lastFrameVideoCpuTime = 0,
+			lastFrameAudioCpuTime = 0,
+			lastFrameDemuxerCpuTime = 0;
+			lastVideoCpuTime = 0,
+			lastAudioCpuTime = 0,
+			lastDemuxerCpuTime = 0;
 		var lastFrameTimestamp = 0.0;
 
 		var lastTimeUpdate = 0, // ms
@@ -1080,13 +1089,29 @@ return /******/ (function(modules) { // webpackBootstrap
 			totalJitter += jitter;
 			playTime += wallClockTime;
 
-			fireEvent('framecallback', {
+			var timing = {
 				cpuTime: lastFrameDecodeTime,
+				videoTime: 0,
+				audioTime: 0,
 				clockTime: wallClockTime
-			});
-
+			};
+			if (codec) {
+				timing.cpuTime += (codec.demuxerCpuTime - lastFrameDemuxerCpuTime);
+				timing.videoTime += (codec.videoCpuTime - lastFrameVideoCpuTime);
+				timing.audioTime += (codec.audioCpuTime - lastFrameAudioCpuTime);
+			}
 			lastFrameDecodeTime = 0;
 			lastFrameTimestamp = newFrameTimestamp;
+			if (codec) {
+				lastFrameVideoCpuTime = codec.videoCpuTime;
+				lastFrameAudioCpuTime = codec.audioCpuTime;
+				lastFrameDemuxerCpuTime = codec.demuxerCpuTime;
+			} else {
+				lastFrameVideoCpuTime = 0;
+				lastFrameAudioCpuTime = 0;
+				lastFrameDemuxerCpuTime = 0;
+			}
+			fireEvent('framecallback', timing);
 
 			if (!lastTimeUpdate || (newFrameTimestamp - lastTimeUpdate) >= timeUpdateInterval) {
 				lastTimeUpdate = newFrameTimestamp;
@@ -1133,13 +1158,12 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (waitingOnInput) {
 					stream.abort();
 					waitingOnInput = false;
-					// clear any queued input/seek-start
-					actionQueue.splice(0, actionQueue.length);
-				} else {
-					stopPlayback();
-					if (audioFeeder) {
-						audioFeeder.flush();
-					}
+				}
+				// clear any queued input/seek-start
+				actionQueue.splice(0, actionQueue.length);
+				stopPlayback();
+				if (audioFeeder) {
+					audioFeeder.flush();
 				}
 				state = State.SEEKING;
 				seekTargetTime = toTime;
@@ -1159,28 +1183,41 @@ return /******/ (function(modules) { // webpackBootstrap
 				lastFrameSkipped = false;
 				lastSeekPosition = -1;
 
-				codec.flush(function() {
-					codec.getKeypointOffset(toTime, function(offset) {
-						if (offset > 0) {
-							// This file has an index!
-							//
-							// Start at the keypoint, then decode forward to the desired time.
-							//
-							seekState = SeekState.LINEAR_TO_TARGET;
-							stream.seek(offset);
-							readBytesAndWait();
+				codec.seekToKeypoint(toTime, function(seeking) {
+					if (seeking) {
+						seekState = SeekState.LINEAR_TO_TARGET;
+						fireEventAsync('seeking');
+						if (isProcessing()) {
+							// wait for i/o
 						} else {
-							// No index.
-							//
-							// Bisect through the file finding our target time, then we'll
-							// have to do it again to reach the keypoint, and *then* we'll
-							// have to decode forward back to the desired time.
-							//
-							seekState = SeekState.BISECT_TO_TARGET;
-							startBisection(seekTargetTime);
+							pingProcessing();
 						}
+						return;
+					}
+					// Use the old interface still implemented on ogg demuxer
+					codec.flush(function() {
+						codec.getKeypointOffset(toTime, function(offset) {
+							if (offset > 0) {
+								// This file has an index!
+								//
+								// Start at the keypoint, then decode forward to the desired time.
+								//
+								seekState = SeekState.LINEAR_TO_TARGET;
+								stream.seek(offset);
+								readBytesAndWait();
+							} else {
+								// No index.
+								//
+								// Bisect through the file finding our target time, then we'll
+								// have to do it again to reach the keypoint, and *then* we'll
+								// have to decode forward back to the desired time.
+								//
+								seekState = SeekState.BISECT_TO_TARGET;
+								startBisection(seekTargetTime);
+							}
 
-						fireEvent('seeking');
+							fireEvent('seeking');
+						});
 					});
 				});
 			});
@@ -1204,14 +1241,14 @@ return /******/ (function(modules) { // webpackBootstrap
 			initialPlaybackOffset = seekTargetTime;
 
 			function finishedSeeking() {
+				lastTimeUpdate = seekTargetTime;
+				fireEventAsync('timeupdate');
+				fireEventAsync('seeked');
 				if (isProcessing()) {
 					// wait for whatever's going on to complete
 				} else {
-					pingProcessing(0);
+					pingProcessing();
 				}
-				lastTimeUpdate = seekTargetTime;
-				fireEvent('timeupdate');
-				fireEvent('seeked');
 			}
 
 			if (paused) {
@@ -1254,10 +1291,12 @@ return /******/ (function(modules) { // webpackBootstrap
 					// Haven't found a frame yet, process more data
 					pingProcessing();
 					return;
-				} else if (codec.frameTimestamp < 0 || codec.frameTimestamp + frameDuration < seekTargetTime) {
+				} else if (codec.frameTimestamp + frameDuration < seekTargetTime) {
 					// Haven't found a time yet, or haven't reached the target time.
 					// Decode it in case we're at our keyframe or a following intraframe...
+					waitingOnInput = true;
 					codec.decodeFrame(function() {
+						waitingOnInput = false;
 						pingProcessing();
 					});
 					return;
@@ -1277,11 +1316,12 @@ return /******/ (function(modules) { // webpackBootstrap
 					// Haven't found an audio packet yet, process more data
 					pingProcessing();
 					return;
-				}
-				if (codec.audioTimestamp < 0 || codec.audioTimestamp + frameDuration < seekTargetTime) {
+				} else if (codec.audioTimestamp + frameDuration < seekTargetTime) {
 					// Haven't found a time yet, or haven't reached the target time.
 					// Decode it so when we reach the target we've got consistent data.
+					waitingOnInput = true;
 					codec.decodeAudio(function() {
+						waitingOnInput = false;
 						pingProcessing();
 					});
 					return;
@@ -1384,20 +1424,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 
 		var depth = 0,
-			useImmediate = options.useImmediate && !!window.setImmediate,
-			useTailCalls = !useImmediate,
+			needProcessing = false,
 			pendingFrame = 0,
 			pendingAudio = 0;
-
-		function tailCall(func) {
-			if (useImmediate) {
-				setImmediate(func);
-			} else if (!useTailCalls) {
-				setTimeout(func, 0);
-			} else {
-				func();
-			}
-		}
 
 		function doProcessing() {
 			nextProcessingTimer = null;
@@ -1405,13 +1434,32 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (isProcessing()) {
 				// Called async while waiting for something else to complete...
 				// let it finish, then we'll get called again to continue.
-				return;
+				//return;
+				throw new Error('REENTRANCY FAIL: doProcessing during processing');
 			}
 
-			if (depth > 0 && !useTailCalls) {
+			if (depth > 0) {
 				throw new Error('REENTRANCY FAIL: doProcessing recursing unexpectedly');
 			}
-			depth++;
+			var iters = 0;
+			do {
+				needProcessing = false;
+				depth++;
+				doProcessingLoop();
+				depth--;
+				
+				if (needProcessing && isProcessing()) {
+					throw new Error('REENTRANCY FAIL: waiting on input or codec but asked to keep processing');
+				}
+				if (++iters > 500) {
+					console.log('stuck in processing loop; breaking with timer');
+					needProcessing = 0;
+					pingProcessing(0);
+				}
+			} while (needProcessing);
+		}
+
+		function doProcessingLoop() {
 
 			if (actionQueue.length) {
 				// data or user i/o to process in our serialized event stream
@@ -1509,10 +1557,10 @@ return /******/ (function(modules) { // webpackBootstrap
 			} else if (state == State.LOADED) {
 
 				state = State.PRELOAD;
-				fireEvent('loadedmetadata');
-				fireEvent('durationchange');
+				fireEventAsync('loadedmetadata');
+				fireEventAsync('durationchange');
 				if (codec.hasVideo) {
-					fireEvent('resize');
+					fireEventAsync('resize');
 				}
 				pingProcessing(0);
 
@@ -1522,8 +1570,8 @@ return /******/ (function(modules) { // webpackBootstrap
 				    (codec.audioReady || !codec.hasAudio)) {
 
 					state = State.READY;
-					fireEvent('loadeddata');
-					pingProcessing(0);
+					fireEventAsync('loadeddata');
+					pingProcessing();
 				} else {
 					codec.process(function doProcessPreload(more) {
 						if (more) {
@@ -1554,8 +1602,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 						startPlayback();
 						pingProcessing(0);
-						fireEvent('play');
-						fireEvent('playing');
+						fireEventAsync('play');
+						fireEventAsync('playing');
 					}
 
 					if (codec.hasAudio && !audioFeeder && !muted) {
@@ -1568,27 +1616,32 @@ return /******/ (function(modules) { // webpackBootstrap
 
 			} else if (state == State.SEEKING) {
 
-				codec.process(function processSeeking(more) {
-					if (!more) {
-						readBytesAndWait();
-					} else if (seekState == SeekState.NOT_SEEKING) {
-						throw new Error('seeking in invalid state (not seeking?)');
-					} else if (seekState == SeekState.BISECT_TO_TARGET) {
-						doProcessBisectionSeek();
-					} else if (seekState == SeekState.BISECT_TO_KEYPOINT) {
-						doProcessBisectionSeek();
-					} else if (seekState == SeekState.LINEAR_TO_TARGET) {
-						doProcessLinearSeeking();
-					}
-				});
+				//console.log('seeking', seekTargetTime, codec.frameTimestamp, codec.audioTimestamp, stream.bytesRead, stream.bytesBuffered - stream.bytesRead);
+				if ((codec.hasVideo && codec.frameTimestamp < 0)
+				 || (codec.hasAudio && codec.audioTimestamp < 0)
+				) {
+					codec.process(function processSeeking(more) {
+						if (more) {
+							pingProcessing();
+						} else {
+							readBytesAndWait();
+						}
+					});
+				} else if (seekState == SeekState.NOT_SEEKING) {
+					throw new Error('seeking in invalid state (not seeking?)');
+				} else if (seekState == SeekState.BISECT_TO_TARGET) {
+					doProcessBisectionSeek();
+				} else if (seekState == SeekState.BISECT_TO_KEYPOINT) {
+					doProcessBisectionSeek();
+				} else if (seekState == SeekState.LINEAR_TO_TARGET) {
+					doProcessLinearSeeking();
+				} else {
+					throw new Error('Invalid seek state ' + seekState);
+				}
 
 			} else if (state == State.PLAYING) {
 
-				var demuxStartTime = getTimestamp();
 				codec.process(function doProcessPlay(more) {
-					var delta = getTimestamp() - demuxStartTime;
-					demuxingTime += delta;
-					lastFrameDecodeTime += delta;
 
 					//console.log(more, codec.audioReady, codec.frameReady, codec.audioTimestamp, codec.frameTimestamp);
 
@@ -1739,7 +1792,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 								log('ready to decode frame');
 
-								var videoStartTime = getTimestamp();
 								pendingFrame++;
 								if (videoInfo.fps == 0 && (codec.frameTimestamp - frameEndTimestamp) > 0) {
 									// WebM doesn't encode a frame rate
@@ -1752,9 +1804,6 @@ return /******/ (function(modules) { // webpackBootstrap
 								codec.decodeFrame(function processingDecodeFrame(ok) {
 									pendingFrame--;
 									log('decoded frame');
-									var delta = getTimestamp() - videoStartTime;
-									videoDecodingTime += delta;
-									lastFrameDecodeTime += delta;
 									if (ok && codec.frameBuffer.duplicate) {
 										// Dupe frame! No need to draw anything.
 										doFrameComplete();
@@ -1777,14 +1826,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 								log('ready for audio');
 
-								var audioStartTime = getTimestamp();
 								pendingAudio++;
 								audioEndTimestamp = codec.audioTimestamp;
 								codec.decodeAudio(function processingDecodeAudio(ok) {
 									log('decoded audio');
-									var delta = getTimestamp() - audioStartTime;
-									audioDecodingTime += delta;
-									lastFrameDecodeTime += delta;
 
 									if (ok) {
 										var buffer = codec.audioBuffer;
@@ -1828,13 +1873,16 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 				});
 
+			} else if (state == State.ERROR) {
+
+				// Nothing to do.
+				console.log("Reached error state. Sorry bout that.");
+
 			} else {
 
 				throw new Error('Unexpected OGVPlayer state ' + state);
 
 			}
-
-			depth--;
 		}
 
 		/**
@@ -1867,9 +1915,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			if (delay > fudge) {
 				//log('pingProcessing delay: ' + delay);
 				nextProcessingTimer = setTimeout(doProcessing, delay);
-			} else {
+			} else if (depth) {
 				//log('pingProcessing tail call (' + delay + ')');
-				tailCall(doProcessing);
+				needProcessing = true;
+			} else {
+				doProcessing();
 			}
 		}
 
@@ -1882,15 +1932,25 @@ return /******/ (function(modules) { // webpackBootstrap
 			}
 
 			framesProcessed = 0;
-			demuxingTime = 0;
-			videoDecodingTime = 0;
-			audioDecodingTime = 0;
 			bufferTime = 0;
 			drawingTime = 0;
 			started = true;
 			ended = false;
 
 			codec = new codecClass(codecOptions);
+			lastVideoCpuTime = 0;
+			lastAudioCpuTime = 0;
+			lastDemuxerCpuTime = 0;
+			lastFrameVideoCpuTime = 0;
+			lastFrameAudioCpuTime = 0;
+			lastFrameDemuxerCpuTime = 0;
+			codec.onseek = function(offset) {
+				if (stream) {
+					console.log('SEEKING TO', offset);
+					stream.seek(offset);
+					readBytesAndWait();
+				}
+			};
 			codec.init(function() {
 				readBytesAndWait();
 			});
@@ -1983,6 +2043,7 @@ return /******/ (function(modules) { // webpackBootstrap
 					onerror: function(err) {
 						// @todo handle failure to initialize
 						console.log("reading error: " + err);
+						state = State.ERROR;
 					}
 				});
 				waitingOnInput = true;
@@ -2080,9 +2141,9 @@ return /******/ (function(modules) { // webpackBootstrap
 				targetPerFrameTime: targetPerFrameTime,
 				framesProcessed: framesProcessed,
 				playTime: playTime,
-				demuxingTime: demuxingTime,
-				videoDecodingTime: videoDecodingTime,
-				audioDecodingTime: audioDecodingTime,
+				demuxingTime: codec ? (codec.demuxerCpuTime - lastDemuxerCpuTime) : 0,
+				videoDecodingTime: codec ? (codec.videoCpuTime - lastVideoCpuTime) : 0,
+				audioDecodingTime: codec ? (codec.audioCpuTime - lastAudioCpuTime) : 0,
 				bufferTime: bufferTime,
 				drawingTime: drawingTime,
 				droppedAudio: droppedAudio,
@@ -2093,9 +2154,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		self.resetPlaybackStats = function() {
 			framesProcessed = 0;
 			playTime = 0;
-			demuxingTime = 0;
-			videoDecodingTime = 0;
-			audioDecodingTime = 0;
+			if (codec) {
+				lastDemuxerCpuTime = codec.demuxerCpuTime;
+				lastVideoCpuTime = codec.videoCpuTime;
+				lastAudioCpuTime = codec.audioCpuTime;
+			}
 			bufferTime = 0;
 			drawingTime = 0;
 			totalJitter = 0;
@@ -2476,7 +2539,11 @@ return /******/ (function(modules) { // webpackBootstrap
 		 */
 		Object.defineProperty(self, "error", {
 			get: function getError() {
-				return null;
+				if (state === State.ERROR) {
+					return "error occurred in media procesing";
+				} else {
+					return null;
+				}
 			}
 		});
 		/**
@@ -2819,197 +2886,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	module.exports = OGVPlayer;
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9).setImmediate))
 
 /***/ },
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(10).nextTick;
-	var apply = Function.prototype.apply;
-	var slice = Array.prototype.slice;
-	var immediateIds = {};
-	var nextImmediateId = 0;
-
-	// DOM APIs, for completeness
-
-	exports.setTimeout = function() {
-	  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
-	};
-	exports.setInterval = function() {
-	  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
-	};
-	exports.clearTimeout =
-	exports.clearInterval = function(timeout) { timeout.close(); };
-
-	function Timeout(id, clearFn) {
-	  this._id = id;
-	  this._clearFn = clearFn;
-	}
-	Timeout.prototype.unref = Timeout.prototype.ref = function() {};
-	Timeout.prototype.close = function() {
-	  this._clearFn.call(window, this._id);
-	};
-
-	// Does not start the time, just sets up the members needed.
-	exports.enroll = function(item, msecs) {
-	  clearTimeout(item._idleTimeoutId);
-	  item._idleTimeout = msecs;
-	};
-
-	exports.unenroll = function(item) {
-	  clearTimeout(item._idleTimeoutId);
-	  item._idleTimeout = -1;
-	};
-
-	exports._unrefActive = exports.active = function(item) {
-	  clearTimeout(item._idleTimeoutId);
-
-	  var msecs = item._idleTimeout;
-	  if (msecs >= 0) {
-	    item._idleTimeoutId = setTimeout(function onTimeout() {
-	      if (item._onTimeout)
-	        item._onTimeout();
-	    }, msecs);
-	  }
-	};
-
-	// That's not how node.js implements it but the exposed api is the same.
-	exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
-	  var id = nextImmediateId++;
-	  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
-
-	  immediateIds[id] = true;
-
-	  nextTick(function onNextTick() {
-	    if (immediateIds[id]) {
-	      // fn.call() is faster so we optimize for the common use-case
-	      // @see http://jsperf.com/call-apply-segu
-	      if (args) {
-	        fn.apply(null, args);
-	      } else {
-	        fn.call(null);
-	      }
-	      // Prevent ids from leaking
-	      exports.clearImmediate(id);
-	    }
-	  });
-
-	  return id;
-	};
-
-	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
-	  delete immediateIds[id];
-	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9).setImmediate, __webpack_require__(9).clearImmediate))
-
-/***/ },
-/* 10 */
-/***/ function(module, exports) {
-
-	// shim for using process in browser
-
-	var process = module.exports = {};
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-
-	function cleanUpNextTick() {
-	    if (!draining || !currentQueue) {
-	        return;
-	    }
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = setTimeout(cleanUpNextTick);
-	    draining = true;
-
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    clearTimeout(timeout);
-	}
-
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
-	    }
-	};
-
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-
-	function noop() {}
-
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var YCBCR_VERTEX_SHADER = __webpack_require__(12);
-	var YCBCR_FRAGMENT_SHADER = __webpack_require__(13);
-	var YCBCR_STRIPE_FRAGMENT_SHADER = __webpack_require__(14);
+	var YCBCR_VERTEX_SHADER = __webpack_require__(10);
+	var YCBCR_FRAGMENT_SHADER = __webpack_require__(11);
+	var YCBCR_STRIPE_FRAGMENT_SHADER = __webpack_require__(12);
 
 	/**
 	 * Warning: canvas must not have been used for 2d drawing prior!
@@ -3310,7 +3194,9 @@ return /******/ (function(modules) { // webpackBootstrap
 		canvas.width = 1;
 		canvas.height = 1;
 		var options = {
-			failIfMajorPerformanceCaveat: true
+			// Still dithering on whether to use this.
+			// Recommend avoiding it, as it's overly conservative
+			//failIfMajorPerformanceCaveat: true
 		};
 		try {
 			gl = canvas.getContext('webgl', options) || canvas.getContext('experimental-webgl', options);
@@ -3361,35 +3247,35 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 10 */
 /***/ function(module, exports) {
 
 	module.exports = "attribute vec2 aPosition;\nattribute vec2 aLumaPosition;\nattribute vec2 aChromaPosition;\nvarying vec2 vLumaPosition;\nvarying vec2 vChromaPosition;\nvoid main() {\n    gl_Position = vec4(aPosition, 0, 1);\n    vLumaPosition = aLumaPosition;\n    vChromaPosition = aChromaPosition;\n}\n"
 
 
 /***/ },
-/* 13 */
+/* 11 */
 /***/ function(module, exports) {
 
 	module.exports = "// inspired by https://github.com/mbebenita/Broadway/blob/master/Player/canvas.js\n\nprecision mediump float;\nuniform sampler2D uTextureY;\nuniform sampler2D uTextureCb;\nuniform sampler2D uTextureCr;\nvarying vec2 vLumaPosition;\nvarying vec2 vChromaPosition;\nvoid main() {\n   // Y, Cb, and Cr planes are uploaded as LUMINANCE textures.\n   float fY = texture2D(uTextureY, vLumaPosition).x;\n   float fCb = texture2D(uTextureCb, vChromaPosition).x;\n   float fCr = texture2D(uTextureCr, vChromaPosition).x;\n\n   // Premultipy the Y...\n   float fYmul = fY * 1.1643828125;\n\n   // And convert that to RGB!\n   gl_FragColor = vec4(\n     fYmul + 1.59602734375 * fCr - 0.87078515625,\n     fYmul - 0.39176171875 * fCb - 0.81296875 * fCr + 0.52959375,\n     fYmul + 2.017234375   * fCb - 1.081390625,\n     1\n   );\n}\n"
 
 
 /***/ },
-/* 14 */
+/* 12 */
 /***/ function(module, exports) {
 
 	module.exports = "// inspired by https://github.com/mbebenita/Broadway/blob/master/Player/canvas.js\n// extra 'stripe' texture fiddling to work around IE 11's poor performance on gl.LUMINANCE and gl.ALPHA textures\n\nprecision mediump float;\nuniform sampler2D uStripeLuma;\nuniform sampler2D uStripeChroma;\nuniform sampler2D uTextureY;\nuniform sampler2D uTextureCb;\nuniform sampler2D uTextureCr;\nvarying vec2 vLumaPosition;\nvarying vec2 vChromaPosition;\nvoid main() {\n   // Y, Cb, and Cr planes are mapped into a pseudo-RGBA texture\n   // so we can upload them without expanding the bytes on IE 11\n   // which doesn\\'t allow LUMINANCE or ALPHA textures.\n   // The stripe textures mark which channel to keep for each pixel.\n   vec4 vStripeLuma = texture2D(uStripeLuma, vLumaPosition);\n   vec4 vStripeChroma = texture2D(uStripeChroma, vChromaPosition);\n\n   // Each texture extraction will contain the relevant value in one\n   // channel only.\n   vec4 vY = texture2D(uTextureY, vLumaPosition) * vStripeLuma;\n   vec4 vCb = texture2D(uTextureCb, vChromaPosition) * vStripeChroma;\n   vec4 vCr = texture2D(uTextureCr, vChromaPosition) * vStripeChroma;\n\n   // Now assemble that into a YUV vector, and premultipy the Y...\n   vec3 YUV = vec3(\n     (vY.x  + vY.y  + vY.z  + vY.w) * 1.1643828125,\n     (vCb.x + vCb.y + vCb.z + vCb.w),\n     (vCr.x + vCr.y + vCr.z + vCr.w)\n   );\n   // And convert that to RGB!\n   gl_FragColor = vec4(\n     YUV.x + 1.59602734375 * YUV.z - 0.87078515625,\n     YUV.x - 0.39176171875 * YUV.y - 0.81296875 * YUV.z + 0.52959375,\n     YUV.x + 2.017234375   * YUV.y - 1.081390625,\n     1\n   );\n}\n"
 
 
 /***/ },
-/* 15 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * @param HTMLCanvasElement canvas
 	 * @constructor
 	 */
-	var YCbCr = __webpack_require__(16);
+	var YCbCr = __webpack_require__(14);
 
 	function FrameSink(canvas, videoInfo) {
 		var self = this,
@@ -3463,7 +3349,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 14 */
 /***/ function(module, exports) {
 
 	/**
@@ -3582,7 +3468,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 15 */
 /***/ function(module, exports) {
 
 	/**
@@ -3616,7 +3502,6 @@ return /******/ (function(modules) { // webpackBootstrap
 			waitingForInput = false,
 			doneBuffering = false,
 			bytesTotal = 0,
-			bytesRead = 0,
 			buffers = [],
 			cachever = 0,
 			responseHeaders = {};
@@ -3715,8 +3600,6 @@ return /******/ (function(modules) { // webpackBootstrap
 					xhr.setRequestHeader('Range', range);
 				}
 
-				bytesRead = 0;
-
 				xhr.onreadystatechange = function(event) {
 					if (xhr.readyState == 2) {
 						if (xhr.status == 206) {
@@ -3741,6 +3624,10 @@ return /******/ (function(modules) { // webpackBootstrap
 								return;
 							}
 						}
+						if (xhr.status >= 400) {
+							onerror('HTTP error; status code ' + xhr.status);
+							return;
+						}
 						if (!started) {
 							internal.setBytesTotal(xhr);
 							internal.processResponseHeaders(xhr);
@@ -3753,8 +3640,8 @@ return /******/ (function(modules) { // webpackBootstrap
 						internal.onXHRLoading(xhr);
 					} else if (xhr.readyState == 4) {
 						// Complete.
-						internal.onXHRLoading(xhr);
 						internal.onXHRDone(xhr);
+						internal.onXHRLoading(xhr);
 					}
 				};
 
@@ -3870,13 +3757,11 @@ return /******/ (function(modules) { // webpackBootstrap
 					}
 				}
 
-				bytesRead += byteLength;
 				bufferPosition += byteLength;
 				return bufferOut.slice(0, byteLength);
 			},
 
 			clearReadState: function() {
-				bytesRead = 0;
 				doneBuffering = false;
 				waitingForInput = true;
 			},
@@ -3892,9 +3777,6 @@ return /******/ (function(modules) { // webpackBootstrap
 				if (waitingForInput) {
 					waitingForInput = false;
 					onread(internal.popBuffer());
-					if (doneBuffering && !internal.dataToRead()) {
-						internal.onReadDone();
-					}
 				}
 			},
 
@@ -3913,12 +3795,12 @@ return /******/ (function(modules) { // webpackBootstrap
 		self.readBytes = function() {
 			if (internal.dataToRead()) {
 				var buffer = internal.popBuffer();
-				onread(buffer);
 				if (doneBuffering && self.bytesBuffered < Math.min(bufferPosition + chunkSize, self.bytesTotal)) {
 					seekPosition += chunkSize;
 					internal.clearReadState();
 					internal.openXHR();
 				}
+				onread(buffer);
 			} else if (doneBuffering) {
 				// We're out of data!
 				internal.onReadDone();
@@ -3933,6 +3815,7 @@ return /******/ (function(modules) { // webpackBootstrap
 				internal.abortXHR(internal.xhr);
 				internal.xhr = null;
 				internal.clearBuffers();
+				waitingForInput = false;
 			}
 		};
 
@@ -3972,7 +3855,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 		Object.defineProperty(self, 'bytesRead', {
 			get: function() {
-				return seekPosition + bytesRead;
+				return bufferPosition;
 			}
 		});
 
@@ -4057,7 +3940,6 @@ return /******/ (function(modules) { // webpackBootstrap
 						var buffer = event.target.result,
 							len = buffer.byteLength;
 						if (len > 0) {
-							bytesRead += len;
 							bufferPosition += len;
 							onread(buffer);
 						} else {
@@ -4141,7 +4023,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	(function webpackUniversalModuleDefinition(root, factory) {
@@ -5802,13 +5684,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	;
 
 /***/ },
-/* 19 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__.p + "dynamicaudio.swf?version=6e7e05c14196b3ea0651bcc21c5938a7";
 
 /***/ },
-/* 20 */
+/* 18 */
 /***/ function(module, exports) {
 
 	/**
@@ -5857,7 +5739,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 21 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -5874,7 +5756,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var OGVWrapperCodec = (function(options) {
 		options = options || {};
 		var self = this,
-			suffix = '?version=' + encodeURIComponent(("1.1.1-20160518171756-f2fe5bd")),
+			suffix = '?version=' + encodeURIComponent(("1.1.2-alpha.3-20160528230519-29d3e14")),
 			base = (typeof options.base === 'string') ? (options.base + '/') : '',
 			type = (typeof options.type === 'string') ? options.type : 'video/ogg',
 			processing = false,
@@ -6006,6 +5888,11 @@ return /******/ (function(modules) { // webpackBootstrap
 			processing = true;
 			OGVLoader.loadClass(demuxerClassName, function(demuxerClass) {
 				demuxer = new demuxerClass();
+				demuxer.onseek = function(offset) {
+					if (self.onseek) {
+						self.onseek(offset);
+					}
+				};
 				demuxer.init(function() {
 					processing = false;
 					callback();
@@ -6074,6 +5961,9 @@ return /******/ (function(modules) { // webpackBootstrap
 					var videoOptions = {};
 					if (demuxer.videoFormat) {
 						videoOptions.videoFormat = demuxer.videoFormat;
+					}
+					if (options.memoryLimit) {
+						videoOptions.memoryLimit = options.memoryLimit;
 					}
 					videoDecoder = new videoCodecClass(videoOptions);
 					videoDecoder.init(function() {
@@ -6261,6 +6151,45 @@ return /******/ (function(modules) { // webpackBootstrap
 		self.getKeypointOffset = function(timeSeconds, callback) {
 			demuxer.getKeypointOffset(timeSeconds, callback);
 		};
+
+		self.seekToKeypoint = function(timeSeconds, callback) {
+			demuxer.seekToKeypoint(timeSeconds, function(seeking) {
+				if (seeking) {
+					inputQueue.splice(0, inputQueue.length);
+				}
+				callback(seeking)
+			});
+		}
+
+		self.onseek = null;
+
+		Object.defineProperty(self, "demuxerCpuTime", {
+			get: function() {
+				if (demuxer) {
+					return demuxer.cpuTime;
+				} else {
+					return 0;
+				}
+			}
+		});
+		Object.defineProperty(self, "audioCpuTime", {
+			get: function() {
+				if (audioDecoder) {
+					return audioDecoder.cpuTime;
+				} else {
+					return 0;
+				}
+			}
+		});
+		Object.defineProperty(self, "videoCpuTime", {
+			get: function() {
+				if (videoDecoder) {
+					return videoDecoder.cpuTime;
+				} else {
+					return 0;
+				}
+			}
+		});
 
 		return self;
 	});
