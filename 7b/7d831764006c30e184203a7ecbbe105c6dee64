@@ -1,0 +1,9 @@
+Code-Review+2: Brion VIBBER <brion@wikimedia.org>
+Verified+2: jenkins-bot
+Code-Review+1: Filippo Giunchedi <fgiunchedi@wikimedia.org>
+Code-Review+1: Paladox <thomasmulhall410@yahoo.com>
+Submitted-by: jenkins-bot
+Submitted-at: Tue, 21 Jun 2016 15:57:55 +0000
+Reviewed-on: https://gerrit.wikimedia.org/r/291921
+Project: mediawiki/extensions/TimedMediaHandler
+Branch: refs/heads/master
