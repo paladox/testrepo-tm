@@ -71,10 +71,12 @@ class TimedMediaIframeOutput {
 		if ( $wgTmhWebPlayer == 'mwembed' ) {
 			$wgOut->addModules( [ 'mw.MediaWikiPlayer.loader', 'ext.tmh.embedPlayerIframe' ] );
 		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
-			$wgOut->addModuleStyles( 'ext.tmh.player.styles' );
 			$wgOut->addModules( 'ext.tmh.player' );
+			$wgOut->addModuleStyles( 'ext.tmh.player.styles' );
+			$styleModules[] = 'ext.tmh.player.styles';
 		}
 		$wgOut->addModuleStyles( 'embedPlayerIframeStyle' );
+		$styleModules[] = 'embedPlayerIframeStyle';
 		$wgOut->sendCacheControl();
 	?>
 <!DOCTYPE html>
@@ -88,7 +90,7 @@ class TimedMediaIframeOutput {
 	<?php
 		// In place of buildCssLinks, because we don't want to pull in all the skin CSS etc.
 		$links = $wgOut->makeResourceLoaderLink(
-			'embedPlayerIframeStyle', ResourceLoaderModule::TYPE_STYLES
+			$styleModules, ResourceLoaderModule::TYPE_STYLES
 		);
 		echo implode( "\n", $links["html"] );
 
@@ -98,9 +100,7 @@ class TimedMediaIframeOutput {
 	</head>
 <body>
 		<img src="<?php echo $videoTransform->getUrl() ?>" id="bgimage" ></img>
-		<div id="videoContainer" style="visibility:hidden">
-			<?php echo $videoTransform->toHtml(); ?>
-		</div>
+		<?php echo $videoTransform->toHtml(); ?>
 	<?php echo $wgOut->getBottomScripts(); ?>
 </body>
 </html>
