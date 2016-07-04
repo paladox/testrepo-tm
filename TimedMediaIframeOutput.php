@@ -81,9 +81,9 @@ class TimedMediaIframeOutput {
 <html>
 <head>
 <meta charset="UTF-8" />
-<title><?php echo $title->getText() ?></title>
+<title><?php echo $title->getText(); ?></title>
 	<?php
-		echo implode( "\n", $wgOut->getHeadLinksArray() );
+		echo implode( "\n", $wgOut->getHeadLinksArray(); );
 	?>
 	<?php
 		// In place of buildCssLinks, because we don't want to pull in all the skin CSS etc.
@@ -97,7 +97,7 @@ class TimedMediaIframeOutput {
 	<?php echo "\n" . $wgOut->getHeadScripts(); ?>
 	</head>
 <body>
-		<img src="<?php echo $videoTransform->getUrl() ?>" id="bgimage" ></img>
+		<img src="<?php echo $videoTransform->getUrl(); ?>" id="bgimage" ></img>
 		<div id="videoContainer" style="visibility:hidden">
 			<?php echo $videoTransform->toHtml(); ?>
 		</div>
