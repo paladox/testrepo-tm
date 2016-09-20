@@ -97,7 +97,9 @@ class TimedMediaIframeOutput {
 	?>
 <body>
 		<img src="<?php echo $videoTransform->getUrl(); ?>" id="bgimage" ></img>
-		<?php echo $videoTransform->toHtml(); ?>
+		<div id="videoContainer">
+			<?php echo $videoTransform->toHtml(); ?>
+		</div>
 	<?php echo $wgOut->getBottomScripts(); ?>
 </body>
 </html>
