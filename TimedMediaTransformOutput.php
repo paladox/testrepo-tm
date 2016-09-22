@@ -297,8 +297,6 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 	 * @return string
 	 */
 	function getHtmlMediaTagOutput( $sizeOverride = [], $autoPlay = false ) {
-		global $wgTmhWebPlayer;
-
 		// Try to get the first source src attribute ( usually this should be the source file )
 		$mediaSources = $this->getMediaSources();
 		reset( $mediaSources ); // do not rely on auto-resetting of arrays under HHVM
@@ -361,7 +359,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			self::htmlTagSet( 'track', $mediaTracks )
 		);
 
-		if ( $wgTmhWebPlayer === 'videojs' ) {
+		if ( TimedMediaHandlerHooks::activeMode() === 'videojs' ) {
 			return $s;
 		} // else mwEmbed player
 
@@ -398,7 +396,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 	 * @return array
 	 */
 	function getMediaAttr( $sizeOverride = false, $autoPlay = false ) {
-		global $wgVideoPlayerSkin, $wgTmhWebPlayer;
+		global $wgVideoPlayerSkin;
 
 		// Normalize values
 		$length = floatval( $this->length );
@@ -437,7 +435,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			unset( $mediaAttr[ 'poster' ] );
 		}
 
-		if ( $wgTmhWebPlayer === 'videojs' ) {
+		if ( TimedMediaHandlerHooks::activeMode() === 'videojs' ) {
 			$mediaAttr['class'] = 'video-js ' . $wgVideoPlayerSkin;
 			$mediaAttr['width'] = intval( $width );
 			if ( $this->isVideo ) {
