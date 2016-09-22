@@ -17,6 +17,10 @@ $wgAutoloadClasses['WebVideoTranscode'] = "$timedMediaDir/WebVideoTranscode/WebV
 $wgAvailableRights[] = 'transcode-reset';
 $wgAvailableRights[] = 'transcode-status';
 
+// Controls weather to enable videojs beta feature
+// Requires the BetaFeature extension be installed.
+$wgTMHBetaFeature = false;
+
 // Configure the webplayer. Allowed values: mwembed, videojs
 $wgTmhWebPlayer = 'mwembed';
 
@@ -322,6 +326,10 @@ $wgMessagesDirs['MwEmbed.TimedText'] = __DIR__ . '/MwEmbedModules/TimedText/i18n
 // Special Pages
 $wgAutoloadClasses['SpecialTimedMediaHandler'] = "$timedMediaDir/SpecialTimedMediaHandler.php";
 $wgAutoloadClasses['SpecialOrphanedTimedText'] = "$timedMediaDir/SpecialOrphanedTimedText.php";
+
+if ( class_exists( 'BetaFeatures' ) ) {
+	$wgHooks['GetBetaFeaturePreferences'][] = 'TimedMediaHandlerHooks::onGetBetaFeaturePreferences';
+}
 
 // This way if you set a variable like $wgTimedTextNS in LocalSettings.php
 // after you include TimedMediaHandler we can still read the variable values
