@@ -32,7 +32,7 @@ class TimedMediaHandlerHooks {
 	// But for now we register them dynamically, because they are config dependent,
 	// while we have two players
 	public static function resourceLoaderRegisterModules( &$resourceLoader ) {
-		global $wgTmhWebPlayer;
+		global $wgTmhWebPlayer, $wgUser, $wgTMHBetaFeature;
 
 		$baseExtensionResource = [
 			'localBasePath' => __DIR__,
@@ -83,7 +83,7 @@ class TimedMediaHandlerHooks {
 						'position' => 'top',
 					],
 			];
-		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
+		} elseif ( $wgTmhWebPlayer === 'videojs' || $wgTMHBetaFeature ) {
 			$resourceModules = [
 				'ext.tmh.video-js' => $baseExtensionResource + [
 						'scripts' => 'resources/videojs/video.js',
@@ -217,7 +217,7 @@ class TimedMediaHandlerHooks {
 			}
 		}
 
-		if ( $wgTmhWebPlayer === 'mwembed' ) {
+		if ( $wgTmhWebPlayer === 'mwembed' && !$wgTmhBetaFeatures ) {
 			if ( !class_exists( 'MwEmbedResourceManager' ) ) {
 				echo "TimedMediaHandler requires the MwEmbedSupport extension.\n";
 				exit( 1 );
@@ -390,7 +390,7 @@ class TimedMediaHandlerHooks {
 	 * @return bool
 	 */
 	private static function onImagePageHooks( $file, $out ) {
-		global $wgTmhWebPlayer;
+		global $wgTmhWebPlayer, $wgUser, $wgTMHBetaFeature;
 
 		$handler = $file->getHandler();
 		if ( $handler !== false && $handler instanceof TimedMediaHandler ) {
@@ -401,7 +401,7 @@ class TimedMediaHandlerHooks {
 					'mw.PopUpMediaTransform',
 					'mw.TMHGalleryHook.js',
 				] );
-			} elseif ( $wgTmhWebPlayer === 'videojs' ) {
+			} elseif ( $wgTmhWebPlayer === 'videojs' || $wgTMHBetaFeature ) {
 				$out->addModuleStyles( 'ext.tmh.player.styles' );
 				$out->addModules( 'ext.tmh.player' );
 			}
@@ -653,7 +653,7 @@ class TimedMediaHandlerHooks {
 	 * @return bool
 	 */
 	static function pageOutputHook( &$out, &$sk ) {
-		global $wgTimedTextNS, $wgTmhWebPlayer;
+		global $wgTimedTextNS, $wgTmhWebPlayer, $wgUser, $wgTMHBetaFeature;
 
 		$title = $out->getTitle();
 		$namespace = $title->getNamespace();
@@ -671,13 +671,13 @@ class TimedMediaHandlerHooks {
 			}
 		}
 
-		if ( $wgTmhWebPlayer === 'mwembed' ) {
+		if ( self::activeMode() === 'mwembed' ) {
 			$out->addModuleStyles( 'ext.tmh.thumbnail.styles' );
 			$out->addModules( [
 				'mw.MediaWikiPlayer.loader',
 				'mw.PopUpMediaTransform',
 			] );
-		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
+		} elseif ( self::activeMode() === 'videojs' || $wgTMHBetaFeature ) {
 			$out->addModuleStyles( 'ext.tmh.player.styles' );
 			$out->addModules( 'ext.tmh.player' );
 		}
@@ -728,5 +728,37 @@ class TimedMediaHandlerHooks {
 			}
 		}
 		return true;
+	}
+
+	public static function onGetBetaFeaturePreferences( $user, &$prefs ) {
+		global $wgTMHBetaFeature, $wgTmhWebPlayer;
+
+		if ( $wgTMHBetaFeature ) {
+			$prefs['tmh-videojs'] = array(
+				// The first two are message keys
+				'label-message' => 'tmh-beta-feature-message-videojs',
+				'desc-message' => 'tmh-beta-feature-description-videojs',
+				// Paths to images that represents the feature.
+				// The image is usually different for ltr and rtl languages.
+				// Images for specific languages can also specified using the language code.
+				'screenshot' => array(
+					'ltr' => "",
+					'rtl' => "",
+				),
+				// Link to information on the feature - use subpages on mw.org, maybe?
+				'info-link' => 'https://www.mediawiki.org/wiki/Extension:MyExtension',
+				// Link to discussion about the feature - talk pages might work
+				'discussion-link' => 'https://www.mediawiki.org/wiki/Extension_talk:MyExtension',
+			);
+		}
+	}
+
+	public static function activeMode() {
+		global $wgUser, $wgTmhWebPlayer, $wgTMHBetaFeature;
+		if ( $wgTMHBetaFeature && BetaFeatures::isFeatureEnabled( $wgUser, 'tmh-videojs' ) {
+			return 'videojs';
+		} else {
+			return $wgTmhWebPlayer;
+		}
 	}
 }
