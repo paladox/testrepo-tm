@@ -297,7 +297,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 	 * @return string
 	 */
 	function getHtmlMediaTagOutput( $sizeOverride = [], $autoPlay = false ) {
-		global $wgTmhWebPlayer;
+		global $wgTmhWebPlayer, $wgUser, $wgTMHBetaFeature;
 
 		// Try to get the first source src attribute ( usually this should be the source file )
 		$mediaSources = $this->getMediaSources();
@@ -361,7 +361,11 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			self::htmlTagSet( 'track', $mediaTracks )
 		);
 
-		if ( $wgTmhWebPlayer === 'videojs' ) {
+		if ( $wgTMHBetaFeature && class_exists( 'BetaFeatures' ) &&
+			BetaFeatures::isFeatureEnabled( $wgUser, 'tmh-videojs' ) &&
+			!$wgTmhWebPlayer === 'videojs' ) {
+				return $s;
+		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
 			return $s;
 		} // else mwEmbed player
 
@@ -398,7 +402,7 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 	 * @return array
 	 */
 	function getMediaAttr( $sizeOverride = false, $autoPlay = false ) {
-		global $wgVideoPlayerSkin, $wgTmhWebPlayer;
+		global $wgVideoPlayerSkin, $wgTmhWebPlayer, $wgUser, $wgTMHBetaFeature;
 
 		// Normalize values
 		$length = floatval( $this->length );
@@ -437,7 +441,23 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			unset( $mediaAttr[ 'poster' ] );
 		}
 
-		if ( $wgTmhWebPlayer === 'videojs' ) {
+		if ( $wgTmhWebPlayer === 'mwembed' && $wgTMHBetaFeature
+			&& class_exists( 'BetaFeatures' ) &&
+			BetaFeatures::isFeatureEnabled( $wgUser, 'tmh-videojs' ) ) {
+				$mediaAttr['class'] = 'video-js ' . $wgVideoPlayerSkin;
+				$mediaAttr['width'] = intval( $width );
+				if ( $this->isVideo ) {
+					$mediaAttr['height'] = intval( $height );
+				} else {
+					unset( $mediaAttr['height'] );
+				}
+				if ( $this->fillwindow ) {
+					unset( $mediaAttr['width'] );
+					unset( $mediaAttr['height'] );
+					$mediaAttr[ 'class' ] .= ' vjs-fluid';
+					$mediaAttr[ 'data-player' ] = 'fillwindow';
+				}
+		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
 			$mediaAttr['class'] = 'video-js ' . $wgVideoPlayerSkin;
 			$mediaAttr['width'] = intval( $width );
 			if ( $this->isVideo ) {
