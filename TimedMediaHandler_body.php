@@ -197,7 +197,7 @@ class TimedMediaHandler extends MediaHandler {
 	 * @param $file File
 	 */
 	function parserTransformHook( $parser, $file ) {
-		global $wgTmhWebPlayer;
+		global $wgTmhWebPlayer, $wgUser, $wgTMHBetaFeature;
 
 		$parserOutput = $parser->getOutput();
 		if ( isset( $parserOutput->hasTimedMediaTransform ) ) {
@@ -205,12 +205,18 @@ class TimedMediaHandler extends MediaHandler {
 		}
 		$parserOutput->hasTimedMediaTransform = true;
 		if ( $wgTmhWebPlayer == 'mwembed' ) {
-			$parserOutput->addModuleStyles( 'ext.tmh.thumbnail.styles' );
-			$parserOutput->addModules( [
-				'mw.MediaWikiPlayer.loader',
-				'mw.PopUpMediaTransform',
-				'mw.TMHGalleryHook.js',
-			] );
+			if ( $wgTMHBetaFeature && class_exists( 'BetaFeatures' ) &&
+				BetaFeatures::isFeatureEnabled( $wgUser, 'tmh-videojs' ) ) {
+					$parserOutput->addModuleStyles( 'ext.tmh.player.styles' );
+					$parserOutput->addModules( 'ext.tmh.player' );
+			} else {
+				$parserOutput->addModuleStyles( 'ext.tmh.thumbnail.styles' );
+				$parserOutput->addModules( [
+					'mw.MediaWikiPlayer.loader',
+					'mw.PopUpMediaTransform',
+					'mw.TMHGalleryHook.js',
+				] );
+			}
 		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
 			$parserOutput->addModuleStyles( 'ext.tmh.player.styles' );
 			$parserOutput->addModules( 'ext.tmh.player' );
