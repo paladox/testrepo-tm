@@ -32,14 +32,13 @@ class TimedMediaHandlerHooks {
 	// But for now we register them dynamically, because they are config dependent,
 	// while we have two players
 	public static function resourceLoaderRegisterModules( &$resourceLoader ) {
-		global $wgTmhWebPlayer;
+		global $wgTMHBetaFeature;
 
 		$baseExtensionResource = [
 			'localBasePath' => __DIR__,
 			'remoteExtPath' => 'TimedMediaHandler',
 		];
 
-		if ( $wgTmhWebPlayer === 'mwembed' ) {
 			$resourceModules = [
 				'mw.PopUpMediaTransform' => $baseExtensionResource + [
 						'scripts' => 'resources/mw.PopUpThumbVideo.js',
@@ -82,9 +81,6 @@ class TimedMediaHandlerHooks {
 						],
 						'position' => 'top',
 					],
-			];
-		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
-			$resourceModules = [
 				'ext.tmh.video-js' => $baseExtensionResource + [
 						'scripts' => 'resources/videojs/video.js',
 						'styles' => 'resources/videojs/video-js.css',
@@ -179,7 +175,6 @@ class TimedMediaHandlerHooks {
 						'targets' => [ 'mobile', 'desktop' ],
 					],
 			];
-		}
 
 		$resourceLoader->register( $resourceModules );
 		return true;
@@ -217,7 +212,7 @@ class TimedMediaHandlerHooks {
 			}
 		}
 
-		if ( $wgTmhWebPlayer === 'mwembed' ) {
+		if ( self::activeMode() === 'mwembed' ) {
 			if ( !class_exists( 'MwEmbedResourceManager' ) ) {
 				echo "TimedMediaHandler requires the MwEmbedSupport extension.\n";
 				exit( 1 );
@@ -394,14 +389,16 @@ class TimedMediaHandlerHooks {
 
 		$handler = $file->getHandler();
 		if ( $handler !== false && $handler instanceof TimedMediaHandler ) {
-			if ( $wgTmhWebPlayer === 'mwembed' ) {
+			if ( self::activeMode() === 'mwembed' ) {
 				$out->addModuleStyles( 'ext.tmh.thumbnail.styles' );
 				$out->addModules( [
 					'mw.MediaWikiPlayer.loader',
 					'mw.PopUpMediaTransform',
 					'mw.TMHGalleryHook.js',
 				] );
-			} elseif ( $wgTmhWebPlayer === 'videojs' ) {
+			}
+
+			if ( self::activeMode() === 'videojs' ) {
 				$out->addModuleStyles( 'ext.tmh.player.styles' );
 				$out->addModules( 'ext.tmh.player' );
 			}
@@ -671,13 +668,15 @@ class TimedMediaHandlerHooks {
 			}
 		}
 
-		if ( $wgTmhWebPlayer === 'mwembed' ) {
+		if ( self::activeMode() === 'mwembed' ) {
 			$out->addModuleStyles( 'ext.tmh.thumbnail.styles' );
 			$out->addModules( [
 				'mw.MediaWikiPlayer.loader',
 				'mw.PopUpMediaTransform',
 			] );
-		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
+		}
+
+		if ( self::activeMode() === 'videojs' ) {
 			$out->addModuleStyles( 'ext.tmh.player.styles' );
 			$out->addModules( 'ext.tmh.player' );
 		}
@@ -719,7 +718,7 @@ class TimedMediaHandlerHooks {
 		) {
 			/* page has old style TMH elements */
 			if (
-				$wgTmhWebPlayer === 'mwembed' &&
+				self::activeMode() === 'mwembed' &&
 				!in_array( 'mw.MediaWikiPlayer.loader', $parserOutput->getModules() )
 			) {
 				wfDebug( 'Bad TMH parsercache value, throw this out.' );
@@ -728,5 +727,39 @@ class TimedMediaHandlerHooks {
 			}
 		}
 		return true;
+	}
+
+	public static function onGetBetaFeaturePreferences( $user, &$prefs ) {
+		global $wgTMHBetaFeature, $wgTmhWebPlayer;
+
+		if ( $wgTMHBetaFeature ) {
+			$prefs['tmh-videojs'] = [
+				// The first two are message keys
+				'label-message' => 'tmh-beta-feature-message-videojs',
+				'desc-message' => 'tmh-beta-feature-description-videojs',
+				// Paths to images that represents the feature.
+				// The image is usually different for ltr and rtl languages.
+				// Images for specific languages can also specified using the language code.
+				'screenshot' => [
+					'ltr' => "",
+					'rtl' => "",
+				],
+				// Link to information on the feature - use subpages on mw.org, maybe?
+				'info-link' => 'https://www.mediawiki.org/wiki/Extension:MyExtension',
+				// Link to discussion about the feature - talk pages might work
+				'discussion-link' => 'https://www.mediawiki.org/wiki/Extension_talk:MyExtension',
+			];
+			return true;
+		}
+	}
+
+	public static function activeMode() {
+		global $wgTmhWebPlayer, $wgTMHBetaFeature;
+		$context = new RequestContext();
+		if ( $wgTMHBetaFeature && class_exists( 'BetaFeatures' ) && BetaFeatures::isFeatureEnabled( $context->getUser(), 'tmh-videojs' ) ) {
+			return 'videojs';
+		} else {
+			return $wgTmhWebPlayer;
+		}
 	}
 }
