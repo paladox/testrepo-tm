@@ -32,7 +32,7 @@ class TimedMediaHandlerHooks {
 	// But for now we register them dynamically, because they are config dependent,
 	// while we have two players
 	public static function resourceLoaderRegisterModules( &$resourceLoader ) {
-		global $wgTmhWebPlayer;
+		global $wgTmhWebPlayer, $wgUser, $wgTMHBetaFeature;
 
 		$baseExtensionResource = [
 			'localBasePath' => __DIR__,
@@ -83,7 +83,7 @@ class TimedMediaHandlerHooks {
 						'position' => 'top',
 					],
 			];
-		} elseif ( $wgTmhWebPlayer === 'videojs' ) {
+		} elseif ( $wgTmhWebPlayer === 'videojs' || $wgTMHBetaFeature ) {
 			$resourceModules = [
 				'ext.tmh.video-js' => $baseExtensionResource + [
 						'scripts' => 'resources/videojs/video.js',
@@ -217,7 +217,7 @@ class TimedMediaHandlerHooks {
 			}
 		}
 
-		if ( $wgTmhWebPlayer === 'mwembed' ) {
+		if ( $wgTmhWebPlayer === 'mwembed' && !$wgTmhBetaFeatures ) {
 			if ( !class_exists( 'MwEmbedResourceManager' ) ) {
 				echo "TimedMediaHandler requires the MwEmbedSupport extension.\n";
 				exit( 1 );
@@ -390,11 +390,16 @@ class TimedMediaHandlerHooks {
 	 * @return bool
 	 */
 	private static function onImagePageHooks( $file, $out ) {
-		global $wgTmhWebPlayer;
+		global $wgTmhWebPlayer, $wgUser, $wgTMHBetaFeature;
 
 		$handler = $file->getHandler();
 		if ( $handler !== false && $handler instanceof TimedMediaHandler ) {
-			if ( $wgTmhWebPlayer === 'mwembed' ) {
+			if ( $wgTMHBetaFeature && class_exists( 'BetaFeatures' ) &&
+				BetaFeatures::isFeatureEnabled( $wgUser, 'tmh-videojs' ) &&
+				!$wgTmhWebPlayer === 'videojs' ) {
+					$out->addModuleStyles( 'ext.tmh.player.styles' );
+					$out->addModules( 'ext.tmh.player' );
+			} elseif ( $wgTmhWebPlayer === 'mwembed' ) {
 				$out->addModuleStyles( 'ext.tmh.thumbnail.styles' );
 				$out->addModules( [
 					'mw.MediaWikiPlayer.loader',
@@ -653,7 +658,7 @@ class TimedMediaHandlerHooks {
 	 * @return bool
 	 */
 	static function pageOutputHook( &$out, &$sk ) {
-		global $wgTimedTextNS, $wgTmhWebPlayer;
+		global $wgTimedTextNS, $wgTmhWebPlayer, $wgUser, $wgTMHBetaFeature;
 
 		$title = $out->getTitle();
 		$namespace = $title->getNamespace();
@@ -671,7 +676,12 @@ class TimedMediaHandlerHooks {
 			}
 		}
 
-		if ( $wgTmhWebPlayer === 'mwembed' ) {
+		if ( $wgTMHBetaFeature && class_exists( 'BetaFeatures' ) &&
+			BetaFeatures::isFeatureEnabled( $wgUser, 'tmh-videojs' ) &&
+			!$wgTmhWebPlayer === 'videojs' ) {
+				$out->addModuleStyles( 'ext.tmh.player.styles' );
+				$out->addModules( 'ext.tmh.player' );
+		} elseif ( $wgTmhWebPlayer === 'mwembed' ) {
 			$out->addModuleStyles( 'ext.tmh.thumbnail.styles' );
 			$out->addModules( [
 				'mw.MediaWikiPlayer.loader',
@@ -728,5 +738,28 @@ class TimedMediaHandlerHooks {
 			}
 		}
 		return true;
+	}
+
+	public static function onGetBetaFeaturePreferences( $user, &$prefs ) {
+		global $wgTMHBetaFeature, $wgTmhWebPlayer;
+
+		if ( $wgTMHBetaFeature ) {
+			$prefs['tmh-videojs'] = array(
+				// The first two are message keys
+				'label-message' => 'tmh-beta-feature-message-videojs',
+				'desc-message' => 'tmh-beta-feature-description-videojs',
+				// Paths to images that represents the feature.
+				// The image is usually different for ltr and rtl languages.
+				// Images for specific languages can also specified using the language code.
+				'screenshot' => array(
+					'ltr' => "",
+					'rtl' => "",
+				),
+				// Link to information on the feature - use subpages on mw.org, maybe?
+				'info-link' => 'https://www.mediawiki.org/wiki/Extension:MyExtension',
+				// Link to discussion about the feature - talk pages might work
+				'discussion-link' => 'https://www.mediawiki.org/wiki/Extension_talk:MyExtension',
+			);
+		}
 	}
 }
