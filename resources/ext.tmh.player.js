@@ -54,8 +54,8 @@
 				playerConfig = $.extend( true, {}, playerConfig, audioConfig );
 			}
 			$( videoplayer ).attr( {
-				/* Don't preload on pages with many videos, like Category pages */
-				preload: ( index < 10 ) ? 'auto' : 'metadata'
+				/* Don't preload, it's expensive if the file isn't run especially with ogv.js */
+				preload: 'none'
 			} ).find( 'source' ).each( function () {
 				// FIXME would be better if we can configure the plugin to make use of our preferred attributes
 				$source = $( this );
