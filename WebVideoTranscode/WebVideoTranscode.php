@@ -1011,11 +1011,14 @@ class WebVideoTranscode {
 		$src = self::getTranscodedUrlForFile( $file, $transcodeKey );
 
 		if ( $file->getHandler()->isAudio( $file ) ) {
-			$width = $height = 0;
+			$width = $height = $res = 0;
+			$resLabel = wfMessage( 'timedmedia-resolution-audio' )->text();
 		} else {
+			$res = self::$derivativeSettings[$transcodeKey]['maxSize'];
+			$resLabel = wfMessage( 'timedmedia-resolution-' . $res )->text();
 			list( $width, $height ) = WebVideoTranscode::getMaxSizeTransform(
 				$file,
-				self::$derivativeSettings[$transcodeKey]['maxSize']
+				$res
 			);
 		}
 
@@ -1035,6 +1038,10 @@ class WebVideoTranscode {
 				// eventually we will define a manifest xml entry point.
 				"width" => intval( $width ),
 				"height" => intval( $height ),
+
+				// For videojs-resolution-switcher
+				'res' => intval( $res ),
+				'label' => $resLabel,
 			];
 
 		// a "ready" transcode should have a bitrate:
