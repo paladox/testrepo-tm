@@ -323,6 +323,8 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			'framerate',
 			'disablecontrols',
 			'transcodekey',
+			'label',
+			'res',
 		];
 		foreach ( $mediaSources as &$source ) {
 			foreach ( $source as $attr => $val ) {
