@@ -214,6 +214,11 @@ class TimedMediaHandler extends MediaHandler {
 		if ( TimedMediaHandlerHooks::activePlayerMode() === 'videojs' ) {
 			$parserOutput->addModuleStyles( 'ext.tmh.player.styles' );
 			$parserOutput->addModules( 'ext.tmh.player' );
+
+			global $wgTmhUseMultimediaViewer;
+			if ( $wgTmhUseMultimediaViewer ) {
+				$parserOutput->addModuleStyles( 'ext.tmh.placeholder' );
+			}
 		}
 
 		if ( $parserOutput ) {

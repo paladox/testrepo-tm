@@ -32,6 +32,8 @@ class TimedMediaHandlerHooks {
 	// But for now we register them dynamically, because they are config dependent,
 	// while we have two players
 	public static function resourceLoaderRegisterModules( &$resourceLoader ) {
+		global $wgTmhUseMultimediaViewer;
+
 		$baseExtensionResource = [
 			'localBasePath' => __DIR__,
 			'remoteExtPath' => 'TimedMediaHandler',
@@ -184,6 +186,24 @@ class TimedMediaHandlerHooks {
 				],
 		];
 
+		if ( $wgTmhUseMultimediaViewer ) {
+			$resourceModules['ext.tmh.placeholder'] = $baseExtensionResource + [
+				'targets' => [ 'desktop', 'mobile' ],
+				'styles' => 'resources/ext.tmh.placeholder.less',
+				'dependencies' => [
+					'mmv'
+				],
+			];
+			$resourceModules['mmv.tmh'] = $baseExtensionResource + [
+				'scripts' => 'resources/mmv.tmh.js',
+				'targets' => [ 'desktop' ],
+				'dependencies' => [
+					'mmv',
+					'ext.tmh.player'
+				],
+			];
+		}
+
 		$resourceLoader->register( $resourceModules );
 		return true;
 	}
@@ -194,7 +214,8 @@ class TimedMediaHandlerHooks {
 		$wgResourceModules, $wgExcludeFromThumbnailPurge,
 		$wgFileExtensions, $wgTmhEnableMp4Uploads, $wgExtensionAssetsPath,
 		$wgMwEmbedModuleConfig, $wgEnableLocalTimedText, $wgTmhFileExtensions,
-		$wgTmhTheoraTwoPassEncoding, $wgTmhWebPlayer, $wgWikimediaJenkinsCI;
+		$wgTmhTheoraTwoPassEncoding, $wgTmhWebPlayer, $wgWikimediaJenkinsCI,
+		$wgTmhUseMultimediaViewer;
 
 		// set config for parser tests
 		if ( isset( $wgWikimediaJenkinsCI ) && $wgWikimediaJenkinsCI  === true ) {
@@ -217,6 +238,14 @@ class TimedMediaHandlerHooks {
 				if ( isset( $settings['videoCodec'] ) && $settings['videoCodec'] === 'theora' ) {
 					$settings['twopass'] = 'true';
 				}
+			}
+		}
+
+		if ( $wgTmhUseMultimediaViewer ) {
+			global $wgMediaViewerExtensions;
+			$formats = [ 'ogg', 'oga', 'ogv', 'ogm', 'opus', 'webm', 'mp4' ];
+			foreach ( $formats as $ext ) {
+				$wgMediaViewerExtensions[$ext] = 'mmv.tmh';
 			}
 		}
 
@@ -407,6 +436,11 @@ class TimedMediaHandlerHooks {
 			if ( self::activePlayerMode() === 'videojs' ) {
 				$out->addModuleStyles( 'ext.tmh.player.styles' );
 				$out->addModules( 'ext.tmh.player' );
+
+				global $wgTmhUseMultimediaViewer;
+				if ( $wgTmhUseMultimediaViewer ) {
+					$out->addModuleStyles( 'ext.tmh.placeholder' );
+				}
 			}
 		}
 		return true;
@@ -686,6 +720,11 @@ class TimedMediaHandlerHooks {
 			if ( self::activePlayerMode() === 'videojs' ) {
 				$out->addModuleStyles( 'ext.tmh.player.styles' );
 				$out->addModules( 'ext.tmh.player' );
+
+				global $wgTmhUseMultimediaViewer;
+				if ( $wgTmhUseMultimediaViewer ) {
+					$out->addModuleStyles( 'ext.tmh.placeholder' );
+				}
 			}
 		}
 
