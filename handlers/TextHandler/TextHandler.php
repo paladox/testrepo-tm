@@ -54,7 +54,11 @@ class TextHandler {
 				return $wgTimedTextForeignNamespaces[ $wikiID ];
 			}
 			// failed to get namespace via ForeignDBViaLBRepo, return NS_TIMEDTEXT
-			return NS_TIMEDTEXT;
+			if ( $wgEnableLocalTimedText ) {
+				return NS_TIMEDTEXT;
+			} else {
+				return false;
+			}
 		} else {
 			if ( $this->remoteNs !== null ) {
 				return $this->remoteNs;
@@ -289,11 +293,17 @@ class TextHandler {
 	}
 
 	function getForeignNamespaceName() {
+		global $wgEnableLocalTimedText;
 		if ( $this->remoteNs !== null ) {
 			return $this->remoteNsName;
 		}
 		/* Else, we use the canonical namespace, since we can't look up the actual one */
-		return strtr( MWNamespace::getCanonicalName( NS_TIMEDTEXT ), ' ', '_' );
+		if ( $wgEnableLocalTimedText ) {
+			return strtr( MWNamespace::getCanonicalName( NS_TIMEDTEXT ), ' ', '_' );
+		} else {
+			// Assume default.
+			return 'TimedText';
+		}
 	}
 
 	/**
