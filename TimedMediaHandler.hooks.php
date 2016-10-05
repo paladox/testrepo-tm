@@ -32,7 +32,7 @@ class TimedMediaHandlerHooks {
 	// But for now we register them dynamically, because they are config dependent,
 	// while we have two players
 	public static function resourceLoaderRegisterModules( &$resourceLoader ) {
-		global $wgTmhWebPlayer;
+		global $wgTmhWebPlayer, $wgTmhUseMultimediaViewer;
 
 		$baseExtensionResource = [
 			'localBasePath' => __DIR__,
@@ -189,6 +189,16 @@ class TimedMediaHandlerHooks {
 						'targets' => [ 'mobile', 'desktop' ],
 					],
 			];
+
+			if ( $wgTmhUseMultimediaViewer ) {
+				$resourceModules['mmv.tmh'] = $baseExtensionResource + [
+					'scripts' => 'resources/mmv.tmh.js',
+					'targets' => [ 'desktop' ],
+					'dependencies' => [
+						'mmv'
+					],
+				];
+			}
 		}
 
 		$resourceLoader->register( $resourceModules );
@@ -201,7 +211,8 @@ class TimedMediaHandlerHooks {
 		$wgResourceModules, $wgExcludeFromThumbnailPurge,
 		$wgFileExtensions, $wgTmhEnableMp4Uploads, $wgExtensionAssetsPath,
 		$wgMwEmbedModuleConfig, $wgEnableLocalTimedText, $wgTmhFileExtensions,
-		$wgTmhTheoraTwoPassEncoding, $wgTmhWebPlayer, $wgWikimediaJenkinsCI;
+		$wgTmhTheoraTwoPassEncoding, $wgTmhWebPlayer, $wgWikimediaJenkinsCI,
+		$wgTmhUseMultimediaViewer;
 
 		// set config for parser tests
 		if ( isset( $wgWikimediaJenkinsCI ) && $wgWikimediaJenkinsCI  === true ) {
@@ -224,6 +235,14 @@ class TimedMediaHandlerHooks {
 				if ( isset( $settings['videoCodec'] ) && $settings['videoCodec'] === 'theora' ) {
 					$settings['twopass'] = 'true';
 				}
+			}
+		}
+
+		if ( $wgTmhUseMultimediaViewer ) {
+			global $wgMediaViewerExtensions;
+			$formats = [ 'ogg', 'oga', 'ogv', 'ogm', 'opus', 'webm', 'mp4' ];
+			foreach ( $formats as $ext ) {
+				$wgMediaViewerExtensions[$ext] = 'mmv.tmh';
 			}
 		}
 

@@ -20,6 +20,9 @@ $wgAvailableRights[] = 'transcode-status';
 // Configure the webplayer. Allowed values: mwembed, videojs
 $wgTmhWebPlayer = 'mwembed';
 
+// Integrate with MultimediaViewer extension
+$wgTmhUseMultimediaViewer = false;
+
 /*** MwEmbed module configuration: *********************************/
 
 // Show a warning to the user if they are not using an html5 browser with high quality ogg support

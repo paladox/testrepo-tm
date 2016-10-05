@@ -1,6 +1,6 @@
 <?php
 
-class TimedMediaTransformOutput extends MediaTransformOutput {
+class TimedMediaTransformOutput extends ThumbnailImage {
 	private static $serial = 0;
 
 	// Video file sources object lazy init in getSources()
@@ -139,11 +139,14 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			$this->width = $options['override-width'];
 		}
 
-		if ( $this->useImagePopUp() && $wgTmhWebPlayer === 'mwembed' ) {
+		if ( $wgTmhWebPlayer === 'mwembed' && $this->useImagePopUp() ) {
 			$res = $this->getImagePopUp();
+		} else if ( $wgTmhWebPlayer === 'videojs' && $this->useImagePlaceholder() ) {
+			$res = $this->getImagePlaceholder();
 		} else {
 			$res = $this->getHtmlMediaTagOutput();
 		}
+
 		$this->width = $oldWidth;
 		$this->height = $oldHeight;
 		return $res;
@@ -164,6 +167,11 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			&& $this->getPlayerWidth() < $wgMinimumVideoPlayerSize
 			// Do not do pop-up if its going to be the same size as inline player anyways
 			&& $this->getPlayerWidth() < $this->getPopupPlayerWidth();
+	}
+
+	private function useImagePlaceholder() {
+		global $wgTmhUseMultimediaViewer;
+		return $this->isVideo && !$this->fillwindow && !$this->inline;
 	}
 
 	/**
@@ -240,6 +248,20 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 	private function getPopupPlayerWidth() {
 		list( $popUpWidth ) = $this->getPopupPlayerSize();
 		return $popUpWidth;
+	}
+
+	/**
+	 * Return a plain-image version of the image
+	 */
+	private function getImagePlaceholder() {
+		$poster = $this->getUrl();
+		$thumb = new ThumbnailImage( $this->file, $poster, false, [
+			'width' => intval( $this->width ),
+			'height' => intval( $this->height ),
+		] );
+		return $thumb->toHtml( [
+			'desc-link' => true,
+		] );
 	}
 
 	/**
