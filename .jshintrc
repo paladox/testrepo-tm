@@ -33,6 +33,7 @@
 	"nomen": true,
 
 	"globals": {
+		"console": false,
 		"mediaWiki": false,
 		"jQuery": false,
 		"OGVVersion": false,

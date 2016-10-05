@@ -1,0 +1,14 @@
+.media-placeholder {
+	position: relative;
+}
+.media-placeholder a.image::after {
+	content: url(player_big_play_button.png);
+	position: absolute;
+	top: 16px;
+	left: 16px;
+	width: 70px;
+	height: 53px;
+}
+.media-placeholder a.image:hover::after {
+	content: url(player_big_play_button_hover.png);
+}
