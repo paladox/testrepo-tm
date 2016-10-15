@@ -363,3 +363,7 @@ $wgExtensionCredits['media'][] = [
 	'version' => '0.5.0',
 	'license-name' => 'GPL-2.0+',
 ];
+
+if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
+	require_once __DIR__ . '/vendor/autoload.php';
+}
