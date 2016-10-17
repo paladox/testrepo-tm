@@ -34,9 +34,6 @@
 			},
 			replayButton: {},
 			infoButton: {}
-		},
-		ogvjs: {
-			base: mw.OgvJsSupport.basePath()
 		}
 	};
 
@@ -48,11 +45,11 @@
 
 	/**
 	 * Load video players for a jQuery collection
-     */
+	 */
 	function loadVideoPlayer() {
-		var videoplayer, $videoplayer;
+		var videoplayer, $videoplayer, $collection = this;
 
-		this.each( function ( index ) {
+		function loadSinglePlayer( index ) {
 			videoplayer = this;
 			$videoplayer = $( this );
 			if ( $videoplayer.closest( '.video-js' ).size() ) {
@@ -129,7 +126,29 @@
 			videojs( videoplayer, playerConfig ).ready( function () {
 				/* More custom stuff goes here */
 			} );
-		} );
+		}
+
+		if( isOGVSupported() ) {
+			$collection.each( loadSinglePlayer );
+		} else {
+			mw.loader.using( 'ext.tmh.videojs-ogvjs' ).then( function() {
+				globalConfig.ogvjs = {
+					base: mw.OgvJsSupport.basePath()
+				};
+				$collection.each( loadSinglePlayer );
+			} );
+		}
+	}
+
+	function isOGVSupported() {
+		var el = document.createElement('video');
+		if( el && el.canPlayType && el.canPlayType( 'application/ogg' ) ) {
+			return true;
+		}
+		return false;
+	}
+	if( !isOGVSupported() ) {
+		mw.loader.load( 'ext.tmh.videojs-ogvjs' );
 	}
 
 	$.fn.loadVideoPlayer = loadVideoPlayer;
