@@ -155,6 +155,7 @@ class TimedMediaHandlerHooks {
 				'targets' => [ 'mobile', 'desktop' ],
 				'dependencies' => [
 					'ext.tmh.video-js',
+					'mediawiki.Title',
 				],
 			],
 			'ext.tmh.player' => $baseExtensionResource + [
