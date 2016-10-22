@@ -19,6 +19,37 @@ div.thumbinner.mw-overflow {
 	display: table-cell;
 }
 
+.mw-tmh-fallback {
+	margin: 0;
+	padding: 0;
+	position: relative;
+	display: inline-block;
+
+	.play-btn-large {
+		position: absolute;
+		cursor: pointer;
+		border: none;
+		top: 50%;
+		left : 50%;
+		width: 70px;
+		height: 53px;
+		margin-left: -35px;
+		margin-top: -25px;
+		/* @embed */
+		background-image: url('player_big_play_button.png');
+
+		&:hover {
+			/* @embed */
+			background-image: url('player_big_play_button_hover.png');
+		}
+	}
+	.mw-tmh-playtext {
+		display: block;
+		height: 0;
+		overflow: hidden;
+	}
+}
+
 /*
  * Make video-js behave like standard <video><audio> elements
  * The thumbinner check works around a width interaction for

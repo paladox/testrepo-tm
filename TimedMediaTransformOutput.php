@@ -351,12 +351,14 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 		}
 
 		// Build the video tag output:
-		$s = Html::rawElement( $this->getTagName(), $this->getMediaAttr( $sizeOverride, $autoPlay ),
+		$s = Html::rawElement( $this->getTagName() , $this->getMediaAttr( $sizeOverride, $autoPlay ),
 			// The set of media sources:
 			self::htmlTagSet( 'source', $mediaSources ) .
 
 			// Timed text:
-			self::htmlTagSet( 'track', $mediaTracks )
+			self::htmlTagSet( 'track', $mediaTracks ) .
+
+			$this->getVideoElementFallbackContent()
 		);
 
 		if ( TimedMediaHandlerHooks::activePlayerMode() === 'videojs' ) {
@@ -368,6 +370,42 @@ class TimedMediaTransformOutput extends MediaTransformOutput {
 			'class' => 'mediaContainer',
 			'style' => 'width:'. $width
 		], $s );
+	}
+
+	function getVideoElementFallbackContent() {
+		if ( TimedMediaHandlerHooks::activePlayerMode() === 'mwembed' ) {
+			return '';
+		}
+		// Build fallback content
+		return Xml::tags( 'div', [
+			'class' => 'mw-tmh-fallback'
+		], 	Xml::tags( 'a', [
+				'href' => $this->file->getTitle()->getLocalUrl()
+			], Xml::tags( 'img', [
+				'alt' => $this->file->getTitle(),
+				'style' => "width:" . $this->getPlayerWidth() . "px;height:" .
+							$this->getPlayerHeight() . "px",
+				'src' =>  $this->getUrl(),
+			], '' ))
+			.
+			// For non-HTML5 browsers provide a link to the asset:
+			Xml::tags( 'a', [
+					'href'=> $this->file->getUrl(),
+					'title' => wfMessage( 'timedmedia-play-media' )->escaped(),
+					'target' => 'new'
+				],
+				Xml::tags( 'span', [
+						'class' => 'play-btn-large'
+					],
+					// Have some sort of text for lynx & screen readers.
+					Html::element(
+						'span',
+						[ 'class' => 'mw-tmh-playtext' ],
+						wfMessage( 'timedmedia-play-media' )->text()
+					)
+				)
+			)
+		);
 	}
 
 	/**

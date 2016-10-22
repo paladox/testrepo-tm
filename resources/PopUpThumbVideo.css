@@ -1,4 +1,7 @@
 .PopUpMediaTransform a .play-btn-large {
+	position: absolute;
+	cursor: pointer;
+	border: none !important;
 	top: 50%;
 	left : 50%;
 	width: 70px;
