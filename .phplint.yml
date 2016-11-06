@@ -1,0 +1,4 @@
+path: ./
+jobs: 50
+exclude:
+  - vendor
