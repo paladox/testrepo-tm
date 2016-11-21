@@ -1,0 +1,476 @@
+{
+	"name": "TimedMediaHandler",
+	"namemsg": "timedmediahandler-extensionname",
+	"version": "0.5.0",
+	"author": [
+		"Michael Dale",
+		"Tim Starling",
+		"James Heinrich",
+		"Jan Gerber",
+		"Brion Vibber",
+		"Derk-Jan Hartman"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:TimedMediaHandler",
+	"descriptionmsg": "timedmediahandler-desc",
+	"license-name": "GPL-2.0+",
+	"type": "media",
+	"callback": "TimedMediaHandlerHooks::onRegistration",
+	"APIModules": {
+		"transcodereset": "ApiTranscodeReset"
+	},
+	"APIPropModules": {
+		"videoinfo": "ApiQueryVideoInfo",
+		"transcodestatus": "ApiTranscodeStatus"
+	},
+	"AvailableRights": [
+		"transcode-reset",
+		"transcode-status"
+	],
+	"FileExtensions": [
+		"ogg",
+		"ogv",
+		"oga",
+		"flac",
+		"opus",
+		"wav",
+		"webm",
+		"mp4"
+	],
+	"GroupPermissions": {
+		"sysop": {
+			"transcode-reset": true,
+			"transcode-status": true
+		},
+		"autoconfirmed": {
+			"transcode-reset": true
+		}
+	},
+	"JobClasses": {
+		"webVideoTranscode": "WebVideoTranscodeJob"
+	},
+	"MediaHandlers": {
+		"application/ogg": "OggHandlerTMH",
+		"audio/webm": "WebMHandler",
+		"video/webm": "WebMHandler",
+		"video/mp4": "Mp4Handler",
+		"audio/x-flac": "FLACHandler",
+		"audio/flac": "FLACHandler",
+		"audio/wav": "WAVHandler"
+	},
+	"SpecialPages": {
+		"OrphanedTimedText": "SpecialOrphanedTimedText",
+		"TimedMediaHandler": "SpecialTimedMediaHandler"
+	},
+	"MessagesDirs": {
+		"TimedMediaHandler": [
+			"i18n"
+		],
+		"MwEmbed.EmbedPlayer": [
+			"MwEmbedModules/EmbedPlayer/i18n"
+		],
+		"MwEmbed.TimedText": [
+			"MwEmbedModules/TimedText/i18n"
+		]
+	},
+	"ExtensionMessagesFiles": {
+		"TimedMediaHandlerMagic": "TimedMediaHandler.i18n.magic.php",
+		"TimedMediaHandlerAliases": "TimedMediaHandler.i18n.alias.php"
+	},
+	"AutoloadClasses": {
+		"WebVideoTranscode": "WebVideoTranscode/WebVideoTranscode.php",
+		"TimedMediaHandler": "TimedMediaHandler_body.php",
+		"TimedMediaHandlerHooks": "TimedMediaHandler.hooks.php",
+		"TimedMediaTransformOutput": "TimedMediaTransformOutput.php",
+		"TimedMediaIframeOutput": "TimedMediaIframeOutput.php",
+		"TimedMediaThumbnail": "TimedMediaThumbnail.php",
+		"TranscodeStatusTable": "TranscodeStatusTable.php",
+		"ApiTestCaseVideoUpload": "tests/phpunit/ApiTestCaseVideoUpload.php",
+		"OggHandlerTMH": "handlers/OggHandler/OggHandler.php",
+		"OggException": "handlers/OggHandler/OggException.php",
+		"File_Ogg": "handlers/OggHandler/File_Ogg/File/Ogg.php",
+		"File_Ogg_Bitstream": "handlers/OggHandler/File_Ogg/File/Ogg/Bitstream.php",
+		"File_Ogg_Flac": "handlers/OggHandler/File_Ogg/File/Ogg/Flac.php",
+		"File_Ogg_Media": "handlers/OggHandler/File_Ogg/File/Ogg/Media.php",
+		"File_Ogg_Opus": "handlers/OggHandler/File_Ogg/File/Ogg/Opus.php",
+		"File_Ogg_Speex": "handlers/OggHandler/File_Ogg/File/Ogg/Speex.php",
+		"File_Ogg_Theora": "handlers/OggHandler/File_Ogg/File/Ogg/Theora.php",
+		"File_Ogg_Vorbis": "handlers/OggHandler/File_Ogg/File/Ogg/Vorbis.php",
+		"ID3Handler": "handlers/ID3Handler/ID3Handler.php",
+		"Mp4Handler": "handlers/Mp4Handler/Mp4Handler.php",
+		"WebMHandler": "handlers/WebMHandler/WebMHandler.php",
+		"FLACHandler": "handlers/FLACHandler/FLACHandler.php",
+		"WAVHandler": "handlers/WAVHandler/WAVHandler.php",
+		"TextHandler": "handlers/TextHandler/TextHandler.php",
+		"TimedTextPage": "TimedTextPage.php",
+		"WebVideoTranscodeJob": "WebVideoTranscode/WebVideoTranscodeJob.php",
+		"ApiQueryVideoInfo": "ApiQueryVideoInfo.php",
+		"ApiTranscodeStatus": "ApiTranscodeStatus.php",
+		"ApiTranscodeReset": "ApiTranscodeReset.php",
+		"SpecialTimedMediaHandler": "SpecialTimedMediaHandler.php",
+		"SpecialOrphanedTimedText": "SpecialOrphanedTimedText.php"
+	},
+	"ResourceModules": {
+		"ext.tmh.thumbnail.styles": {
+			"styles": "resources/ext.tmh.thumbnail.css",
+			"position": "top"
+		},
+		"ext.tmh.transcodetable": {
+			"scripts": "resources/ext.tmh.transcodetable.js",
+			"styles": "resources/transcodeTable.css",
+			"dependencies": [
+				"mediawiki.api.edit",
+				"oojs-ui"
+			],
+			"messages": [
+				"timedmedia-reset-button-cancel",
+				"timedmedia-reset-button-dismiss",
+				"timedmedia-reset-button-reset",
+				"timedmedia-reset-error",
+				"timedmedia-reset",
+				"timedmedia-reset-areyousure",
+				"timedmedia-reset-explanation"
+			]
+		},
+		"ext.tmh.TimedTextSelector": {
+			"scripts": "resources/ext.tmh.TimedTextSelector.js"
+		},
+		"ext.tmh.OgvJsSupport": {
+			"scripts": [
+				"MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv-support.js",
+				"resources/ext.tmh.OgvJsSupport.js"
+			],
+			"targets": [
+				"mobile",
+				"desktop"
+			]
+		},
+		"ext.tmh.OgvJs": {
+			"scripts": [
+				"MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv.js"
+			],
+			"dependencies": "ext.tmh.OgvJsSupport",
+			"targets": [
+				"mobile",
+				"desktop"
+			]
+		},
+		"embedPlayerIframeStyle": {
+			"styles": "resources/embedPlayerIframe.css",
+			"targets": [
+				"mobile",
+				"desktop"
+			]
+		},
+		"mw.PopUpMediaTransform": {
+			"scripts": "resources/mw.PopUpThumbVideo.js",
+			"dependencies": [
+				"mw.MwEmbedSupport",
+				"mediawiki.Title",
+				"mw.PopUpMediaTransform.styles"
+			],
+			"position": "top"
+		},
+		"mw.PopUpMediaTransform.styles": {
+			"position": "top",
+			"styles": "resources/PopUpThumbVideo.css"
+		},
+		"mw.TMHGalleryHook.js": {
+			"scripts": "resources/mw.TMHGalleryHook.js",
+			"position": "top"
+		},
+		"ext.tmh.embedPlayerIframe": {
+			"scripts": "resources/ext.tmh.embedPlayerIframe.js",
+			"dependencies": [
+				"jquery.embedPlayer",
+				"mw.MwEmbedSupport"
+			]
+		},
+		"mw.MediaWikiPlayerSupport": {
+			"scripts": "resources/mw.MediaWikiPlayerSupport.js",
+			"dependencies": [
+				"mw.Api",
+				"mw.MwEmbedSupport"
+			]
+		},
+		"mw.MediaWikiPlayer.loader": {
+			"scripts": "resources/mw.MediaWikiPlayer.loader.js",
+			"dependencies": [
+				"mw.EmbedPlayer.loader",
+				"mw.TimedText.loader"
+			],
+			"position": "top"
+		},
+		"ext.tmh.video-js": {
+			"scripts": "resources/videojs/video.js",
+			"styles": "resources/videojs/video-js.css",
+			"noflip": true,
+			"targets": [
+				"mobile",
+				"desktop"
+			],
+			"languageScripts": {
+				"ar": "resources/videojs/lang/ar.js",
+				"ba": "resources/videojs/lang/ba.js",
+				"bg": "resources/videojs/lang/bg.js",
+				"ca": "resources/videojs/lang/ca.js",
+				"cs": "resources/videojs/lang/cs.js",
+				"da": "resources/videojs/lang/da.js",
+				"de": "resources/videojs/lang/de.js",
+				"el": "resources/videojs/lang/el.js",
+				"en": "resources/videojs/lang/en.js",
+				"es": "resources/videojs/lang/es.js",
+				"fa": "resources/videojs/lang/fa.js",
+				"fi": "resources/videojs/lang/fi.js",
+				"fr": "resources/videojs/lang/fr.js",
+				"hr": "resources/videojs/lang/hr.js",
+				"hu": "resources/videojs/lang/hu.js",
+				"it": "resources/videojs/lang/it.js",
+				"ja": "resources/videojs/lang/ja.js",
+				"ko": "resources/videojs/lang/ko.js",
+				"nb": "resources/videojs/lang/nb.js",
+				"nl": "resources/videojs/lang/nl.js",
+				"nn": "resources/videojs/lang/nn.js",
+				"pl": "resources/videojs/lang/pl.js",
+				"pt-BR": "resources/videojs/lang/pt-BR.js",
+				"ru": "resources/videojs/lang/ru.js",
+				"sr": "resources/videojs/lang/sr.js",
+				"sv": "resources/videojs/lang/sv.js",
+				"tr": "resources/videojs/lang/tr.js",
+				"uk": "resources/videojs/lang/uk.js",
+				"vi": "resources/videojs/lang/vi.js",
+				"zh-CN": "resources/videojs/lang/zh-CN.js",
+				"zh-TW": "resources/videojs/lang/zh-TW.js"
+			}
+		},
+		"ext.tmh.videojs-ogvjs": {
+			"scripts": "resources/videojs-ogvjs/videojs-ogvjs.js",
+			"targets": [
+				"mobile",
+				"desktop"
+			],
+			"dependencies": [
+				"ext.tmh.video-js",
+				"ext.tmh.OgvJs"
+			]
+		},
+		"ext.tmh.videojs-resolution-switcher": {
+			"scripts": "resources/videojs-resolution-switcher/videojs-resolution-switcher.js",
+			"styles": "resources/videojs-resolution-switcher/videojs-resolution-switcher.css",
+			"targets": [
+				"mobile",
+				"desktop"
+			],
+			"dependencies": [
+				"ext.tmh.video-js"
+			]
+		},
+		"ext.tmh.videojs-responsive-layout": {
+			"scripts": "resources/videojs-responsive-layout/videojs-responsive-layout.js",
+			"targets": [
+				"mobile",
+				"desktop"
+			],
+			"dependencies": [
+				"ext.tmh.video-js"
+			]
+		},
+		"ext.tmh.videojs-replay": {
+			"scripts": "resources/videojs-replay/videojs-replay.js",
+			"styles": "resources/videojs-replay/videojs-replay.css",
+			"targets": [
+				"mobile",
+				"desktop"
+			],
+			"dependencies": [
+				"ext.tmh.video-js"
+			]
+		},
+		"ext.tmh.mw-info-button": {
+			"scripts": "resources/mw-info-button/mw-info-button.js",
+			"styles": "resources/mw-info-button/mw-info-button.css",
+			"targets": [
+				"mobile",
+				"desktop"
+			],
+			"dependencies": [
+				"ext.tmh.video-js"
+			]
+		},
+		"ext.tmh.player": {
+			"scripts": "resources/ext.tmh.player.js",
+			"targets": [
+				"mobile",
+				"desktop"
+			],
+			"dependencies": [
+				"ext.tmh.video-js",
+				"ext.tmh.videojs-resolution-switcher",
+				"ext.tmh.videojs-responsive-layout",
+				"ext.tmh.videojs-replay",
+				"ext.tmh.mw-info-button",
+				"ext.tmh.OgvJsSupport"
+			],
+			"messages": [
+				"timedmedia-resolution-160",
+				"timedmedia-resolution-240",
+				"timedmedia-resolution-360",
+				"timedmedia-resolution-480",
+				"timedmedia-resolution-720",
+				"timedmedia-resolution-1080",
+				"timedmedia-resolution-1440",
+				"timedmedia-resolution-2160"
+			]
+		},
+		"ext.tmh.player.styles": {
+			"styles": "resources/ext.tmh.player.styles.less",
+			"targets": [
+				"mobile",
+				"desktop"
+			]
+		}
+	},
+	"ResourceFileModulePaths": {
+		"localBasePath": "",
+		"remoteExtPath": "TimedMediaHandler"
+	},
+	"Hooks": {
+		"GetBetaFeaturePreferences": "TimedMediaHandlerHooks::onGetBetaFeaturePreferences",
+		"PageRenderingHash": "TimedMediaHandlerHooks::changePageRenderingHash",
+		"CanonicalNamespaces": "TimedMediaHandlerHooks::addCanonicalNamespaces",
+		"ArticleFromTitle": "TimedMediaIframeOutput::iframeHook",
+		"FileUpload": "TimedMediaHandlerHooks::onFileUpload",
+		"TitleMove": "TimedMediaHandlerHooks::checkTitleMove",
+		"FileDeleteComplete": "TimedMediaHandlerHooks::onFileDeleteComplete",
+		"BeforePageDisplay": "TimedMediaHandlerHooks::pageOutputHook",
+		"ImageOpenShowImageInlineBefore": "TimedMediaHandlerHooks::onImageOpenShowImageInlineBefore",
+		"ImagePageFileHistoryLine": "TimedMediaHandlerHooks::onImagePageFileHistoryLine",
+		"LoadExtensionSchemaUpdates": [
+			"TimedMediaHandlerHooks::loadExtensionSchemaUpdates",
+			"TimedMediaHandlerHooks::checkSchemaUpdates"
+		],
+		"UnitTestsList": "TimedMediaHandlerHooks::registerUnitTests",
+		"ParserTestTables": "TimedMediaHandlerHooks::onParserTestTables",
+		"ParserTestGlobals": "TimedMediaHandlerHooks::onParserTestGlobals",
+		"ImagePageAfterImageLinks": "TimedMediaHandlerHooks::checkForTranscodeStatus",
+		"NewRevisionFromEditComplete": "TimedMediaHandlerHooks::onNewRevisionFromEditComplete",
+		"ArticlePurge": "TimedMediaHandlerHooks::onArticlePurge",
+		"wgQueryPages": "TimedMediaHandlerHooks::onwgQueryPages",
+		"RejectParserCacheValue": "TimedMediaHandlerHooks::rejectParserCacheValue"
+	},
+	"ParserTestFiles": [
+		"tests/parserTests.txt"
+	],
+	"config": {
+		"TmhUseBetaFeatures": {
+			"value": false
+		},
+		"TmhWebPlayer": {
+			"value": "mwembed"
+		},
+		"MwEmbedModuleConfig": {
+			"value": {
+				"EmbedPlayer.DirectFileLinkWarning": true,
+				"EmbedPlayer.EnableOptionsMenu": true,
+				"EmbedPlayer.DisableHTML5FlashFallback": true,
+				"TimedText.ShowInterface": "always",
+				"TimedText.ShowAddTextLink": true
+			}
+		},
+		"WaitTimeForTranscodeReset": {
+			"value": 3600
+		},
+		"MinimumVideoPlayerSize": {
+			"value": 200
+		},
+		"MediaVideoTypes": {
+			"value": [
+				"Theora",
+				"VP8"
+			]
+		},
+		"MediaAudioTypes": {
+			"value": [
+				"Vorbis",
+				"Speex",
+				"FLAC",
+				"Opus"
+			]
+		},
+		"VideoPlayerSkinModule": {
+			"value": "mw.PlayerSkinKskin"
+		},
+		"EnableIframeEmbed": {
+			"value": true
+		},
+		"EnableTranscode": {
+			"value": true
+		},
+		"EnableNiceBackgroundTranscodeJobs": {
+			"value": false
+		},
+		"TranscodeBackgroundPriority": {
+			"value": 19
+		},
+		"TranscodeBackgroundTimeLimit": {
+			"value": 28800
+		},
+		"TranscodeBackgroundMemoryLimit": {
+			"value": 2097152
+		},
+		"TranscodeBackgroundSizeLimit": {
+			"value": 3145728
+		},
+		"FFmpegThreads": {
+			"value": 1
+		},
+		"FFmpeg2theoraLocation": {
+			"value": "/usr/bin/ffmpeg2theora"
+		},
+		"OggThumbLocation": {
+			"value": "/usr/bin/oggThumb"
+		},
+		"FFmpegLocation": {
+			"value": "/usr/bin/avconv"
+		},
+		"TimedTextNS": {
+			"value": 710
+		},
+		"TimedTextForeignNamespaces": {
+			"value": []
+		},
+		"EnableLocalTimedText": {
+			"value": true
+		},
+		"EnabledTranscodeSet": {
+			"value": []
+		},
+		"EnabledAudioTranscodeSet": {
+			"value": []
+		},
+		"TmhEnableMp4Uploads": {
+			"value": false
+		},
+		"TmhTheoraTwoPassEncoding": {
+			"value": false
+		},
+		"TmhFileExtensions": {
+			"value": [
+				"ogg",
+				"ogv",
+				"oga",
+				"flac",
+				"opus",
+				"wav",
+				"webm",
+				"mp4"
+			]
+		},
+		"JobTypesExcludedFromDefaultQueue": {
+			"value": [
+				"webVideoTranscode"
+			]
+		}
+	},
+	"load_composer_autoloader": true,
+	"manifest_version": 2
+}
