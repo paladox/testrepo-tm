@@ -34,182 +34,112 @@ class TimedMediaHandlerHooks {
 	}
 
 	/**
-	 * At some point these should be registered in extension.json
-	 * But for now we register them dynamically, because they are config dependent,
-	 * while we have two players
-	 *
-	 * @param ResourceLoader $resourceLoader
-	 * @return bool
-	 */
-	public static function resourceLoaderRegisterModules( &$resourceLoader ) {
-		$baseExtensionResource = [
-			'localBasePath' => __DIR__,
-			'remoteExtPath' => 'TimedMediaHandler',
-		];
-
-		$resourceModules = [
-			'mw.PopUpMediaTransform' => $baseExtensionResource + [
-				'scripts' => 'resources/mw.PopUpThumbVideo.js',
-				'dependencies' => [
-					'mw.MwEmbedSupport',
-					'mediawiki.Title',
-					'mw.PopUpMediaTransform.styles'
-				],
-				'position' => 'top',
-			],
-			'mw.PopUpMediaTransform.styles' => $baseExtensionResource + [
-				'position' => 'top',
-				'styles' => 'resources/PopUpThumbVideo.css',
-			],
-			'mw.TMHGalleryHook.js' => $baseExtensionResource + [
-				'scripts' => 'resources/mw.TMHGalleryHook.js',
-				// position top needed as it needs to load before mediawiki.page.gallery
-				'position' => 'top',
-			],
-			'ext.tmh.embedPlayerIframe' => $baseExtensionResource + [
-				'scripts' => 'resources/ext.tmh.embedPlayerIframe.js',
-				'dependencies' => [
-					'jquery.embedPlayer',
-					'mw.MwEmbedSupport',
-				],
-			],
-			"mw.MediaWikiPlayerSupport" =>  $baseExtensionResource + [
-				'scripts' => 'resources/mw.MediaWikiPlayerSupport.js',
-				'dependencies'=> [
-					'mw.Api',
-					'mw.MwEmbedSupport',
-				],
-			],
-			// adds support MediaWikiPlayerSupport player bindings
-			"mw.MediaWikiPlayer.loader" => $baseExtensionResource + [
-				'scripts' => 'resources/mw.MediaWikiPlayer.loader.js',
-				'dependencies' => [
-					"mw.EmbedPlayer.loader",
-					"mw.TimedText.loader",
-				],
-				'position' => 'top',
-			],
-			'ext.tmh.video-js' => $baseExtensionResource + [
-				'scripts' => 'resources/videojs/video.js',
-				'styles' => 'resources/videojs/video-js.css',
-				'noflip' => true,
-				'targets' => [ 'mobile', 'desktop' ],
-				'languageScripts' => [
-					'ar' => 'resources/videojs/lang/ar.js',
-					'ba' => 'resources/videojs/lang/ba.js',
-					'bg' => 'resources/videojs/lang/bg.js',
-					'ca' => 'resources/videojs/lang/ca.js',
-					'cs' => 'resources/videojs/lang/cs.js',
-					'da' => 'resources/videojs/lang/da.js',
-					'de' => 'resources/videojs/lang/de.js',
-					'el' => 'resources/videojs/lang/el.js',
-					'en' => 'resources/videojs/lang/en.js',
-					'es' => 'resources/videojs/lang/es.js',
-					'fa' => 'resources/videojs/lang/fa.js',
-					'fi' => 'resources/videojs/lang/fi.js',
-					'fr' => 'resources/videojs/lang/fr.js',
-					'hr' => 'resources/videojs/lang/hr.js',
-					'hu' => 'resources/videojs/lang/hu.js',
-					'it' => 'resources/videojs/lang/it.js',
-					'ja' => 'resources/videojs/lang/ja.js',
-					'ko' => 'resources/videojs/lang/ko.js',
-					'nb' => 'resources/videojs/lang/nb.js',
-					'nl' => 'resources/videojs/lang/nl.js',
-					'nn' => 'resources/videojs/lang/nn.js',
-					'pl' => 'resources/videojs/lang/pl.js',
-					'pt-BR' => 'resources/videojs/lang/pt-BR.js',
-					'ru' => 'resources/videojs/lang/ru.js',
-					'sr' => 'resources/videojs/lang/sr.js',
-					'sv' => 'resources/videojs/lang/sv.js',
-					'tr' => 'resources/videojs/lang/tr.js',
-					'uk' => 'resources/videojs/lang/uk.js',
-					'vi' => 'resources/videojs/lang/vi.js',
-					'zh-CN' => 'resources/videojs/lang/zh-CN.js',
-					'zh-TW' => 'resources/videojs/lang/zh-TW.js',
-				],
-			],
-			'ext.tmh.videojs-ogvjs' => $baseExtensionResource + [
-				'scripts' => 'resources/videojs-ogvjs/videojs-ogvjs.js',
-				'targets' => [ 'mobile', 'desktop' ],
-				'dependencies' => [
-					'ext.tmh.video-js',
-					'ext.tmh.OgvJs',
-				],
-			],
-			'ext.tmh.videojs-resolution-switcher' => $baseExtensionResource + [
-				'scripts' => 'resources/videojs-resolution-switcher/videojs-resolution-switcher.js',
-				'styles' => 'resources/videojs-resolution-switcher/videojs-resolution-switcher.css',
-				'targets' => [ 'mobile', 'desktop' ],
-				'dependencies' => [
-					'ext.tmh.video-js',
-				],
-			],
-			'ext.tmh.videojs-responsive-layout' => $baseExtensionResource + [
-				'scripts' => 'resources/videojs-responsive-layout/videojs-responsive-layout.js',
-				'targets' => [ 'mobile', 'desktop' ],
-				'dependencies' => [
-					'ext.tmh.video-js',
-				],
-			],
-			'ext.tmh.videojs-replay' => $baseExtensionResource + [
-				'scripts' => 'resources/videojs-replay/videojs-replay.js',
-				'styles' => 'resources/videojs-replay/videojs-replay.css',
-				'targets' => [ 'mobile', 'desktop' ],
-				'dependencies' => [
-					'ext.tmh.video-js',
-				],
-			],
-			'ext.tmh.mw-info-button' => $baseExtensionResource + [
-				'scripts' => 'resources/mw-info-button/mw-info-button.js',
-				'styles' => 'resources/mw-info-button/mw-info-button.css',
-				'targets' => [ 'mobile', 'desktop' ],
-				'dependencies' => [
-					'ext.tmh.video-js',
-				],
-			],
-			'ext.tmh.player' => $baseExtensionResource + [
-				'scripts' => 'resources/ext.tmh.player.js',
-				'targets' => [ 'mobile', 'desktop' ],
-				'dependencies' => [
-					'ext.tmh.video-js',
-					'ext.tmh.videojs-resolution-switcher',
-					'ext.tmh.videojs-responsive-layout',
-					'ext.tmh.videojs-replay',
-					'ext.tmh.mw-info-button',
-					'ext.tmh.OgvJsSupport',
-				],
-				'messages' => [
-					'timedmedia-resolution-160',
-					'timedmedia-resolution-240',
-					'timedmedia-resolution-360',
-					'timedmedia-resolution-480',
-					'timedmedia-resolution-720',
-					'timedmedia-resolution-1080',
-					'timedmedia-resolution-1440',
-					'timedmedia-resolution-2160',
-				],
-			],
-			'ext.tmh.player.styles' => $baseExtensionResource + [
-				'styles' => 'resources/ext.tmh.player.styles.less',
-				'targets' => [ 'mobile', 'desktop' ],
-			],
-		];
-
-		$resourceLoader->register( $resourceModules );
-		return true;
-	}
-
-	/**
 	 * Register TimedMediaHandler Hooks
 	 *
 	 * @return bool
 	 */
-	public static function register() {
-		global $wgHooks, $wgJobClasses, $wgJobTypesExcludedFromDefaultQueue, $wgMediaHandlers,
-		$wgResourceModules, $wgExcludeFromThumbnailPurge,
+	public static function onRegistration() {
+		global $wgHooks, $wgExcludeFromThumbnailPurge,
 		$wgFileExtensions, $wgTmhEnableMp4Uploads, $wgExtensionAssetsPath,
 		$wgMwEmbedModuleConfig, $wgEnableLocalTimedText, $wgTmhFileExtensions,
-		$wgTmhTheoraTwoPassEncoding, $wgWikimediaJenkinsCI;
+		$wgTmhTheoraTwoPassEncoding, $wgWikimediaJenkinsCI, $wgEnabledTranscodeSet,
+		$wgEnabledAudioTranscodeSet;
+
+		if ( !count( $wgEnabledTranscodeSet ) ) {
+			$wgEnabledTranscodeSet = [ // WebM VP8/Vorbis
+				// primary free/open video format
+				// supported by Chrome/Firefox/Opera but not Safari/IE/Edge
+
+				// Very low-bitrate web streamable WebM video
+				WebVideoTranscode::ENC_WEBM_160P,
+
+				// Low-bitrate web streamable WebM video
+				WebVideoTranscode::ENC_WEBM_240P,
+
+				// Medium-bitrate web streamable WebM video
+				WebVideoTranscode::ENC_WEBM_360P,
+
+				// Moderate-bitrate web streamable WebM video
+				WebVideoTranscode::ENC_WEBM_480P,
+
+				// A high quality WebM stream
+				WebVideoTranscode::ENC_WEBM_720P,
+
+				// A full-HD high quality WebM stream
+				WebVideoTranscode::ENC_WEBM_1080P,
+
+				// A 4K full high quality WebM stream
+				// WebVideoTranscode::ENC_WEBM_2160P,
+
+				// Ogg Theora/Vorbis
+				// Fallback for Safari/IE/Edge with ogv.js
+
+				// Requires twice the bitrate for same quality as VP8,
+				// and JS decoder can be slow, so shift to smaller sizes.
+
+				// Low-bitrate Ogg stream
+				WebVideoTranscode::ENC_OGV_160P,
+
+				// Medium-bitrate Ogg stream
+				WebVideoTranscode::ENC_OGV_240P,
+
+				// Moderate-bitrate Ogg stream
+				WebVideoTranscode::ENC_OGV_360P,
+
+				// High-bitrate Ogg stream
+				WebVideoTranscode::ENC_OGV_480P,
+
+				// Variable-bitrate HD Ogg stream
+				// for ogv.js on reasonably speedy machines
+				WebVideoTranscode::ENC_OGV_720P,
+
+				// Variable-bitrate HD Ogg stream
+				// for ogv.js on reasonably speedy machines
+				WebVideoTranscode::ENC_OGV_1080P,
+
+				/*
+					// MP4 H.264/AAC
+					// Primary format for the Apple/Microsoft world
+					//
+					// Check patent licensing issues in your country before use!
+					// Similar to WebM in quality/bitrate
+
+					// Very low
+					WebVideoTranscode::ENC_H264_160P,
+
+					// Low
+					WebVideoTranscode::ENC_H264_240P,
+
+					// A least common denominator h.264 stream; first gen iPhone, iPods, early android etc.
+					WebVideoTranscode::ENC_H264_320P,
+
+					// A mid range h.264 stream; mid range phones and low end tables
+					WebVideoTranscode::ENC_H264_480P,
+
+					// An high quality HD stream; higher end phones, tablets, smart tvs
+					WebVideoTranscode::ENC_H264_720P,
+
+					// A full-HD high quality stream; higher end phones, tablets, smart tvs
+					WebVideoTranscode::ENC_H264_1080P,
+
+					// A 4K high quality stream; higher end phones, tablets, smart tvs
+					WebVideoTranscode::ENC_H264_2160P,
+				*/ ];
+		}
+
+		if ( !count( $wgEnabledAudioTranscodeSet ) ) {
+			$wgEnabledAudioTranscodeSet = [ WebVideoTranscode::ENC_OGG_VORBIS,
+
+				// opus support must be available in avconv
+				// WebVideoTranscode::ENC_OGG_OPUS,
+
+				// avconv needs libmp3lame support
+				// WebVideoTranscode::ENC_MP3,
+
+				// avconv needs libvo_aacenc support
+				// WebVideoTranscode::ENC_AAC,
+			];
+		}
 
 		// set config for parser tests
 		if ( isset( $wgWikimediaJenkinsCI ) && $wgWikimediaJenkinsCI  === true ) {
@@ -250,96 +180,6 @@ class TimedMediaHandlerHooks {
 				'/' . basename( __DIR__ ) . '/MwEmbedModules/EmbedPlayer';
 		}
 
-		// Setup media Handlers:
-		$wgMediaHandlers['application/ogg'] = 'OggHandlerTMH';
-		$wgMediaHandlers['audio/webm'] = 'WebMHandler';
-		$wgMediaHandlers['video/webm'] = 'WebMHandler';
-		$wgMediaHandlers['video/mp4'] = 'Mp4Handler';
-		$wgMediaHandlers['audio/x-flac'] = 'FLACHandler';
-		$wgMediaHandlers['audio/flac'] = 'FLACHandler';
-		$wgMediaHandlers['audio/wav'] = 'WAVHandler';
-
-		// Add transcode job class:
-		$wgJobClasses['webVideoTranscode'] = 'WebVideoTranscodeJob';
-
-		// Transcode jobs must be explicitly requested from the job queue:
-		$wgJobTypesExcludedFromDefaultQueue[] = 'webVideoTranscode';
-
-		$baseExtensionResource = [
-			'localBasePath' => __DIR__,
-			'remoteExtPath' => 'TimedMediaHandler',
-		];
-
-		$wgResourceModules += [
-			'ext.tmh.thumbnail.styles' => $baseExtensionResource + [
-				'styles' => 'resources/ext.tmh.thumbnail.css',
-				'position' => 'top',
-			],
-			'ext.tmh.transcodetable' => $baseExtensionResource + [
-				'scripts' => 'resources/ext.tmh.transcodetable.js',
-				'styles' => 'resources/transcodeTable.css',
-				'dependencies' => [
-					'mediawiki.api.edit',
-					'oojs-ui',
-				],
-				'messages'=> [
-					'timedmedia-reset-button-cancel',
-					'timedmedia-reset-button-dismiss',
-					'timedmedia-reset-button-reset',
-					'timedmedia-reset-error',
-					'timedmedia-reset',
-					'timedmedia-reset-areyousure',
-					'timedmedia-reset-explanation',
-				]
-			],
-			'ext.tmh.TimedTextSelector' =>  $baseExtensionResource + [
-				'scripts' => 'resources/ext.tmh.TimedTextSelector.js',
-			],
-			// Add OgvJs-related modules for Safari/IE/Edge Ogg playback
-			'ext.tmh.OgvJsSupport' => $baseExtensionResource + [
-				'scripts' => [
-					'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv-support.js',
-					'resources/ext.tmh.OgvJsSupport.js',
-				],
-				'targets' => [ 'mobile', 'desktop' ],
-			],
-			'ext.tmh.OgvJs' => $baseExtensionResource + [
-				'scripts' => [
-					'MwEmbedModules/EmbedPlayer/binPlayers/ogv.js/ogv.js',
-				],
-				'dependencies' => 'ext.tmh.OgvJsSupport',
-				'targets' => [ 'mobile', 'desktop' ],
-			],
-			'embedPlayerIframeStyle'=> $baseExtensionResource + [
-				'styles' => 'resources/embedPlayerIframe.css',
-				'targets' => [ 'mobile', 'desktop' ],
-			],
-		];
-
-		// Setup a hook for iframe embed handling:
-		$wgHooks['ArticleFromTitle'][] = 'TimedMediaIframeOutput::iframeHook';
-
-		// When an upload completes ( check clear any existing transcodes )
-		$wgHooks['FileUpload'][] = 'TimedMediaHandlerHooks::onFileUpload';
-
-		// When an image page is moved:
-		$wgHooks['TitleMove'][] = 'TimedMediaHandlerHooks::checkTitleMove';
-
-		// When image page is deleted so that we remove transcode settings / files.
-		$wgHooks['FileDeleteComplete'][] = 'TimedMediaHandlerHooks::onFileDeleteComplete';
-
-		// Use a BeforePageDisplay hook to load the styles in pages that pull in media dynamically.
-		// (Special:Upload, for example, when there is an "existing file" warning.)
-		$wgHooks['BeforePageDisplay'][] = 'TimedMediaHandlerHooks::pageOutputHook';
-
-		// Make sure modules are loaded on image pages that don't have a media file in the wikitext.
-		$wgHooks['ImageOpenShowImageInlineBefore'][] =
-			'TimedMediaHandlerHooks::onImageOpenShowImageInlineBefore';
-
-		// Bug T63923: Make sure modules are loaded for the image history of image pages.
-		// This is needed when ImageOpenShowImageInlineBefore is not triggered (diff previews).
-		$wgHooks['ImagePageFileHistoryLine'][] = 'TimedMediaHandlerHooks::onImagePageFileHistoryLine';
-
 		// Exclude transcoded assets from normal thumbnail purging
 		// ( a maintenance script could handle transcode asset purging)
 		if ( isset( $wgExcludeFromThumbnailPurge ) ) {
@@ -348,13 +188,6 @@ class TimedMediaHandlerHooks {
 			// ( probably should move in-progress encodes out of web accessible directory )
 			$wgExcludeFromThumbnailPurge[] = 'log';
 		}
-
-		$wgHooks['LoadExtensionSchemaUpdates'][] = 'TimedMediaHandlerHooks::loadExtensionSchemaUpdates';
-
-		// Add unit tests
-		$wgHooks['UnitTestsList'][] = 'TimedMediaHandlerHooks::registerUnitTests';
-		$wgHooks['ParserTestTables'][] = 'TimedMediaHandlerHooks::onParserTestTables';
-		$wgHooks['ParserTestGlobals'][] = 'TimedMediaHandlerHooks::onParserTestGlobals';
 
 		/**
 		 * Add support for the "TimedText" NameSpace
@@ -370,15 +203,6 @@ class TimedMediaHandlerHooks {
 			$wgMwEmbedModuleConfig['TimedText.ShowInterface.local'] = 'off';
 		}
 
-		// Add transcode status to video asset pages:
-		$wgHooks['ImagePageAfterImageLinks'][] = 'TimedMediaHandlerHooks::checkForTranscodeStatus';
-		$wgHooks['NewRevisionFromEditComplete'][] =
-			'TimedMediaHandlerHooks::onNewRevisionFromEditComplete';
-		$wgHooks['ArticlePurge'][] = 'TimedMediaHandlerHooks::onArticlePurge';
-
-		$wgHooks['LoadExtensionSchemaUpdates'][] = 'TimedMediaHandlerHooks::checkSchemaUpdates';
-		$wgHooks['wgQueryPages'][] = 'TimedMediaHandlerHooks::onwgQueryPages';
-		$wgHooks['RejectParserCacheValue'][] = 'TimedMediaHandlerHooks::rejectParserCacheValue';
 		return true;
 	}
 
@@ -654,16 +478,6 @@ class TimedMediaHandlerHooks {
 	}
 
 	/**
-	 * Adds the transcode sql
-	 * @param $updater DatabaseUpdater
-	 * @return bool
-	 */
-	public static function loadExtensionSchemaUpdates( $updater ) {
-		$updater->addExtensionTable( 'transcode', __DIR__ . '/TimedMediaHandler.sql' );
-		return true;
-	}
-
-	/**
 	 * Hook to add list of PHPUnit test cases.
 	 * @param $files array of files
 	 * @return bool
@@ -752,10 +566,12 @@ class TimedMediaHandlerHooks {
 	}
 
 	/**
+	 * Adds the transcode sql
+	 *
 	 * @param DatabaseUpdater $updater
 	 * @return bool
 	 */
-	public static function checkSchemaUpdates( DatabaseUpdater $updater ) {
+	public static function loadExtensionSchemaUpdates( DatabaseUpdater $updater ) {
 		$base = __DIR__;
 
 		switch ( $updater->getDB()->getType() ) {
