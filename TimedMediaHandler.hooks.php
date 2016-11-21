@@ -9,6 +9,106 @@
 
 class TimedMediaHandlerHooks {
 
+	public static function onRegistration() {
+		global $wgEnabledTranscodeSet, $wgEnabledAudioTranscodeSet;
+
+		if ( !count( $wgEnabledTranscodeSet ) ) {
+			$wgEnabledTranscodeSet = [ // WebM VP8/Vorbis
+				// primary free/open video format
+				// supported by Chrome/Firefox/Opera but not Safari/IE/Edge
+
+				// Very low-bitrate web streamable WebM video
+				WebVideoTranscode::ENC_WEBM_160P,
+
+				// Low-bitrate web streamable WebM video
+				WebVideoTranscode::ENC_WEBM_240P,
+
+				// Medium-bitrate web streamable WebM video
+				WebVideoTranscode::ENC_WEBM_360P,
+
+				// Moderate-bitrate web streamable WebM video
+				WebVideoTranscode::ENC_WEBM_480P,
+
+				// A high quality WebM stream
+				WebVideoTranscode::ENC_WEBM_720P,
+
+				// A full-HD high quality WebM stream
+				WebVideoTranscode::ENC_WEBM_1080P,
+
+				// A 4K full high quality WebM stream
+				// WebVideoTranscode::ENC_WEBM_2160P,
+
+				// Ogg Theora/Vorbis
+				// Fallback for Safari/IE/Edge with ogv.js
+
+				// Requires twice the bitrate for same quality as VP8,
+				// and JS decoder can be slow, so shift to smaller sizes.
+
+				// Low-bitrate Ogg stream
+				WebVideoTranscode::ENC_OGV_160P,
+
+				// Medium-bitrate Ogg stream
+				WebVideoTranscode::ENC_OGV_240P,
+
+				// Moderate-bitrate Ogg stream
+				WebVideoTranscode::ENC_OGV_360P,
+
+				// High-bitrate Ogg stream
+				WebVideoTranscode::ENC_OGV_480P,
+
+				// Variable-bitrate HD Ogg stream
+				// for ogv.js on reasonably speedy machines
+				WebVideoTranscode::ENC_OGV_720P,
+
+				// Variable-bitrate HD Ogg stream
+				// for ogv.js on reasonably speedy machines
+				WebVideoTranscode::ENC_OGV_1080P,
+
+				/*
+					// MP4 H.264/AAC
+					// Primary format for the Apple/Microsoft world
+					//
+					// Check patent licensing issues in your country before use!
+					// Similar to WebM in quality/bitrate
+
+					// Very low
+					WebVideoTranscode::ENC_H264_160P,
+
+					// Low
+					WebVideoTranscode::ENC_H264_240P,
+
+					// A least common denominator h.264 stream; first gen iPhone, iPods, early android etc.
+					WebVideoTranscode::ENC_H264_320P,
+
+					// A mid range h.264 stream; mid range phones and low end tables
+					WebVideoTranscode::ENC_H264_480P,
+
+					// An high quality HD stream; higher end phones, tablets, smart tvs
+					WebVideoTranscode::ENC_H264_720P,
+
+					// A full-HD high quality stream; higher end phones, tablets, smart tvs
+					WebVideoTranscode::ENC_H264_1080P,
+
+					// A 4K high quality stream; higher end phones, tablets, smart tvs
+					WebVideoTranscode::ENC_H264_2160P,
+				*/ ];
+		}
+
+		if ( !count( $wgEnabledAudioTranscodeSet ) ) {
+			$wgEnabledAudioTranscodeSet = [ WebVideoTranscode::ENC_OGG_VORBIS,
+
+				// opus support must be available in avconv
+				// WebVideoTranscode::ENC_OGG_OPUS,
+
+				// avconv needs libmp3lame support
+				// WebVideoTranscode::ENC_MP3,
+
+				// avconv needs libvo_aacenc support
+				// WebVideoTranscode::ENC_AAC,
+			];
+		}
+	}
+
 	/**
 	 * Register TimedMediaHandler namespace IDs
 	 * These are configurable due to Commons history: T123823
