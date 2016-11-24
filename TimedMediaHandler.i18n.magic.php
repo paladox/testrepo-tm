@@ -85,3 +85,10 @@ $magicWords['ru'] = array(
 	'timedmedia_starttime'   => array( '0', 'начало=$1', 'start=$1' ),
 	'timedmedia_endtime'     => array( '0', 'окончание=$1', 'end=$1' ),
 );
+
+$magicWords['uk'] = array(
+	'timedmedia_noplayer'    => array( '0', 'немаєпрогравача', 'нетпроигрывателя', 'noplayer' ),
+	'timedmedia_noicon'      => array( '0', 'немаєзначка', 'нетзначка', 'noicon' ),
+	'timedmedia_starttime'   => array( '0', 'початок=$1', 'начало=$1', 'start=$1' ),
+	'timedmedia_endtime'     => array( '0', 'закінчення=$1', 'окончание=$1', 'end=$1' ),
+);
