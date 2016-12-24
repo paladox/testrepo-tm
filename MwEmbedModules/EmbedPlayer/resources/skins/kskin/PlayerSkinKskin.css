@@ -12,11 +12,11 @@
 	color: #0B0080;
 }
 .k-player .ui-widget-content {
-	color: #555;
+	color: #54595d;
 	z-index: 1503;
 }
 .k-player .ui-widget-content a{
-	color: #555;
+	color: #54595d;
 }
 /* large play button */
 .k-player .play-btn-large {
@@ -84,7 +84,7 @@
 	margin-top: 0px;
 	background: url(images/ksprite.png) repeat-x 0 -81px;
 	font: normal 11px arial, sans-serif;
-	color: #555;
+	color: #54595d;
 
 	position:absolute;
 	bottom:0px;
@@ -101,7 +101,7 @@
 	/* @noflip */
 	float: left;
 	margin-left: 10px;
-	border: 1px solid #EEEEEE;
+	border: 1px solid #eaecf0;
 	height: 8px;
 	margin: 5px 2px 0 0px;
 	position: relative;
@@ -112,7 +112,7 @@
 .k-player .play_head .ui-slider-handle {
 	background: url("images/ksprite.png") no-repeat scroll -67px -341px
 		transparent !important;
-	border: 1px solid #888888;
+	border: 1px solid #72777d;
 	display: block;
 	height: 8px;
 	margin: -1px 0 0 -5px;
@@ -150,7 +150,7 @@
 .k-player .time-disp {
 	border: medium none;
 	display: inline;
-	color: #555555;
+	color: #54595d;
 	font: 11px arial, sans-serif;
 	line-height: 20px;
 	overflow: hidden;
@@ -162,7 +162,7 @@
 .k-player .source-switch {
 	border: medium none;
 	display: inline;
-	color: #555;
+	color: #54595d;
 	font: 11px arial, sans-serif;
 	line-height: 20px;
 	overflow: hidden;
@@ -202,8 +202,8 @@
 }
 
 .k-player .k-options {
-	border: 1px solid #AAAAAA !important;
-	color: #555555 !important;
+	border: 1px solid #a2a9b1 !important;
+	color: #54595d !important;
 	/* @noflip */
 	float: right;
 	height: 21px;
@@ -244,7 +244,7 @@
 }
 
 .k-player .k-menu {
-	background: none repeat scroll 0 0 #181818;
+	background: none repeat scroll 0 0 #222;
 	border: medium none;
 	display: none;
 	left: 0;
@@ -312,7 +312,7 @@
 	height: 223px;
 	padding-top: 77px;
 	text-align: center;
-	background: #181818;
+	background: #222;
 	color: #fff;
 }
 
@@ -333,7 +333,7 @@
 	padding: 0 0 5px 15px;
 	clear: both;
 	font-size: 12px;
-	color: #999;
+	color: #a2a9b1;
 	border-bottom: 0;
 }
 
@@ -360,7 +360,7 @@
 	padding-right: 22px;
 	background: url(images/ksprite.png) no-repeat -85px -274px;
 	text-decoration: none;
-	color: #BBB;
+	color: #c8ccd1;
 }
 
 .k-menu-screens li a.active,.k-menu-screens li a:hover .active {
@@ -376,7 +376,7 @@
 	border-color: #000000 -moz-use-text-color -moz-use-text-color #000000;
 	border-style: solid none none solid;
 	border-width: 2px medium medium 2px;
-	color: #CCCCCC;
+	color: #c8ccd1;
 	font: 11px arial, sans-serif;
 	overflow: hidden;
 	padding-left: 2px;
@@ -402,14 +402,14 @@
 
 .k-player .menu-screen.menu-share div.ui-state-highlight {
 	background: none repeat scroll 0 0 transparent;
-	border-color: #554926;
-	color: #FFE96E;
+	border-color: #ac6600;
+	color: #fc3;
 	float: left;
 	padding: 2px 5px;
 }
 
 .k-player .menu-screen.menu-share div.ui-state-highlight a {
-	color: #FFE96E;
+	color: #fc3;
 	font-weight: bold;
 }
 
@@ -464,7 +464,7 @@
 	overflow:hidden;
 }
 .k-player .credits_box a{
-	color:#666;
+	color:#54595d;
 	text-decoration: underline;
 }
 .k-player .creditline img {
